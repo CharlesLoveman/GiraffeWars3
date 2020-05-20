@@ -10,13 +10,12 @@ constexpr int NUM_POINTS = 38;
 
 struct MoveSet {
 public:
-	std::array<std::vector<std::vector<HitCollider>>, NUM_MOVES> Hitboxes;
-	std::array<std::vector<std::array<HurtCollider, 6>>, NUM_MOVES> Hurtboxes;
-	std::array<std::vector<std::array<Vec2, NUM_POINTS>>, NUM_MOVES> SkelPoints;
-	std::array<int, 10> LandingLag;
-	MoveSet();
-private:
-	static int index;
+	virtual ~MoveSet() { };
+	virtual std::vector<HitCollider>* GetHitboxes(int MoveId, int FrameNum) = 0;
+	virtual std::array<HurtCollider, 6>* GetHurtboxes(int MoveId, int FrameNum) = 0;
+	virtual std::array<Vec2, NUM_POINTS>* GetSkelPoints(int MoveId, int FrameNum) = 0;
+	virtual int GetLandingLag(int MoveId) = 0;
+	virtual int GetMoveLength(int MoveId) = 0;
 };
 
 #endif // !_MOVESET_H_

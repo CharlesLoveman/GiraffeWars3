@@ -4,13 +4,14 @@
 #include "giraffewar.h"
 #include "gamestate.h"
 #include "MoveSet.h"
+#include "NormGiraffe.h"
 
 
 extern GGPOSession* ggpo;
 
 
 //Initialise the game state
-void GameState::Init(HWND hwnd, int num_players, const MoveSet Moves[4]) {
+void GameState::Init(HWND hwnd, int num_players, const std::array<MoveSet*, 4> MoveSets) {
 	int w, h;
 	//const MoveSet Moves[4] = { MoveSet(), MoveSet(), MoveSet(), MoveSet() };
 
@@ -30,9 +31,11 @@ void GameState::Init(HWND hwnd, int num_players, const MoveSet Moves[4]) {
 	float stagetop = 30.0f;
 
 	for (int i = 0; i < _num_giraffes; ++i) {
-		giraffes[i] = Giraffe(Vec2(stageleft + stagewidth * (2.0f * i + 1.0f)/(2.0f * _num_giraffes), 20), &Moves[0]);
-		//giraffes[i].Position = Vec2((w / 2.0f) * cos(i * 2.0f * 3.1415926f / num_players), (h / 2.0f) + h / 4.0f * sin(i * 2.0f * 3.1415926f / num_players));
-		//giraffes[i].Velocity
+		normGiraffes.push_back(NormGiraffe(Vec2(stageleft + stagewidth * (2.0f * i + 1.0f) / (2.0f * _num_giraffes), 20), MoveSets[0]));
+	}
+
+	for (int i = 0; i < normGiraffes.size(); ++i) {
+		giraffes[i] = &normGiraffes[i];
 	}
 
 	stage.Box = {
@@ -95,14 +98,12 @@ void GameState::Update(int inputs[], int disconnect_flags)
 	++_framenumber;
 
 	for (int i = 0; i < _num_giraffes; ++i) {
-
 		if (!(disconnect_flags & (1 << i))) {
-			giraffes[i].ParseInputs(inputs[i], _framenumber);
+			(*giraffes[i]).Update(giraffes, _num_giraffes, i, inputs[i], _framenumber);
 		}
-		giraffes[i].Update(giraffes, _num_giraffes, i, _framenumber);
 	}
 
 	for (int i = 0; i < _num_giraffes; ++i) {
-		giraffes[i].Move(stage, _framenumber);
+		(*giraffes[i]).Move(stage, _framenumber);
 	}
 }

@@ -42,16 +42,13 @@
     <ClCompile Include="ArrayQueue.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="GiraffeFactory.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="MoveSet.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GiraffeRenderer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="VecRect.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="NormGiraffe.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="NormMoveSet.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -89,13 +86,13 @@
     <ClInclude Include="MoveSet.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="GiraffeFactory.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GiraffeRenderer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="VecRect.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="NormGiraffe.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="NormMoveSet.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

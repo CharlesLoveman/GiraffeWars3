@@ -6,11 +6,10 @@
 #include "Vec2.h"
 #include "giraffewar.h"
 #include "Stage.h"
-#include "MoveSet.h"
-#include "GiraffeFactory.h"
+#include <vector>
+#include <array>
 
 class Giraffe;
-typedef void(*attackfptr)();
 enum GiraffeStates {
 	STATE_UP = (1 << 0),
 	STATE_BACK = (1 << 1),
@@ -41,26 +40,20 @@ struct HitWID {
 
 class Giraffe {
 public:
-	Giraffe();
-	Giraffe(Vec2 position, const MoveSet* moves);
-	void ParseInputs(const int inputs, const int frameNumber);
-	void Update(Giraffe giraffes[], const int num_giraffes, const int i, const int frameNumber);
-	void Move(Stage stage, const int frameNumber);
-	void AddHit(HitCollider hit, const float multiplier, int ID, Vec2 facing);
-	void Draw(HDC hdc, Vec2 Scale);
+	virtual ~Giraffe() { };
+	virtual void Update(std::array<Giraffe*, 4> giraffes, const int num_giraffes, const int i, const int inputs, const int frameNumber) = 0;
+	virtual void Draw(HDC hdc, Vec2 Scale) = 0;
+	virtual void Move(Stage stage, const int frameNumber) = 0;
+	void AddHit(HitCollider hit, int ID, Vec2 facing, Vec2 position);
+
 	Vec2 Position;
 	int State;
 	const std::array<HurtCollider, 6>* Hurtboxes;
 	const std::vector<HitCollider>* Hitboxes;
-	const MoveSet* Moves;
-	void (*DrawSelf)(HDC, std::array<Vec2, NUM_POINTS>, Vec2, Vec2, Vec2);
-	void (*CharAttacks)(Giraffe& g);
 	HBRUSH ShieldBrush;
 	float Knockback;
 
-	friend void NormAttacks(Giraffe& g);
-
-private:
+protected:
 	//Movement
 	Vec2 Velocity;
 	float MaxGroundSpeed;
@@ -79,7 +72,6 @@ private:
 	float DashSpeed;
 
 	//Misc
-	
 	int Stocks;
 	float Mass;
 	
@@ -105,7 +97,7 @@ private:
 	//int AttackID;
 	int LastAttackID;
 	int numIncoming;
-	int numHitboxes; //Should never be more than 6
+	int numHitboxes;
 
 	//Animation
 	int AnimFrame;

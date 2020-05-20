@@ -55,8 +55,8 @@ void GDIRenderer::Draw(GameState& gs, NonGameState& ngs)
 		SetTextColor(hdc, _giraffeColours[i]);
 		SelectObject(hdc, _giraffePens[i]);
 		DrawGiraffe(hdc, i, gs);
-		DrawConnectState(hdc, gs.giraffes[i], ngs.players[i]);
-		DrawGiraffeInfo(hdc, gs.giraffes[i], i);
+		DrawConnectState(hdc, *gs.giraffes[i], ngs.players[i]);
+		DrawGiraffeInfo(hdc, *gs.giraffes[i], i);
 	}
 
 	DrawStage(hdc, gs.stage);
@@ -87,7 +87,7 @@ void GDIRenderer::SetStatusText(const char* text)
 
 void GDIRenderer::DrawGiraffe(HDC hdc, int which, GameState& gs)
 {
-	Giraffe* giraffe = gs.giraffes + which;
+	Giraffe* giraffe = gs.giraffes[which];
 	giraffe->Draw(hdc, Scale);
 	//Ellipse(hdc, (int)(giraffe->Position.x - 10), (int)(giraffe->Position.y - 10), (int)(giraffe->Position.x + 10), (int)(giraffe->Position.y + 10));
 }

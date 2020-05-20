@@ -136,11 +136,10 @@
     <ClCompile Include="gamestate.cpp" />
     <ClCompile Include="gdi_renderer.cpp" />
     <ClCompile Include="Giraffe.cpp" />
-    <ClCompile Include="GiraffeFactory.cpp" />
-    <ClCompile Include="GiraffeRenderer.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="giraffewar.cpp" />
-    <ClCompile Include="MoveSet.cpp" />
+    <ClCompile Include="NormGiraffe.cpp" />
+    <ClCompile Include="NormMoveSet.cpp" />
     <ClCompile Include="Stage.cpp" />
     <ClCompile Include="Vec2.cpp" />
     <ClCompile Include="VecRect.cpp" />
@@ -151,11 +150,11 @@
     <ClInclude Include="gamestate.h" />
     <ClInclude Include="gdi_renderer.h" />
     <ClInclude Include="Giraffe.h" />
-    <ClInclude Include="GiraffeRenderer.h" />
     <ClInclude Include="MoveSet.h" />
     <ClInclude Include="nongamestate.h" />
     <ClInclude Include="giraffewar.h" />
-    <ClInclude Include="GiraffeFactory.h" />
+    <ClInclude Include="NormGiraffe.h" />
+    <ClInclude Include="NormMoveSet.h" />
     <ClInclude Include="renderer.h" />
     <ClInclude Include="Stage.h" />
     <ClInclude Include="Vec2.h" />

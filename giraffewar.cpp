@@ -5,13 +5,17 @@
 #include <stdio.h>
 #include "gdi_renderer.h"
 #include "giraffewar.h"
+#include <memory>
+#include <array>
+#include "MoveSet.h"
+#include "NormMoveSet.h"
 
 #pragma comment(lib, "Ws2_32.lib")
 #pragma comment(lib, "Winmm.lib")
 
 GameState gs = { 0 };
 NonGameState ngs = { 0 };
-const MoveSet Moves[4] = { MoveSet(), MoveSet(), MoveSet(), MoveSet() };
+std::array<MoveSet*, 4> MoveSets;
 struct {
 	int	key;
 	int	input;
@@ -115,7 +119,7 @@ bool __cdecl gw_save_game_state_callback(unsigned char** buffer, int* len, int* 
 		return false;
 	}
 
-	const std::array<HurtCollider, 6>* h0 = gs.giraffes[0].Hurtboxes;
+	/*const std::array<HurtCollider, 6>* h0 = gs.giraffes[0].Hurtboxes;
 	const std::array<HurtCollider, 6>* h1 = gs.giraffes[1].Hurtboxes;
 	const std::vector<HitCollider>* hh0 = gs.giraffes[0].Hitboxes;
 	const std::vector<HitCollider>* hh1 = gs.giraffes[1].Hitboxes;
@@ -135,10 +139,10 @@ bool __cdecl gw_save_game_state_callback(unsigned char** buffer, int* len, int* 
 	gs.giraffes[0].DrawSelf = nullptr;
 	gs.giraffes[1].DrawSelf = nullptr;
 	gs.giraffes[0].ShieldBrush = nullptr;
-	gs.giraffes[1].ShieldBrush = nullptr;
+	gs.giraffes[1].ShieldBrush = nullptr;*/
 
 	//memcpy(*buffer, &gs, *len);
-	*checksum = fletcher32_checksum((short*)&gs.giraffes, sizeof(gs.giraffes) / 2);
+	/**checksum = fletcher32_checksum((short*)&gs.giraffes, sizeof(gs.giraffes) / 2);
 
 	gs.giraffes[0].Hurtboxes = h0;
 	gs.giraffes[1].Hurtboxes = h1;
@@ -149,7 +153,7 @@ bool __cdecl gw_save_game_state_callback(unsigned char** buffer, int* len, int* 
 	gs.giraffes[0].DrawSelf = f0;
 	gs.giraffes[1].DrawSelf = f1;
 	gs.giraffes[0].ShieldBrush = b0;
-	gs.giraffes[1].ShieldBrush = b1;
+	gs.giraffes[1].ShieldBrush = b1;*/
 
 
 	memcpy(*buffer, &gs, *len);
@@ -202,8 +206,12 @@ void GiraffeWar_Init(HWND hwnd, unsigned short localport, GGPOPlayer* players, i
 	GGPOErrorCode result;
 	renderer = new GDIRenderer(hwnd);
 
+	for (int i = 0; i < 4; ++i) {
+		MoveSets[i] = new NormMoveSet();
+	}
+
 	//Initialize the game state
-	gs.Init(hwnd, num_players, Moves);
+	gs.Init(hwnd, num_players, MoveSets);
 	ngs.num_players = num_players;
 
 	//Fill in the callback structure used by GGPO
@@ -263,8 +271,13 @@ void GiraffeWar_InitSpectator(HWND hwnd, unsigned short localport, int num_playe
 	GGPOErrorCode result;
 	renderer = new GDIRenderer(hwnd);
 
+	//std::shared_ptr<NormMoveSet> pNorm = std::make_shared<NormMoveSet>();
+	for (int i = 0; i < 4; ++i) {
+		MoveSets[i] = new NormMoveSet();
+	}
+
 	//Initialize the game state
-	gs.Init(hwnd, num_players, Moves);
+	gs.Init(hwnd, num_players, MoveSets);
 
 	//Create the callback structure
 	GGPOSessionCallbacks cb = { 0 };
@@ -317,18 +330,18 @@ void GiraffeWar_AdvanceFrame(int inputs[], int disconnect_flags)
 
 	//update the checksums
 	ngs.now.framenumber = gs._framenumber;
-	const std::array<HurtCollider, 6>* h0 = gs.giraffes[0].Hurtboxes;
+	/*const std::array<HurtCollider, 6>* h0 = gs.giraffes[0].Hurtboxes;
 	const std::array<HurtCollider, 6>* h1 = gs.giraffes[1].Hurtboxes;
 	const std::vector<HitCollider>* hh0 = gs.giraffes[0].Hitboxes;
-	const std::vector<HitCollider>* hh1 = gs.giraffes[1].Hitboxes;
-	const MoveSet* m0 = gs.giraffes[0].Moves;
+	const std::vector<HitCollider>* hh1 = gs.giraffes[1].Hitboxes;*/
+	/*const MoveSet* m0 = gs.giraffes[0].Moves;
 	const MoveSet* m1 = gs.giraffes[1].Moves;
 	const fptr f0 = gs.giraffes[0].DrawSelf;
 	const fptr f1 = gs.giraffes[1].DrawSelf;
 	const HBRUSH b0 = gs.giraffes[0].ShieldBrush;
-	const HBRUSH b1 = gs.giraffes[1].ShieldBrush;
+	const HBRUSH b1 = gs.giraffes[1].ShieldBrush;*/
 
-	gs.giraffes[0].Hurtboxes = nullptr;
+	/*gs.giraffes[0].Hurtboxes = nullptr;
 	gs.giraffes[1].Hurtboxes = nullptr;
 	gs.giraffes[0].Hitboxes = nullptr;
 	gs.giraffes[1].Hitboxes = nullptr;
@@ -337,13 +350,13 @@ void GiraffeWar_AdvanceFrame(int inputs[], int disconnect_flags)
 	gs.giraffes[0].DrawSelf = nullptr;
 	gs.giraffes[1].DrawSelf = nullptr;
 	gs.giraffes[0].ShieldBrush = nullptr;
-	gs.giraffes[1].ShieldBrush = nullptr;
+	gs.giraffes[1].ShieldBrush = nullptr;*/
 
 	ngs.now.checksum = fletcher32_checksum((short*)& gs.giraffes, sizeof(gs.giraffes) / 2);
 	if ((gs._framenumber % 90) == 0) {
 		ngs.periodic = ngs.now;
 	}
-	gs.giraffes[0].Hurtboxes = h0;
+	/*gs.giraffes[0].Hurtboxes = h0;
 	gs.giraffes[1].Hurtboxes = h1;
 	gs.giraffes[0].Hitboxes = hh0;
 	gs.giraffes[1].Hitboxes = hh1;
@@ -352,7 +365,7 @@ void GiraffeWar_AdvanceFrame(int inputs[], int disconnect_flags)
 	gs.giraffes[0].DrawSelf = f0;
 	gs.giraffes[1].DrawSelf = f1;
 	gs.giraffes[0].ShieldBrush = b0;
-	gs.giraffes[1].ShieldBrush = b1;
+	gs.giraffes[1].ShieldBrush = b1;*/
 
 	//Tell ggpo that we've moved forward 1 frame
 	ggpo_advance_frame(ggpo);
@@ -443,6 +456,9 @@ void GiraffeWar_Exit()
 	memset(&gs, 0, sizeof(gs));
 	memset(&ngs, 0, sizeof(ngs));
 	//delete[] Moves;
+	for (int i = 0; i < 4; ++i) {
+		delete MoveSets[i];
+	}
 
 	if (ggpo) {
 		ggpo_close_session(ggpo);

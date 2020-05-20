@@ -173,6 +173,9 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 				AttackNum += 7;
 			}
 		}
+		AttackDelay = frameNumber + Moves->GetMoveLength(AttackNum);
+		++LastAttackID;
+		AnimFrame = 0;
 	}
 	if (inputs & INPUT_HEAVY && !(State & (STATE_WEAK | STATE_HEAVY | STATE_SHIELDING | STATE_DROPSHIELD | STATE_JUMPSQUAT | STATE_JUMPLAND | STATE_HITSTUN | STATE_WAVEDASH | STATE_ATTACKSTUN))) {
 		if ((inputs & INPUT_RIGHT && Facing.x == 1) || (inputs & INPUT_LEFT && Facing.x == -1)) {
@@ -191,8 +194,6 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 			State |= STATE_HEAVY | STATE_DOWN;
 			AttackNum = 14;
 		}
-	}
-	if (State & (STATE_WEAK | STATE_HEAVY)) {
 		AttackDelay = frameNumber + Moves->GetMoveLength(AttackNum);
 		++LastAttackID;
 		AnimFrame = 0;
@@ -264,12 +265,12 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 	}
 	else {
 		Hitboxes = nullptr;
-
+		numHitboxes = 0;
 		if (State & STATE_HITSTUN) {
 			Hurtboxes = Moves->GetHurtboxes(6, AnimFrame % 9);
 		}
 		else if (State & STATE_RUNNING) {
-			Hurtboxes = Moves->GetHurtboxes(1, AnimFrame % 6);
+			Hurtboxes = Moves->GetHurtboxes(1, AnimFrame % 2);
 		}
 		else if (State & STATE_JUMPING) {
 			Hurtboxes = Moves->GetHurtboxes(2, 0);

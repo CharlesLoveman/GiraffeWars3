@@ -374,6 +374,7 @@ void GiraffeWar_Idle(int time)
 
 void GiraffeWar_Exit()
 {
+	delete[] gs.normGiraffes.data();
 	memset(&gs, 0, sizeof(gs));
 	memset(&ngs, 0, sizeof(ngs));
 	//delete[] Moves;

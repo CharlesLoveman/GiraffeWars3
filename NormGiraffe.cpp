@@ -427,17 +427,58 @@ void NormGiraffe::Move(Stage stage, const int frameNumber)
 
 void NormGiraffe::Draw(HDC hdc, Vec2 Scale)
 {
-	int CurrentAnim;
-	int CurrentFrame;
+	int CurrentAnim = 0;
+	int CurrentFrame = 0;
 
-
+	if (State & (STATE_WEAK | STATE_HEAVY)) {
+		CurrentAnim = AttackNum;
+		CurrentFrame = AnimFrame;
+	}
+	else {
+		if (State & (STATE_HITSTUN | STATE_ATTACKSTUN)) {
+			CurrentAnim = 6;
+			CurrentFrame = AnimFrame % 9;
+		}
+		else if (State & STATE_SHIELDSTUN) {
+			SelectObject(hdc, ShieldBrush);
+			Ellipse(hdc, (Position.x - 2.5) * Scale.x, (Position.y - 2.5) * Scale.y, (Position.x + 2.5) * Scale.x, (Position.y + 2.5) * Scale.y);
+			CurrentAnim = 6;
+			CurrentFrame = AnimFrame % 9;
+		}
+		else if (State & STATE_SHIELDING) {
+			SelectObject(hdc, ShieldBrush);
+			Ellipse(hdc, (Position.x - 2.5) * Scale.x, (Position.y - 2.5) * Scale.y, (Position.x + 2.5) * Scale.x, (Position.y + 2.5) * Scale.y);
+			CurrentAnim = 0;
+			CurrentFrame = 0;
+		}
+		else if (State & STATE_RUNNING) {
+			CurrentAnim = 1;
+			CurrentFrame = AnimFrame % 2;
+		}
+		else if (State & STATE_JUMPING) {
+			CurrentAnim = 2;
+			CurrentFrame = 0;
+		}
+		else if (State & STATE_JUMPSQUAT) {
+			CurrentAnim = 3;
+			CurrentFrame = AnimFrame;
+		}
+		else if (State & STATE_JUMPLAND) {
+			CurrentAnim = 4;
+			CurrentFrame = AnimFrame;
+		}
+		else if (State & STATE_WAVEDASH) {
+			CurrentAnim = 7;
+			CurrentFrame = 0;
+		}
+	}
 
 
 
 	POINT points[NUM_POINTS];
 
 	for (int i = 0; i < NUM_POINTS; ++i) {
-		points[i] = (Scale * Position + Scale * Facing * (*Moves->GetSkelPoints(AttackNum, AnimFrame % Moves->GetMoveLength(AttackNum)))[i]).ToPoint();
+		points[i] = (Scale * Position + Scale * Facing * (*Moves->GetSkelPoints(CurrentAnim, CurrentFrame))[i]).ToPoint();
 	}
 
 	//Ellipse(hdc, (int)(Scale.x*(Position.x - 2.5)), (int)(Scale.y * (Position.y - 2.5)), (int)(Scale.x * (Position.x + 2.5)), (int)(Scale.y * (Position.y + 2.5)));

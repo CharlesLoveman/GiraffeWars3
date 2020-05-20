@@ -105,10 +105,10 @@ bool __cdecl gw_advance_frame_callback(int)
 //Match the current state to the one provided by GGPO
 bool __cdecl gw_load_game_state_callback(unsigned char* buffer, int len)
 {
-	memcpy(&gs, buffer, len);
-	for (int i = 0; i < gs._num_giraffes; ++i) {
-		gs.giraffes[i] = &(gs.normGiraffes[i]);
-	}
+	
+	int gslen = len - sizeof(gs.normGiraffes[0]) * gs.normGiraffes.size();
+	memcpy(&gs, buffer, gslen);
+	memcpy(gs.normGiraffes.data(), buffer + gslen, len - gslen);
 
 	return true;
 }
@@ -117,14 +117,15 @@ bool __cdecl gw_load_game_state_callback(unsigned char* buffer, int len)
 //Saves the current state to the buffer
 bool __cdecl gw_save_game_state_callback(unsigned char** buffer, int* len, int* checksum, int)
 {
-	*len = sizeof(gs);
+	*len = sizeof(gs) + sizeof(gs.normGiraffes[0]) * gs.normGiraffes.size();
 	*buffer = (unsigned char*)malloc(*len);
 	if (!*buffer) {
 		return false;
 	}
 
-	*checksum = fletcher32_checksum((short*)&gs.normGiraffes, sizeof(gs.normGiraffes) / 2);
+	*checksum = fletcher32_checksum((short*)gs.normGiraffes.data(), sizeof(gs.normGiraffes[0]) * gs.normGiraffes.size() / 2);
 	memcpy(*buffer, &gs, *len);
+	memcpy(*buffer + sizeof(gs), gs.normGiraffes.data(), sizeof(gs.normGiraffes[0]) * gs.normGiraffes.size());
 
 	return true;
 }

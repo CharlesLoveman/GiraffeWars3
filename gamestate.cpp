@@ -47,49 +47,6 @@ void GameState::Init(HWND hwnd, int num_players, const std::array<MoveSet*, 4> M
 }
 
 
-//void GameState::GetGiraffeAI(int i) {
-//	//If you disconnect
-//	//Do nothing
-//}
-
-
-//void GameState::ParseGiraffeInputs(int inputs, int i) {
-//	Giraffe* giraffe = giraffes + i;
-//
-//	ggpo_log(ggpo, "parsing paddle %d inputs: %d.\n", i, inputs);
-//
-//	if (inputs & INPUT_LEFT) {
-//		*direction = -1;
-//	}
-//	else if (inputs & INPUT_RIGHT) {
-//		*direction = 1;
-//	}
-//	else {
-//		*direction = 0;
-//	}
-//}
-
-
-//void GameState::MovePaddle(int which, int direction) {
-//	Paddle* paddle = _paddles + which;
-//
-//	ggpo_log(ggpo, "calculation of new paddle %d coordinates (direction: %d).\n", which, direction);
-//
-//	if (direction == 1) {
-//		paddle->velocity = { 0, paddle->speed };
-//	}
-//	else if (direction == -1) {
-//		paddle->velocity = { 0, -paddle->speed };
-//	}
-//
-//	//paddle->position.x += paddle->velocity.dx;
-//	paddle->position.y += paddle->velocity.dy;
-//
-//	if ((paddle->position.y - (paddle->height / 2) < _bounds.top) || (paddle ->position.y + (paddle->height / 2) > _bounds.bottom)) {
-//		paddle->velocity.dy *= -1;
-//		paddle->position.y += paddle->velocity.dy * 2;
-//	}
-//}
 
 
 void GameState::Update(int inputs[], int disconnect_flags)

@@ -106,6 +106,10 @@ bool __cdecl gw_advance_frame_callback(int)
 bool __cdecl gw_load_game_state_callback(unsigned char* buffer, int len)
 {
 	memcpy(&gs, buffer, len);
+	for (int i = 0; i < gs._num_giraffes; ++i) {
+		gs.giraffes[i] = &(gs.normGiraffes[i]);
+	}
+
 	return true;
 }
 
@@ -119,43 +123,7 @@ bool __cdecl gw_save_game_state_callback(unsigned char** buffer, int* len, int* 
 		return false;
 	}
 
-	/*const std::array<HurtCollider, 6>* h0 = gs.giraffes[0].Hurtboxes;
-	const std::array<HurtCollider, 6>* h1 = gs.giraffes[1].Hurtboxes;
-	const std::vector<HitCollider>* hh0 = gs.giraffes[0].Hitboxes;
-	const std::vector<HitCollider>* hh1 = gs.giraffes[1].Hitboxes;
-	const MoveSet* m0 = gs.giraffes[0].Moves;
-	const MoveSet* m1 = gs.giraffes[1].Moves;
-	const fptr f0 = gs.giraffes[0].DrawSelf;
-	const fptr f1 = gs.giraffes[1].DrawSelf;
-	const HBRUSH b0 = gs.giraffes[0].ShieldBrush;
-	const HBRUSH b1 = gs.giraffes[1].ShieldBrush;
-
-	gs.giraffes[0].Hurtboxes = nullptr;
-	gs.giraffes[1].Hurtboxes = nullptr;
-	gs.giraffes[0].Hitboxes = nullptr;
-	gs.giraffes[1].Hitboxes = nullptr;
-	gs.giraffes[0].Moves = nullptr;
-	gs.giraffes[1].Moves = nullptr;
-	gs.giraffes[0].DrawSelf = nullptr;
-	gs.giraffes[1].DrawSelf = nullptr;
-	gs.giraffes[0].ShieldBrush = nullptr;
-	gs.giraffes[1].ShieldBrush = nullptr;*/
-
-	//memcpy(*buffer, &gs, *len);
-	/**checksum = fletcher32_checksum((short*)&gs.giraffes, sizeof(gs.giraffes) / 2);
-
-	gs.giraffes[0].Hurtboxes = h0;
-	gs.giraffes[1].Hurtboxes = h1;
-	gs.giraffes[0].Hitboxes = hh0;
-	gs.giraffes[1].Hitboxes = hh1;
-	gs.giraffes[0].Moves = m0;
-	gs.giraffes[1].Moves = m1;
-	gs.giraffes[0].DrawSelf = f0;
-	gs.giraffes[1].DrawSelf = f1;
-	gs.giraffes[0].ShieldBrush = b0;
-	gs.giraffes[1].ShieldBrush = b1;*/
-
-
+	*checksum = fletcher32_checksum((short*)&gs.normGiraffes, sizeof(gs.normGiraffes) / 2);
 	memcpy(*buffer, &gs, *len);
 
 	return true;
@@ -330,42 +298,10 @@ void GiraffeWar_AdvanceFrame(int inputs[], int disconnect_flags)
 
 	//update the checksums
 	ngs.now.framenumber = gs._framenumber;
-	/*const std::array<HurtCollider, 6>* h0 = gs.giraffes[0].Hurtboxes;
-	const std::array<HurtCollider, 6>* h1 = gs.giraffes[1].Hurtboxes;
-	const std::vector<HitCollider>* hh0 = gs.giraffes[0].Hitboxes;
-	const std::vector<HitCollider>* hh1 = gs.giraffes[1].Hitboxes;*/
-	/*const MoveSet* m0 = gs.giraffes[0].Moves;
-	const MoveSet* m1 = gs.giraffes[1].Moves;
-	const fptr f0 = gs.giraffes[0].DrawSelf;
-	const fptr f1 = gs.giraffes[1].DrawSelf;
-	const HBRUSH b0 = gs.giraffes[0].ShieldBrush;
-	const HBRUSH b1 = gs.giraffes[1].ShieldBrush;*/
-
-	/*gs.giraffes[0].Hurtboxes = nullptr;
-	gs.giraffes[1].Hurtboxes = nullptr;
-	gs.giraffes[0].Hitboxes = nullptr;
-	gs.giraffes[1].Hitboxes = nullptr;
-	gs.giraffes[0].Moves = nullptr;
-	gs.giraffes[1].Moves = nullptr;
-	gs.giraffes[0].DrawSelf = nullptr;
-	gs.giraffes[1].DrawSelf = nullptr;
-	gs.giraffes[0].ShieldBrush = nullptr;
-	gs.giraffes[1].ShieldBrush = nullptr;*/
-
-	ngs.now.checksum = fletcher32_checksum((short*)& gs.giraffes, sizeof(gs.giraffes) / 2);
+	ngs.now.checksum = fletcher32_checksum((short*)& gs.normGiraffes, sizeof(gs.normGiraffes) / 2);
 	if ((gs._framenumber % 90) == 0) {
 		ngs.periodic = ngs.now;
 	}
-	/*gs.giraffes[0].Hurtboxes = h0;
-	gs.giraffes[1].Hurtboxes = h1;
-	gs.giraffes[0].Hitboxes = hh0;
-	gs.giraffes[1].Hitboxes = hh1;
-	gs.giraffes[0].Moves = m0;
-	gs.giraffes[1].Moves = m1;
-	gs.giraffes[0].DrawSelf = f0;
-	gs.giraffes[1].DrawSelf = f1;
-	gs.giraffes[0].ShieldBrush = b0;
-	gs.giraffes[1].ShieldBrush = b1;*/
 
 	//Tell ggpo that we've moved forward 1 frame
 	ggpo_advance_frame(ggpo);
@@ -386,23 +322,7 @@ void GiraffeWar_AdvanceFrame(int inputs[], int disconnect_flags)
 //Read the keyboard inputs
 int ReadInputs(HWND hwnd)
 {
-	/*static const struct {
-		int	key;
-		int	input;
-	} inputtable[] = {
-		{'W', INPUT_UP},
-		{'A', INPUT_LEFT},
-		{'S', INPUT_DOWN},
-		{'D', INPUT_RIGHT},
-		{'G', INPUT_JUMP},
-		{'H', INPUT_WEAK},
-		{'J', INPUT_HEAVY},
-		{'K', INPUT_SHIELD},
-	};*/
-	
 	int i, inputs = 0;
-
-
 	if (GetForegroundWindow() == hwnd) {
 		for (i = 0; i < sizeof(inputtable) / sizeof(inputtable[0]); ++i) {
 			if (GetAsyncKeyState(inputtable[i].key)) {

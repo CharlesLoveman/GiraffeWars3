@@ -13,7 +13,6 @@ extern GGPOSession* ggpo;
 //Initialise the game state
 void GameState::Init(HWND hwnd, int num_players, const std::array<MoveSet*, 4> MoveSets) {
 	int w, h;
-	//const MoveSet Moves[4] = { MoveSet(), MoveSet(), MoveSet(), MoveSet() };
 
 	GetClientRect(hwnd, &_bounds);
 	InflateRect(&_bounds, -8, -8);

@@ -328,7 +328,10 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 			}
 		}
 	}
+}
 
+void NormGiraffe::Move(Stage stage, const int frameNumber)
+{
 	//Recieve incoming hits
 	if (State & STATE_SHIELDING) {
 		for (int j = 0; j < numIncoming; ++j) {
@@ -358,11 +361,8 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 		}
 	}
 	numIncoming = 0;
-
-}
-
-void NormGiraffe::Move(Stage stage, const int frameNumber)
-{
+	
+	
 	Position += Velocity;
 	//Correct intersection with the stage
 	int direction;
@@ -479,7 +479,7 @@ void NormGiraffe::Draw(HDC hdc, Vec2 Scale)
 	POINT points[NUM_POINTS];
 
 	for (int i = 0; i < NUM_POINTS; ++i) {
-		points[i] = (Scale * Position + Scale * Facing * (*Moves->GetSkelPoints(CurrentAnim, CurrentFrame))[i]).ToPoint();
+		points[i] = (Scale * (Position + Facing * (*Moves->GetSkelPoints(CurrentAnim, CurrentFrame))[i])).ToPoint();
 	}
 
 	//Ellipse(hdc, (int)(Scale.x*(Position.x - 2.5)), (int)(Scale.y * (Position.y - 2.5)), (int)(Scale.x * (Position.x + 2.5)), (int)(Scale.y * (Position.y + 2.5)));

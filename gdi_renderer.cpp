@@ -97,10 +97,6 @@ void GDIRenderer::DrawStage(HDC hdc, Stage stage)
 {
 	stage.Draw(hdc, Scale, _stageBrush);
 	SetTextAlign(hdc, TA_TOP | TA_CENTER);
-	//TextOutA(hdc, 150 + 250 * i, 0, msg, (int)strlen(msg));
-	for (int i = 0; i < stage.Ledges.size(); ++i) {
-		TextOutA(hdc, 150 + 250 * i, 50, std::to_string(stage.Ledges[i].Hogged).c_str(), 1);
-	}
 }
 
 void GDIRenderer::DrawConnectState(HDC hdc, Giraffe& giraffe, PlayerConnectionInfo& info) 

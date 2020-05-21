@@ -19,7 +19,7 @@ bool Stage::Intersects(Vec2 pos, Collider col, bool down, bool jumping, bool fal
 					else {
 						facing = { -1,1 };
 					}
-					offset = Ledges[l].Col.Position - pos - facing * Vec2(1.5f * col.Radius, 0);
+					offset = Ledges[l].Col.Position - pos - facing * Vec2(1.5f * col.Radius, -col.Radius);
 					deltaV = { 0,0 };
 					return true;
 				}

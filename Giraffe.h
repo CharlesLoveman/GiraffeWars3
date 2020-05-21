@@ -31,6 +31,7 @@ enum GiraffeStates {
 	STATE_SHORTHOP = (1 << 17),
 	STATE_ATTACKSTUN = (1 << 18),
 	STATE_CROUCH = (1 << 19),
+	STATE_LEDGEHOG = (1 << 20),
 };
 
 
@@ -42,16 +43,15 @@ struct HitWID {
 class Giraffe {
 public:
 	virtual ~Giraffe() { };
-	virtual void Update(std::array<Giraffe*, 4> giraffes, const int num_giraffes, const int i, const int inputs, const int frameNumber) = 0;
-	virtual void Draw(HDC hdc, Vec2 Scale) = 0;
-	virtual void Move(Stage stage, const int frameNumber) = 0;
+	virtual void Update(std::array<Giraffe*, 4> giraffes, const int num_giraffes, const int i, const int inputs, const int frameNumber, Stage& stage) = 0;
+	virtual void Draw(HDC hdc, Vec2 Scale, HBRUSH ShieldBrush) = 0;
+	virtual void Move(Stage& stage, const int frameNumber) = 0;
 	void AddHit(HitCollider hit, int ID, Vec2 facing, Vec2 position);
 
 	Vec2 Position;
 	int State;
 	const std::array<HurtCollider, 6>* Hurtboxes;
 	const std::vector<HitCollider>* Hitboxes;
-	HBRUSH ShieldBrush;
 	float Knockback;
 
 protected:
@@ -75,7 +75,7 @@ protected:
 	//Misc
 	int Stocks;
 	float Mass;
-	
+	int LedgeID;
 
 
 	//State Management

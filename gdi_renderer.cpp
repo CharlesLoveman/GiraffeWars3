@@ -34,6 +34,7 @@ GDIRenderer::GDIRenderer(HWND hwnd) :
 
 	_redBrush = CreateSolidBrush(RGB(255, 0, 0));
 	_stageBrush = CreateSolidBrush(RGB(127, 127, 127));
+	_shieldBrush = CreateHatchBrush(HS_BDIAGONAL, RGB(0, 255, 127));
 }
 
 GDIRenderer::~GDIRenderer() 
@@ -88,15 +89,17 @@ void GDIRenderer::SetStatusText(const char* text)
 void GDIRenderer::DrawGiraffe(HDC hdc, int which, GameState& gs)
 {
 	Giraffe* giraffe = gs.giraffes[which];
-	giraffe->Draw(hdc, Scale);
+	giraffe->Draw(hdc, Scale, _shieldBrush);
 	//Ellipse(hdc, (int)(giraffe->Position.x - 10), (int)(giraffe->Position.y - 10), (int)(giraffe->Position.x + 10), (int)(giraffe->Position.y + 10));
 }
 
 void GDIRenderer::DrawStage(HDC hdc, Stage stage)
 {
-	FillRect(hdc, &stage.Box.ToRect(Scale), _stageBrush);
-	for (int p = 0; p < stage.NumPlats; ++p) {
-		FillRect(hdc, &stage.Plats[p].ToRect(Scale), _stageBrush);
+	stage.Draw(hdc, Scale, _stageBrush);
+	SetTextAlign(hdc, TA_TOP | TA_CENTER);
+	//TextOutA(hdc, 150 + 250 * i, 0, msg, (int)strlen(msg));
+	for (int i = 0; i < stage.Ledges.size(); ++i) {
+		TextOutA(hdc, 150 + 250 * i, 50, std::to_string(stage.Ledges[i].Hogged).c_str(), 1);
 	}
 }
 

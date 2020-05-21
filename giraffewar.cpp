@@ -106,9 +106,12 @@ bool __cdecl gw_advance_frame_callback(int)
 bool __cdecl gw_load_game_state_callback(unsigned char* buffer, int len)
 {
 	
-	int gslen = len - sizeof(gs.normGiraffes[0]) * gs.normGiraffes.size();
-	memcpy(&gs, buffer, gslen);
-	memcpy(gs.normGiraffes.data(), buffer + gslen, len - gslen);
+	int giraffeSize = sizeof(gs.normGiraffes[0]) * gs.normGiraffes.size();
+	int ledgeSize = sizeof(gs.stage.Ledges[0]) * gs.stage.Ledges.size();
+	int gsSize = len - giraffeSize - ledgeSize;
+	memcpy(&gs, buffer, gsSize);
+	memcpy(gs.normGiraffes.data(), buffer + gsSize, giraffeSize);
+	memcpy(gs.stage.Ledges.data(), buffer + gsSize + giraffeSize, ledgeSize);
 
 	return true;
 }
@@ -117,7 +120,10 @@ bool __cdecl gw_load_game_state_callback(unsigned char* buffer, int len)
 //Saves the current state to the buffer
 bool __cdecl gw_save_game_state_callback(unsigned char** buffer, int* len, int* checksum, int)
 {
-	*len = sizeof(gs) + sizeof(gs.normGiraffes[0]) * gs.normGiraffes.size();
+	int giraffeSize = sizeof(gs.normGiraffes[0]) * gs.normGiraffes.size();
+	int ledgeSize = sizeof(gs.stage.Ledges[0]) * gs.stage.Ledges.size();
+	int gsSize = sizeof(gs);
+	*len = gsSize + giraffeSize + ledgeSize;
 	*buffer = (unsigned char*)malloc(*len);
 	if (!*buffer) {
 		return false;
@@ -125,7 +131,8 @@ bool __cdecl gw_save_game_state_callback(unsigned char** buffer, int* len, int* 
 
 	*checksum = fletcher32_checksum((short*)gs.normGiraffes.data(), sizeof(gs.normGiraffes[0]) * gs.normGiraffes.size() / 2);
 	memcpy(*buffer, &gs, *len);
-	memcpy(*buffer + sizeof(gs), gs.normGiraffes.data(), sizeof(gs.normGiraffes[0]) * gs.normGiraffes.size());
+	memcpy(*buffer + gsSize, gs.normGiraffes.data(), giraffeSize);
+	memcpy(*buffer + gsSize + giraffeSize, gs.stage.Ledges.data(), ledgeSize);
 
 	return true;
 }
@@ -375,6 +382,8 @@ void GiraffeWar_Idle(int time)
 void GiraffeWar_Exit()
 {
 	delete[] gs.normGiraffes.data();
+	delete[] gs.stage.Ledges.data();
+	delete[] gs.stage.Platforms.data();
 	memset(&gs, 0, sizeof(gs));
 	memset(&ngs, 0, sizeof(ngs));
 	//delete[] Moves;

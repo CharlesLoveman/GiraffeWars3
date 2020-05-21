@@ -32,5 +32,6 @@ protected:
 	HPEN _giraffePens[4];
 	HBRUSH _redBrush;
 	HBRUSH _stageBrush;
+	HBRUSH _shieldBrush;
 };
 #endif

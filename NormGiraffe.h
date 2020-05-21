@@ -14,9 +14,9 @@ public:
 	NormGiraffe(Vec2 _Position, MoveSet* _Moves);
 	~NormGiraffe();
 
-	void Update(std::array<Giraffe*, 4> giraffes, const int num_giraffes, const int i, const int inputs, const int frameNumber);
-	void Move(Stage stage, const int frameNumber);
-	void Draw(HDC hdc, Vec2 Scale);
+	void Update(std::array<Giraffe*, 4> giraffes, const int num_giraffes, const int i, const int inputs, const int frameNumber, Stage& stage);
+	void Move(Stage& stage, const int frameNumber);
+	void Draw(HDC hdc, Vec2 Scale, HBRUSH ShieldBrush);
 private:
 	MoveSet* Moves;
 };

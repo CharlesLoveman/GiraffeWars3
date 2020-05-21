@@ -38,7 +38,8 @@ void GameState::Init(HWND hwnd, int num_players, const std::array<MoveSet*, 4> M
 	}
 
 
-	stage = { {stageleft, stagetop, stageleft + stagewidth, stagetop + stageheight}, 3, {{(float)(stageleft + stagewidth / 2.0f - stagewidth / 10.0f), (float)(stagetop - 2 * stageheight - 0.1f), (float)(stageleft + stagewidth / 2.0f + stagewidth / 10.0f), (float)(stagetop - 2 * stageheight + 0.1f)}, {(float)(stageleft + stagewidth / 4.0f - stagewidth / 10.0f), (float)(stagetop - stageheight - 0.1f), (float)(stageleft + stagewidth / 4.0f + stagewidth / 10.0f), (float)(stagetop - stageheight + 0.1f)}, {(float)(stageleft + 3 * stagewidth / 4.0f - stagewidth / 10.0f), (float)(stagetop - stageheight - 0.1f), (float)(stageleft + 3 * stagewidth / 4.0f + stagewidth / 10.0f), (float)(stagetop - stageheight + 0.1f)}} };
+	stage = { {stageleft, stagetop, stageleft + stagewidth, stagetop + stageheight}, {{(float)(stageleft + stagewidth / 2.0f - stagewidth / 10.0f), (float)(stagetop - 2 * stageheight - 0.1f), (float)(stageleft + stagewidth / 2.0f + stagewidth / 10.0f), (float)(stagetop - 2 * stageheight + 0.1f)}, {(float)(stageleft + stagewidth / 4.0f - stagewidth / 10.0f), (float)(stagetop - stageheight - 0.1f), (float)(stageleft + stagewidth / 4.0f + stagewidth / 10.0f), (float)(stagetop - stageheight + 0.1f)}, {(float)(stageleft + 3 * stagewidth / 4.0f - stagewidth / 10.0f), (float)(stagetop - stageheight - 0.1f), (float)(stageleft + 3 * stagewidth / 4.0f + stagewidth / 10.0f), (float)(stagetop - stageheight + 0.1f)}}, {{{{stageleft, stagetop + 0.5f}, 0.5f}, false, true}, {{{stageleft + stagewidth, stagetop + 0.5f}, 0.5f}, false, false}} };
+
 
 	InflateRect(&_bounds, -8, -8);
 }
@@ -52,7 +53,7 @@ void GameState::Update(int inputs[], int disconnect_flags)
 
 	for (int i = 0; i < _num_giraffes; ++i) {
 		if (!(disconnect_flags & (1 << i))) {
-			(*giraffes[i]).Update(giraffes, _num_giraffes, i, inputs[i], _framenumber);
+			(*giraffes[i]).Update(giraffes, _num_giraffes, i, inputs[i], _framenumber, stage);
 		}
 	}
 

@@ -95,6 +95,9 @@ void GDIRenderer::DrawGiraffe(HDC hdc, int which, GameState& gs)
 void GDIRenderer::DrawStage(HDC hdc, Stage stage)
 {
 	FillRect(hdc, &stage.Box.ToRect(Scale), _stageBrush);
+	for (int p = 0; p < stage.NumPlats; ++p) {
+		FillRect(hdc, &stage.Plats[p].ToRect(Scale), _stageBrush);
+	}
 }
 
 void GDIRenderer::DrawConnectState(HDC hdc, Giraffe& giraffe, PlayerConnectionInfo& info) 

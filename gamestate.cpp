@@ -37,11 +37,8 @@ void GameState::Init(HWND hwnd, int num_players, const std::array<MoveSet*, 4> M
 		giraffes[i] = &normGiraffes[i];
 	}
 
-	stage.Box = {
-				stageleft,
-				stagetop,
-				stageleft + stagewidth,
-				stagetop + stageheight};
+
+	stage = { {stageleft, stagetop, stageleft + stagewidth, stagetop + stageheight}, 3, {{(float)(stageleft + stagewidth / 2.0f - stagewidth / 10.0f), (float)(stagetop - 2 * stageheight - 0.1f), (float)(stageleft + stagewidth / 2.0f + stagewidth / 10.0f), (float)(stagetop - 2 * stageheight + 0.1f)}, {(float)(stageleft + stagewidth / 4.0f - stagewidth / 10.0f), (float)(stagetop - stageheight - 0.1f), (float)(stageleft + stagewidth / 4.0f + stagewidth / 10.0f), (float)(stagetop - stageheight + 0.1f)}, {(float)(stageleft + 3 * stagewidth / 4.0f - stagewidth / 10.0f), (float)(stagetop - stageheight - 0.1f), (float)(stageleft + 3 * stagewidth / 4.0f + stagewidth / 10.0f), (float)(stagetop - stageheight + 0.1f)}} };
 
 	InflateRect(&_bounds, -8, -8);
 }

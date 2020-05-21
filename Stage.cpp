@@ -1,8 +1,26 @@
 #include "Stage.h"
 
-bool Stage::Intersects(Vec2 pos, Collider col, int& direction, float& offset)
+constexpr float EPSILON = 0.00001f;
+
+bool Stage::Intersects(Vec2 pos, Collider col, bool down, bool falling, int& direction, float& offset)
 {
 	Vec2 position = pos + col.Position;
+
+	if (falling) {
+		for (int p = 0; p < NumPlats; ++p) {
+			if (position.y < Plats[p].top && Plats[p].top - position.y - EPSILON < col.Radius && position.x < Plats[p].right && position.x > Plats[p].left) {
+				if (down) {
+					return false;
+				}
+				else {
+					direction = 0;
+					offset = Plats[p].top - col.Radius - position.y;
+					return true;
+				}
+			}
+		}
+	}
+
 	if (position.x + col.Radius < Box.left || position.x - col.Radius > Box.right || position.y + col.Radius < Box.top || position.y - col.Radius > Box.bottom) {
 		return false;
 	}

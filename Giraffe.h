@@ -30,6 +30,7 @@ enum GiraffeStates {
 	STATE_RUNNING = (1 << 16),
 	STATE_SHORTHOP = (1 << 17),
 	STATE_ATTACKSTUN = (1 << 18),
+	STATE_CROUCH = (1 << 19),
 };
 
 

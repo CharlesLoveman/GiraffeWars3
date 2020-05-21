@@ -4,10 +4,17 @@
 #include "Collider.h"
 #include "VecRect.h"
 
+//struct Platform {
+//	Vec2 Position;
+//	float Width;
+//};
+
 struct Stage {
 public:
 	VecRect Box;
-	bool Intersects(Vec2 pos, Collider col, int& direction, float& offset);
+	int NumPlats;
+	VecRect Plats[3];
+	bool Intersects(Vec2 pos, Collider col, bool down, bool falling, int& direction, float& offset);
 };
 
 #endif // !_STAGE_H_

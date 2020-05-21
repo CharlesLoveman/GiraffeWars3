@@ -6,6 +6,7 @@ bool Stage::Intersects(Vec2 pos, Collider col, bool down, bool jumping, bool fal
 {
 	Vec2 position = pos + col.Position;
 
+	//Grab Ledge
 	if (!(down) && jumping) {
 		for (int l = 0; l < Ledges.size(); ++l) {
 			if (!Ledges[l].Hogged) {
@@ -28,6 +29,7 @@ bool Stage::Intersects(Vec2 pos, Collider col, bool down, bool jumping, bool fal
 	}
 	hogging = false;
 
+	//Land on platforms
 	if (falling) {
 		for (int p = 0; p < Platforms.size(); ++p) {
 			if (position.y < Platforms[p].top && Platforms[p].top - position.y - EPSILON < col.Radius && position.x < Platforms[p].right && position.x > Platforms[p].left) {
@@ -37,6 +39,13 @@ bool Stage::Intersects(Vec2 pos, Collider col, bool down, bool jumping, bool fal
 				else {
 					landed = true;
 					offset = { 0, Platforms[p].top - col.Radius - position.y };
+					if (deltaV.Length() > 1.0f) {
+						deltaV.y *= -0.8f;
+					}
+					else {
+						deltaV.y = 0;
+					}
+					
 					return true;
 				}
 			}
@@ -44,27 +53,48 @@ bool Stage::Intersects(Vec2 pos, Collider col, bool down, bool jumping, bool fal
 	}
 
 
-
+	//Land on stage
 	if (position.x + col.Radius < Box.left || position.x - col.Radius > Box.right || position.y + col.Radius < Box.top || position.y - col.Radius > Box.bottom) {
 		return false;
 	}
 
 	if (position.y < Box.top && position.x + col.Radius > Box.left && position.x - col.Radius < Box.right) {
 		offset = { 0, Box.top - col.Radius - position.y };
-		deltaV.y = 0;
+
+		if (deltaV.Length() > 1.0f) {
+			deltaV.y *= -0.8f;
+		}
+		else {
+			deltaV.y = 0;
+		}
 		landed = true;
 	}
 	else if (position.x < Box.left) {
 		offset = { Box.left - col.Radius - position.x, 0 };
-		deltaV.x = 0;
+		if (deltaV.Length() > 1.0f) {
+			deltaV.x *= -0.8f;
+		}
+		else {
+			deltaV.x = 0;
+		}
 	}
 	else if (position.x > Box.right) {
 		offset = { Box.right + col.Radius - position.x, 0 };
-		deltaV.x = 0;
+		if (deltaV.Length() > 1.0f) {
+			deltaV.x *= -0.8f;
+		}
+		else {
+			deltaV.x = 0;
+		}
 	}
 	else if (position.y > Box.bottom) {
 		offset = { 0, Box.bottom + col.Radius - position.y };
-		deltaV.y = 0;
+		if (deltaV.Length() > 1.0f) {
+			deltaV.y *= -0.8f;
+		}
+		else {
+			deltaV.y = 0;
+		}
 	}
 	else {
 		//Just send them up if they are in the middle

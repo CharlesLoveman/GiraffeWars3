@@ -160,7 +160,7 @@ void GDIRenderer::DrawGiraffeInfo(HDC hdc, Giraffe& giraffe, int i)
 	SetTextAlign(hdc, TA_TOP | TA_CENTER);
 	//TextOutA(hdc, 150 + 250 * i, 0, msg, (int)strlen(msg));
 
-	TextOutA(hdc, 150 + 250 * i, 0, std::to_string(giraffe.Knockback * 10).c_str(), 8);
+	TextOutA(hdc, 150 + 250 * i, 0, std::to_string(giraffe.Velocity.Length()).c_str(), 8);
 }
 
 void GDIRenderer::CreateGDIFont(HDC)

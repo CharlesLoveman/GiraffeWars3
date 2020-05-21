@@ -49,6 +49,7 @@ public:
 	void AddHit(HitCollider hit, int ID, Vec2 facing, Vec2 position);
 
 	Vec2 Position;
+	Vec2 Velocity;
 	int State;
 	const std::array<HurtCollider, 6>* Hurtboxes;
 	const std::vector<HitCollider>* Hitboxes;
@@ -56,7 +57,7 @@ public:
 
 protected:
 	//Movement
-	Vec2 Velocity;
+	
 	float MaxGroundSpeed;
 	Vec2 MaxAirSpeed;
 	float RunAccel;

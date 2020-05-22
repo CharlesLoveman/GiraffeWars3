@@ -32,6 +32,10 @@ enum GiraffeStates {
 	STATE_ATTACKSTUN = (1 << 18),
 	STATE_CROUCH = (1 << 19),
 	STATE_LEDGEHOG = (1 << 20),
+	STATE_TECHATTEMPT = (1 << 21),
+	STATE_TECHLAG = (1 << 22),
+	STATE_KNOCKDOWN = (1 << 23),
+	STATE_KNOCKDOWNLAG = (1 << 24),
 };
 
 
@@ -82,6 +86,7 @@ protected:
 	//State Management
 	int JumpDelay;
 	int AttackDelay;
+	int TechDelay;
 	int MaxJumpDelay;
 	int MaxShieldDelay;
 	int AttackNum;

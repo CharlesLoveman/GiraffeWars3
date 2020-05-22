@@ -2,7 +2,7 @@
 
 constexpr float EPSILON = 0.00001f;
 
-bool Stage::Intersects(Vec2 pos, Collider col, bool down, bool jumping, bool falling, bool& landed, Vec2& facing, Vec2& offset, Vec2& deltaV, bool& hogging, int& ledgeID)
+bool Stage::Intersects(Vec2 pos, Collider col, bool down, bool jumping, bool falling, bool& landed, bool& bounced, Vec2& facing, Vec2& offset, Vec2& deltaV, bool& hogging, int& ledgeID)
 {
 	Vec2 position = pos + col.Position;
 
@@ -41,6 +41,7 @@ bool Stage::Intersects(Vec2 pos, Collider col, bool down, bool jumping, bool fal
 					offset = { 0, Platforms[p].top - col.Radius - position.y };
 					if (deltaV.Length() > 1.0f) {
 						deltaV.y *= -0.8f;
+						bounced = true;
 					}
 					else {
 						deltaV.y = 0;
@@ -63,6 +64,7 @@ bool Stage::Intersects(Vec2 pos, Collider col, bool down, bool jumping, bool fal
 
 		if (deltaV.Length() > 1.0f) {
 			deltaV.y *= -0.8f;
+			bounced = true;
 		}
 		else {
 			deltaV.y = 0;
@@ -73,6 +75,7 @@ bool Stage::Intersects(Vec2 pos, Collider col, bool down, bool jumping, bool fal
 		offset = { Box.left - col.Radius - position.x, 0 };
 		if (deltaV.Length() > 1.0f) {
 			deltaV.x *= -0.8f;
+			bounced = true;
 		}
 		else {
 			deltaV.x = 0;
@@ -82,6 +85,7 @@ bool Stage::Intersects(Vec2 pos, Collider col, bool down, bool jumping, bool fal
 		offset = { Box.right + col.Radius - position.x, 0 };
 		if (deltaV.Length() > 1.0f) {
 			deltaV.x *= -0.8f;
+			bounced = true;
 		}
 		else {
 			deltaV.x = 0;
@@ -91,6 +95,7 @@ bool Stage::Intersects(Vec2 pos, Collider col, bool down, bool jumping, bool fal
 		offset = { 0, Box.bottom + col.Radius - position.y };
 		if (deltaV.Length() > 1.0f) {
 			deltaV.y *= -0.8f;
+			bounced = true;
 		}
 		else {
 			deltaV.y = 0;
@@ -102,6 +107,7 @@ bool Stage::Intersects(Vec2 pos, Collider col, bool down, bool jumping, bool fal
 		offset = { 0, Box.top - col.Radius - position.y };
 		if (deltaV.Length() > 1.0f) {
 			deltaV.y *= -0.8f;
+			bounced = true;
 		}
 		else {
 			deltaV.y = 0;

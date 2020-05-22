@@ -118,6 +118,10 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 	else if (State & STATE_TECHLAG && frameNumber >= TechDelay) {
 		State &= ~STATE_TECHLAG;
 	}
+	else if (State & STATE_TECHING && frameNumber >= TechDelay) {
+		State &= ~STATE_TECHING;
+		State &= ~STATE_INTANGIBLE;
+	}
 	else if (State & STATE_KNOCKDOWNLAG && frameNumber >= TechDelay) {
 		State &= ~STATE_KNOCKDOWNLAG;
 		State |= STATE_KNOCKDOWN;
@@ -451,7 +455,7 @@ void NormGiraffe::Move(Stage& stage, const int frameNumber)
 					}
 					else if (State & STATE_TECHATTEMPT) {
 						State |= STATE_TECHING | STATE_INTANGIBLE;
-						TechDelay = 20;
+						TechDelay = frameNumber + 20;
 					}
 
 					State &= ~(STATE_UP | STATE_BACK | STATE_DOWN | STATE_FORWARD | STATE_WEAK | STATE_HEAVY | STATE_JUMPING | STATE_FASTFALL | STATE_HITSTUN | STATE_TECHATTEMPT | STATE_TECHLAG);

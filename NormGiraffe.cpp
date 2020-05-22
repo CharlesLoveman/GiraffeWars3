@@ -408,7 +408,7 @@ void NormGiraffe::Move(Stage& stage, const int frameNumber)
 				}
 				State &= ~(STATE_UP | STATE_BACK | STATE_DOWN | STATE_FORWARD | STATE_WEAK | STATE_HEAVY | STATE_JUMPSQUAT | STATE_JUMPLAND | STATE_SHORTHOP | STATE_ATTACKSTUN | STATE_KNOCKDOWN | STATE_KNOCKDOWNLAG);
 				State |= STATE_HITSTUN;
-				AttackDelay = (int)max(AttackDelay, frameNumber + IncomingHits[j].hit.Damage * 100);
+				AttackDelay = (int)max(AttackDelay, frameNumber + IncomingHits[j].hit.Knockback * 50);
 				PrevHitQueue.Push(IncomingHits[j].ID);
 			}
 		}

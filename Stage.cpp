@@ -100,7 +100,12 @@ bool Stage::Intersects(Vec2 pos, Collider col, bool down, bool jumping, bool fal
 		//Just send them up if they are in the middle
 		landed = true;
 		offset = { 0, Box.top - col.Radius - position.y };
-		deltaV.y = 0;
+		if (deltaV.Length() > 1.0f) {
+			deltaV.y *= -0.8f;
+		}
+		else {
+			deltaV.y = 0;
+		}
 	}
 
 	return true;
@@ -113,7 +118,4 @@ void Stage::Draw(HDC hdc, Vec2 Scale, HBRUSH Brush)
 	for (int p = 0; p < Platforms.size(); ++p) {
 		FillRect(hdc, &Platforms[p].ToRect(Scale), Brush);
 	}
-	/*for (int l = 0; l < Ledges.size(); ++l) {
-		Ellipse(hdc, (int)(Scale.x * (Ledges[l].Col.Position.x - Ledges[l].Col.Radius)), (int)(Scale.y * (Ledges[l].Col.Position.y - Ledges[l].Col.Radius)), (int)(Scale.x * (Ledges[l].Col.Position.x + Ledges[l].Col.Radius)), (int)(Scale.y * (Ledges[l].Col.Position.y + Ledges[l].Col.Radius)));
-	}*/
 }

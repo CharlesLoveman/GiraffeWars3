@@ -126,15 +126,25 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 		State &= ~STATE_KNOCKDOWNLAG;
 		State |= STATE_KNOCKDOWN;
 	}
+	else if (State & STATE_ROLLING && frameNumber >= TechDelay) {
+		State &= ~STATE_ROLLING;
+	}
 	
 	//Read Inputs
-	if (!(State & (STATE_WEAK | STATE_HEAVY | STATE_SHIELDING | STATE_JUMPSQUAT | STATE_JUMPLAND | STATE_DROPSHIELD | STATE_HITSTUN | STATE_ATTACKSTUN | STATE_KNOCKDOWN | STATE_KNOCKDOWNLAG))) {
+	if (!(State & (STATE_WEAK | STATE_HEAVY | STATE_JUMPSQUAT | STATE_JUMPLAND | STATE_DROPSHIELD | STATE_HITSTUN | STATE_ATTACKSTUN | STATE_KNOCKDOWNLAG | STATE_ROLLING))) {
 		if (!(State & STATE_LEDGEHOG)) {
 			if (inputs & INPUT_LEFT) {
 				if (State & STATE_JUMPING) {
 					if (Velocity.x > -MaxAirSpeed.x) {
 						Velocity.x -= AirAccel;
 					}
+				}
+				else if (State & (STATE_TECHING | STATE_SHIELDING | STATE_KNOCKDOWN)) {
+					State &= ~(STATE_TECHING | STATE_SHIELDING | STATE_KNOCKDOWN);
+					State |= STATE_ROLLING | STATE_INTANGIBLE;
+					TechDelay = frameNumber + 20;
+					AnimFrame = 0;
+					Facing = { -1, 1 };
 				}
 				else if (Velocity.x > -MaxGroundSpeed) {
 					Velocity.x -= RunAccel;
@@ -148,6 +158,13 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 					if (Velocity.x < MaxAirSpeed.x) {
 						Velocity.x += AirAccel;
 					}
+				}
+				else if (State & (STATE_TECHING | STATE_SHIELDING | STATE_KNOCKDOWN)) {
+					State &= ~(STATE_TECHING | STATE_SHIELDING | STATE_KNOCKDOWN);
+					State |= STATE_ROLLING | STATE_INTANGIBLE;
+					TechDelay = frameNumber + 20;
+					AnimFrame = 0;
+					Facing = { 1, 1 };
 				}
 				else if (Velocity.x < MaxGroundSpeed) {
 					Velocity.x += RunAccel;
@@ -178,7 +195,7 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 			State &= ~STATE_CROUCH;
 		}
 	}
-	if (inputs & INPUT_WEAK && !(State & (STATE_WEAK | STATE_HEAVY | STATE_SHIELDING | STATE_DROPSHIELD | STATE_JUMPSQUAT | STATE_JUMPLAND | STATE_HITSTUN | STATE_WAVEDASH | STATE_ATTACKSTUN | STATE_LEDGEHOG | STATE_KNOCKDOWNLAG))) {
+	if (inputs & INPUT_WEAK && !(State & (STATE_WEAK | STATE_HEAVY | STATE_SHIELDING | STATE_DROPSHIELD | STATE_JUMPSQUAT | STATE_JUMPLAND | STATE_HITSTUN | STATE_WAVEDASH | STATE_ATTACKSTUN | STATE_LEDGEHOG | STATE_KNOCKDOWNLAG | STATE_TECHING | STATE_ROLLING))) {
 		State |= STATE_WEAK;
 		State &= ~STATE_CROUCH;
 		if ((inputs & INPUT_RIGHT && Facing.x == 1) || (inputs & INPUT_LEFT && Facing.x == -1)) {
@@ -210,7 +227,7 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 		++LastAttackID;
 		AnimFrame = 0;
 	}
-	if (inputs & INPUT_HEAVY && !(State & (STATE_WEAK | STATE_HEAVY | STATE_SHIELDING | STATE_DROPSHIELD | STATE_JUMPSQUAT | STATE_JUMPLAND | STATE_HITSTUN | STATE_WAVEDASH | STATE_ATTACKSTUN | STATE_LEDGEHOG | STATE_KNOCKDOWN | STATE_KNOCKDOWNLAG))) {
+	if (inputs & INPUT_HEAVY && !(State & (STATE_WEAK | STATE_HEAVY | STATE_SHIELDING | STATE_DROPSHIELD | STATE_JUMPSQUAT | STATE_JUMPLAND | STATE_HITSTUN | STATE_WAVEDASH | STATE_ATTACKSTUN | STATE_LEDGEHOG | STATE_KNOCKDOWN | STATE_KNOCKDOWNLAG | STATE_TECHING | STATE_ROLLING))) {
 		State &= ~STATE_CROUCH;
 		if ((inputs & INPUT_RIGHT && Facing.x == 1) || (inputs & INPUT_LEFT && Facing.x == -1)) {
 			//Fsmash
@@ -232,7 +249,7 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 		++LastAttackID;
 		AnimFrame = 0;
 	}
-	if (inputs & INPUT_JUMP && !(State & (STATE_WEAK | STATE_HEAVY | STATE_JUMPSQUAT | STATE_JUMPLAND | STATE_HITSTUN | STATE_SHIELDSTUN | STATE_WAVEDASH | STATE_ATTACKSTUN | STATE_KNOCKDOWNLAG))) {
+	if (inputs & INPUT_JUMP && !(State & (STATE_WEAK | STATE_HEAVY | STATE_JUMPSQUAT | STATE_JUMPLAND | STATE_HITSTUN | STATE_SHIELDSTUN | STATE_WAVEDASH | STATE_ATTACKSTUN | STATE_KNOCKDOWNLAG | STATE_TECHING | STATE_ROLLING))) {
 		if (State & STATE_LEDGEHOG) {
 			State &= ~STATE_LEDGEHOG;
 			stage.Ledges[LedgeID].Hogged = false;
@@ -291,7 +308,7 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 				Velocity.y += DashSpeed;
 			}
 		}
-		else if (!(State & (STATE_WEAK | STATE_HEAVY | STATE_JUMPSQUAT | STATE_JUMPLAND | STATE_JUMPING | STATE_HITSTUN | STATE_SHIELDSTUN | STATE_WAVEDASH | STATE_ATTACKSTUN | STATE_LEDGEHOG | STATE_KNOCKDOWN | STATE_KNOCKDOWNLAG))) {
+		else if (!(State & (STATE_WEAK | STATE_HEAVY | STATE_JUMPSQUAT | STATE_JUMPLAND | STATE_JUMPING | STATE_HITSTUN | STATE_SHIELDSTUN | STATE_WAVEDASH | STATE_ATTACKSTUN | STATE_LEDGEHOG | STATE_KNOCKDOWN | STATE_KNOCKDOWNLAG | STATE_ROLLING))) {
 			State &= ~(STATE_DROPSHIELD | STATE_WAVEDASH | STATE_RUNNING);
 			State |= STATE_SHIELDING;
 			Velocity.x = 0;
@@ -303,6 +320,10 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 		AttackDelay += MaxShieldDelay;
 	}
 
+	if (State & STATE_ROLLING) {
+		Velocity.x = MaxGroundSpeed * Facing.x;//Obviously change this
+	}
+	
 	//Update State
 	if (State & (STATE_WEAK | STATE_HEAVY)) {
 		Hitboxes = Moves->GetHitboxes(AttackNum, AnimFrame);
@@ -345,6 +366,9 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 	}
 	else if ((State & STATE_JUMPING) && (State & STATE_WEAK) && (State & STATE_BACK) && AnimFrame == 7) {
 		Facing.x *= -1;
+	}
+	else if ((State & STATE_ROLLING) && AnimFrame == 10) {
+		State &= ~STATE_INTANGIBLE;
 	}
 
 	//Adding Gravity
@@ -413,7 +437,7 @@ void NormGiraffe::Move(Stage& stage, const int frameNumber)
 				}
 				State &= ~(STATE_UP | STATE_BACK | STATE_DOWN | STATE_FORWARD | STATE_WEAK | STATE_HEAVY | STATE_JUMPSQUAT | STATE_JUMPLAND | STATE_SHORTHOP | STATE_ATTACKSTUN | STATE_KNOCKDOWN | STATE_KNOCKDOWNLAG);
 				State |= STATE_HITSTUN;
-				AttackDelay = (int)max(AttackDelay, frameNumber + min(KnockbackApplied * 50, 100));
+				AttackDelay = (int)max(AttackDelay, frameNumber + min(KnockbackApplied * 40, 100));
 				PrevHitQueue.Push(IncomingHits[j].ID);
 			}
 		}

@@ -200,24 +200,24 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 		State &= ~STATE_CROUCH;
 		if ((inputs & INPUT_RIGHT && Facing.x == 1) || (inputs & INPUT_LEFT && Facing.x == -1)) {
 			State |= STATE_FORWARD;
-			AttackNum = 9;
+			AttackNum = 19;
 		}
 		else if (inputs & INPUT_UP) {
 			State |= STATE_UP;
-			AttackNum = 10;
+			AttackNum = 20;
 		}
 		else if (inputs & INPUT_DOWN) {
 			State |= STATE_DOWN;
-			AttackNum = 11;
+			AttackNum = 21;
 		}
 		else {//Neutral
-			AttackNum = 8;
+			AttackNum = 18;
 		}
 		if (State & STATE_JUMPING) {
 			if ((inputs & INPUT_RIGHT && Facing.x == -1) || (inputs & INPUT_LEFT && Facing.x == 1)) {
 				//Bair
 				State |= STATE_BACK;
-				AttackNum = 19;
+				AttackNum = 29;
 			}
 			else {
 				AttackNum += 7;
@@ -232,18 +232,18 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 		if ((inputs & INPUT_RIGHT && Facing.x == 1) || (inputs & INPUT_LEFT && Facing.x == -1)) {
 			//Fsmash
 			State |= STATE_HEAVY | STATE_FORWARD;
-			AttackNum = 12;
+			AttackNum = 22;
 		}
 		else if (inputs & INPUT_UP) {
 			//Upsmash
 			State |= STATE_HEAVY | STATE_UP;
-			AttackNum = 13;
+			AttackNum = 23;
 		}
 		else if (inputs & INPUT_DOWN)
 		{
 			//Dsmash
 			State |= STATE_HEAVY | STATE_DOWN;
-			AttackNum = 14;
+			AttackNum = 24;
 		}
 		AttackDelay = frameNumber + Moves->GetMoveLength(AttackNum);
 		++LastAttackID;
@@ -288,7 +288,7 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 				Velocity.x += DashSpeed;
 			}
 		}
-		else if (State & STATE_HITSTUN && !(State & STATE_TECHLAG)) {
+		else if ((State & STATE_HITSTUN) && !(State & (STATE_TECHLAG | STATE_TECHATTEMPT))) {
 			State |= STATE_TECHATTEMPT;
 			TechDelay = frameNumber + 20;
 		}
@@ -350,6 +350,9 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 		}
 		else if (State & (STATE_WAVEDASH | STATE_CROUCH)) {
 			Hurtboxes = Moves->GetHurtboxes(7, 0);
+		}
+		else if (State & STATE_ROLLING) {
+			Hurtboxes = Moves->GetHurtboxes(8, 0);
 		}
 		else if (State & STATE_LEDGEHOG) {
 			//Ledgehog anim
@@ -475,7 +478,7 @@ void NormGiraffe::Move(Stage& stage, const int frameNumber)
 				else {
 					if (State & STATE_WEAK) {
 						State |= STATE_ATTACKSTUN;
-						AttackDelay = Moves->GetLandingLag(AttackNum - 15);
+						AttackDelay = Moves->GetLandingLag(AttackNum - 25);
 					}
 					else if (State & STATE_TECHATTEMPT) {
 						State |= STATE_TECHING | STATE_INTANGIBLE;
@@ -580,6 +583,10 @@ void NormGiraffe::Draw(HDC hdc, Vec2 Scale, HBRUSH ShieldBrush, HPEN GiraffePen,
 		else if (State & (STATE_WAVEDASH | STATE_CROUCH)) {
 			CurrentAnim = 7;
 			CurrentFrame = 0;
+		}
+		else if (State & STATE_ROLLING) {
+			CurrentAnim = 8;
+			CurrentFrame = AnimFrame;
 		}
 	}
 

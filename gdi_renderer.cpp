@@ -32,6 +32,7 @@ GDIRenderer::GDIRenderer(HWND hwnd) :
 		_giraffePens[i] = CreatePen(PS_SOLID, 1, _giraffeColours[i]);
 	}
 
+	_intangiblePen = CreatePen(PS_SOLID, 1, RGB(255, 255, 255));
 	_redBrush = CreateSolidBrush(RGB(255, 0, 0));
 	_stageBrush = CreateSolidBrush(RGB(127, 127, 127));
 	_shieldBrush = CreateHatchBrush(HS_BDIAGONAL, RGB(0, 255, 127));
@@ -54,8 +55,8 @@ void GDIRenderer::Draw(GameState& gs, NonGameState& ngs)
 
 	for (int i = 0; i < gs._num_giraffes; ++i) {
 		SetTextColor(hdc, _giraffeColours[i]);
-		SelectObject(hdc, _giraffePens[i]);
-		DrawGiraffe(hdc, i, gs);
+		//SelectObject(hdc, _giraffePens[i]);
+		gs.giraffes[i]->Draw(hdc, Scale, _shieldBrush, _giraffePens[i], _intangiblePen);
 		DrawConnectState(hdc, *gs.giraffes[i], ngs.players[i]);
 		DrawGiraffeInfo(hdc, *gs.giraffes[i], i);
 	}
@@ -89,7 +90,7 @@ void GDIRenderer::SetStatusText(const char* text)
 void GDIRenderer::DrawGiraffe(HDC hdc, int which, GameState& gs)
 {
 	Giraffe* giraffe = gs.giraffes[which];
-	giraffe->Draw(hdc, Scale, _shieldBrush);
+	
 	//Ellipse(hdc, (int)(giraffe->Position.x - 10), (int)(giraffe->Position.y - 10), (int)(giraffe->Position.x + 10), (int)(giraffe->Position.y + 10));
 }
 

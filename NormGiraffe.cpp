@@ -395,20 +395,21 @@ void NormGiraffe::Move(Stage& stage, const int frameNumber)
 		for (int j = 0; j < numIncoming; ++j) {
 			if (!PrevHitQueue.Contains(IncomingHits[j].ID)) {
 				Knockback += IncomingHits[j].hit.Damage;
-				//Velocity += (Knockback / Mass) * IncomingHits[j].hit.Force;
+				float KnockbackApplied;
 				if (IncomingHits[j].hit.Fixed) {
-					Velocity += IncomingHits[j].hit.Knockback * IncomingHits[j].hit.Force;
+					KnockbackApplied = IncomingHits[j].hit.Knockback;
 				}
 				else {
-					Velocity += ((((Knockback / 10 + (Knockback * IncomingHits[j].hit.Damage / 20)) * (200 / (Mass + 100)) * 1.4 + 0.18) * IncomingHits[j].hit.Scale) + IncomingHits[j].hit.Knockback) * IncomingHits[j].hit.Force;
+					KnockbackApplied = ((((Knockback / 10 + (Knockback * IncomingHits[j].hit.Damage / 20)) * (200 / (Mass + 100)) * 1.4 + 0.18) * IncomingHits[j].hit.Scale) + IncomingHits[j].hit.Knockback);
 				}
+				Velocity += KnockbackApplied * IncomingHits[j].hit.Force;
 				if (State & STATE_LEDGEHOG) {
 					stage.Ledges[LedgeID].Hogged = false;
 					State &= ~STATE_LEDGEHOG;
 				}
 				State &= ~(STATE_UP | STATE_BACK | STATE_DOWN | STATE_FORWARD | STATE_WEAK | STATE_HEAVY | STATE_JUMPSQUAT | STATE_JUMPLAND | STATE_SHORTHOP | STATE_ATTACKSTUN | STATE_KNOCKDOWN | STATE_KNOCKDOWNLAG);
 				State |= STATE_HITSTUN;
-				AttackDelay = (int)max(AttackDelay, frameNumber + IncomingHits[j].hit.Knockback * 50);
+				AttackDelay = (int)max(AttackDelay, frameNumber + min(KnockbackApplied * 50, 100));
 				PrevHitQueue.Push(IncomingHits[j].ID);
 			}
 		}
@@ -448,6 +449,10 @@ void NormGiraffe::Move(Stage& stage, const int frameNumber)
 						State |= STATE_ATTACKSTUN;
 						AttackDelay = Moves->GetLandingLag(AttackNum - 15);
 					}
+					else if (State & STATE_TECHATTEMPT) {
+						State |= STATE_TECHING | STATE_INTANGIBLE;
+						TechDelay = 20;
+					}
 
 					State &= ~(STATE_UP | STATE_BACK | STATE_DOWN | STATE_FORWARD | STATE_WEAK | STATE_HEAVY | STATE_JUMPING | STATE_FASTFALL | STATE_HITSTUN | STATE_TECHATTEMPT | STATE_TECHLAG);
 					State |= STATE_JUMPLAND;
@@ -455,7 +460,6 @@ void NormGiraffe::Move(Stage& stage, const int frameNumber)
 					HasDoubleJump = false;
 					JumpDelay = frameNumber + MaxJumpDelay / 2;
 					AnimFrame = 0;
-					TechDelay = 0;
 				}
 			}
 		}
@@ -486,10 +490,15 @@ void NormGiraffe::Move(Stage& stage, const int frameNumber)
 
 }
 
-void NormGiraffe::Draw(HDC hdc, Vec2 Scale, HBRUSH ShieldBrush)
+void NormGiraffe::Draw(HDC hdc, Vec2 Scale, HBRUSH ShieldBrush, HPEN GiraffePen, HPEN IntangiblePen)
 {
 	int CurrentAnim = 0;
 	int CurrentFrame = 0;
+	SelectObject(hdc, GiraffePen);
+
+	if (State & STATE_INTANGIBLE) {
+		SelectObject(hdc, IntangiblePen);
+	}
 
 	if (State & (STATE_WEAK | STATE_HEAVY)) {
 		CurrentAnim = AttackNum;

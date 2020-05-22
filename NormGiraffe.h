@@ -16,7 +16,7 @@ public:
 
 	void Update(std::array<Giraffe*, 4> giraffes, const int num_giraffes, const int i, const int inputs, const int frameNumber, Stage& stage);
 	void Move(Stage& stage, const int frameNumber);
-	void Draw(HDC hdc, Vec2 Scale, HBRUSH ShieldBrush);
+	void Draw(HDC hdc, Vec2 Scale, HBRUSH ShieldBrush, HPEN GiraffePen, HPEN IntangiblePen);
 private:
 	MoveSet* Moves;
 };

@@ -39,6 +39,7 @@ enum GiraffeStates {
 	STATE_KNOCKDOWNLAG = (1 << 25),
 	STATE_ROLLING = (1 << 26),
 	STATE_INTANGIBLE = (1 << 27),
+	STATE_GETUPATTACK = (1 << 28),
 };
 
 

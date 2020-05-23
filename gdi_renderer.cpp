@@ -154,14 +154,14 @@ void GDIRenderer::DrawConnectState(HDC hdc, Giraffe& giraffe, PlayerConnectionIn
 
 void GDIRenderer::DrawGiraffeInfo(HDC hdc, Giraffe& giraffe, int i)
 {
-	char msg[64];
+	/*char msg[64];
 	*msg = '\0';
 	std::bitset<32> bits(giraffe.State);
-	sprintf_s(msg, ARRAYSIZE(msg), bits.to_string().c_str());
+	sprintf_s(msg, ARRAYSIZE(msg), bits.to_string().c_str());*/
 	SetTextAlign(hdc, TA_TOP | TA_CENTER);
-	TextOutA(hdc, 150 + 250 * i, 0, msg, (int)strlen(msg));
+	//TextOutA(hdc, 150 + 250 * i, 0, msg, (int)strlen(msg));
 
-	//TextOutA(hdc, 150 + 250 * i, 0, std::to_string(giraffe.Knockback * 10).c_str(), 8);
+	TextOutA(hdc, 150 + 250 * i, 0, std::to_string(giraffe.Knockback * 10).c_str(), 8);
 }
 
 void GDIRenderer::CreateGDIFont(HDC)

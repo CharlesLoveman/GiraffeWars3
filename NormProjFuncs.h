@@ -20,7 +20,10 @@ struct NormProjFuncs {
 	}
 	static void NeckGrabOnHit(Projectile& self, Giraffe& parent, Giraffe* collided)
 	{
-		Vec2 diff = Vec2(0.2f, 0.3f) * (self.Position - parent.Position);
+		Vec2 diff = Vec2(0.2f, 0.3f) *(self.Position - parent.Position);
+		if (diff.Length() > 1) {
+			diff = 2.0f * diff.Normalise();
+		}
 		parent.Velocity += diff;
 		parent.State &= ~(STATE_HEAVY | STATE_UP);
 		if (collided != nullptr) {

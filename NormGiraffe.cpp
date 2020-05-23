@@ -387,7 +387,7 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 		if (State & STATE_JUMPING) {
 			//Velocity = { 0, Gravity + 0.00001f };
 			if (AnimFrame == 10) {
-				Projectiles.Append(Projectile(Position + Vec2(0.2f, -1.2f), { Facing.x * 0.5f, -0.5f }, 0.3f, { 0.0f, 0.0f }, 0.1f, 0.1f, 1.0f, true, LastAttackID, AttackDelay - 10, NormProjFuncs::NeckGrabOnHit, NormProjFuncs::NeckGrabUpdate, NormProjFuncs::NeckGrabDraw, GiraffePen, SpitBrush));
+				Projectiles.Append(Projectile(Position + Vec2(0.2f, -1.2f), { Facing.x * 0.65f, -0.65f }, 0.3f, { 0.0f, 0.0f }, 0.1f, 0.1f, 1.0f, true, LastAttackID, AttackDelay - 10, NormProjFuncs::NeckGrabOnHit, NormProjFuncs::NeckGrabUpdate, NormProjFuncs::NeckGrabDraw, GiraffePen, SpitBrush));
 			}
 		}
 		else if (AnimFrame == 17) {
@@ -528,7 +528,7 @@ void NormGiraffe::Move(Stage& stage, const int frameNumber)
 					Velocity = { 0,0 };
 					State &= ~STATE_TECHATTEMPT;
 					State |= STATE_TECHING | STATE_INTANGIBLE;
-					TechDelay = frameNumber + 10;
+					TechDelay = frameNumber + 5;
 				}
 			}
 			else if (landed && (State & STATE_JUMPING)) {
@@ -543,7 +543,7 @@ void NormGiraffe::Move(Stage& stage, const int frameNumber)
 						State |= STATE_ATTACKSTUN;
 						AttackDelay = Moves->GetLandingLag(max(0,(AttackNum - 25)));
 					}
-					else if (State & STATE_TECHATTEMPT) {
+					else if ((State & STATE_TECHATTEMPT) && (State & STATE_HITSTUN)) {
 						State &= ~STATE_TECHATTEMPT;
 						State |= STATE_TECHING | STATE_INTANGIBLE;
 						TechDelay = frameNumber + 20;
@@ -568,11 +568,11 @@ void NormGiraffe::Move(Stage& stage, const int frameNumber)
 
 	//Make giraffes loop around like pac-man
 	//Remove this later
-	if (Position.y > 50) {
+	if (Position.y > 60) {
 		Position.y = 0;
 	}
 	else if (Position.y < 0) {
-		Position.y = 50;
+		Position.y = 60;
 	}
 	if (Position.x > 60) {
 		Position.x = 0;

@@ -254,15 +254,12 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 		}
 		if (State & STATE_JUMPING) {
 			if (State & STATE_UP) {
-				AttackNum = 0;
+				AttackNum = 32;
 			}
 		}
 		AttackDelay = frameNumber + Moves->GetMoveLength(AttackNum);
 		++LastAttackID;
 		AnimFrame = 0;
-		if ((State & STATE_JUMPING) && (State & STATE_UP)) {
-			AttackDelay = frameNumber + 30;
-		}
 	}
 	if (inputs & INPUT_JUMP && !(State & (STATE_WEAK | STATE_HEAVY | STATE_JUMPSQUAT | STATE_JUMPLAND | STATE_HITSTUN | STATE_SHIELDSTUN | STATE_WAVEDASH | STATE_ATTACKSTUN | STATE_KNOCKDOWNLAG | STATE_TECHING | STATE_ROLLING))) {
 		if (State & STATE_LEDGEHOG) {
@@ -289,7 +286,7 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 		State |= STATE_SHORTHOP;
 	}
 	if (inputs & INPUT_SHIELD) {
-		if (!(State & (STATE_TECHLAG | STATE_TECHATTEMPT))) {
+		if ((State & STATE_JUMPING) && !(State & (STATE_TECHLAG | STATE_TECHATTEMPT))) {
 			State |= STATE_TECHATTEMPT;
 			TechDelay = frameNumber + 20;
 		}
@@ -390,7 +387,7 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 		if (State & STATE_JUMPING) {
 			//Velocity = { 0, Gravity + 0.00001f };
 			if (AnimFrame == 10) {
-				Projectiles.Append(Projectile(Position + Vec2(0.2f, -1.2f), { Facing.x * 0.5f, -0.5f }, 0.3f, { 0.0f, 0.0f }, 0.1f, 0.1f, 1.0f, true, LastAttackID, AttackDelay, NormProjFuncs::NeckGrabOnHit, NormProjFuncs::NeckGrabUpdate, NormProjFuncs::NeckGrabDraw, GiraffePen, SpitBrush));
+				Projectiles.Append(Projectile(Position + Vec2(0.2f, -1.2f), { Facing.x * 0.5f, -0.5f }, 0.3f, { 0.0f, 0.0f }, 0.1f, 0.1f, 1.0f, true, LastAttackID, AttackDelay - 10, NormProjFuncs::NeckGrabOnHit, NormProjFuncs::NeckGrabUpdate, NormProjFuncs::NeckGrabDraw, GiraffePen, SpitBrush));
 			}
 		}
 		else if (AnimFrame == 17) {
@@ -603,24 +600,30 @@ void NormGiraffe::Draw(HDC hdc, Vec2 Scale)
 		SelectObject(hdc, IntangiblePen);
 	}
 
-	if (State & (STATE_WEAK | STATE_HEAVY)) {
-		CurrentAnim = AttackNum;
-		CurrentFrame = AnimFrame;
-		if (AttackNum == 0) {
-			CurrentFrame = 0;
-			if (AnimFrame >= 10) {
-				POINT points[NUM_POINTS];
 
+	if ((State & STATE_HEAVY) && (State & STATE_JUMPING)) {
+		if (State & STATE_UP) {
+			if (AnimFrame >= 10 && AnimFrame <= 30) {
+				POINT points[NUM_POINTS];
 				for (int i = 0; i < NUM_POINTS; ++i) {
 					points[i] = (Scale * (Position + Facing * (*Moves->GetSkelPoints(CurrentAnim, CurrentFrame))[i])).ToPoint();
 				}
-
 				Polyline(hdc, points, 27);
 				Polyline(hdc, &points[36], 2);
-				return;
+			}
+			else {
+				DrawSelf(hdc, Scale, AnimFrame, AttackNum);
 			}
 		}
-		DrawSelf(hdc, Scale, CurrentFrame, CurrentAnim);
+		else {
+			DrawSelf(hdc, Scale, AnimFrame, AttackNum);
+		}
+		return;
+	}
+
+	if (State & (STATE_WEAK | STATE_HEAVY)) {
+		CurrentAnim = AttackNum;
+		CurrentFrame = AnimFrame;
 	}
 	else {
 		if (State & (STATE_HITSTUN | STATE_ATTACKSTUN)) {
@@ -675,8 +678,8 @@ void NormGiraffe::Draw(HDC hdc, Vec2 Scale)
 			CurrentAnim = 8;
 			CurrentFrame = AnimFrame;
 		}
-		DrawSelf(hdc, Scale, CurrentFrame, CurrentAnim);
 	}
+	DrawSelf(hdc, Scale, CurrentFrame, CurrentAnim);
 }
 
 void NormGiraffe::DrawSelf(HDC hdc, Vec2 Scale, int CurrentFrame, int CurrentAnim)

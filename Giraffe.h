@@ -67,6 +67,8 @@ public:
 	const std::vector<HitCollider>* Hitboxes;
 	float Knockback;
 
+	friend struct NormProjFuncs;
+
 protected:
 	//Movement
 	

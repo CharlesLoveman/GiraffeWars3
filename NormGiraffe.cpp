@@ -1,11 +1,5 @@
 #include "NormGiraffe.h"
-
-
-void SpitOnHit(Projectile& self, Giraffe& parent, Giraffe* collided)
-{
-	//Do nothing
-	//parent.Velocity += 0.1f * (self.Position - parent.Position);
-}
+#include "NormProjFuncs.h"
 
 NormGiraffe::NormGiraffe(Vec2 _Position, MoveSet* _Moves, HPEN _GiraffePen)
 {
@@ -382,11 +376,16 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 	}
 
 	//Character Move-Specific Updates
-	if ((State & STATE_HEAVY) && (State & STATE_UP) && AnimFrame == 17) {
-		++LastAttackID;
+	if ((State & STATE_HEAVY) && (State & STATE_UP)) {
+		if ((State & STATE_JUMPING) && AnimFrame == 10) {
+			Projectiles.Append(Projectile(Position + Vec2(0.2f, -1.2f), { Facing.x * 0.5f, -0.5f }, 0.3f, { 0.0f, 0.0f }, 0.1f, 0.1f, 1.0f, true, LastAttackID, NormProjFuncs::NeckGrabOnHit, NormProjFuncs::NeckGrabUpdate, NormProjFuncs::NeckGrabDraw, GiraffePen, SpitBrush));
+		}
+		else if (AnimFrame == 17) {
+			++LastAttackID;
+		}
 	}
 	else if ((State & STATE_HEAVY) && !(State & (STATE_UP | STATE_FORWARD | STATE_BACK | STATE_DOWN)) && AnimFrame == 13) {
-		Projectiles.Append(Projectile(Position + Vec2(0.2f, -1.2f), { Facing.x * 0.5f, 0.0f }, 0.3f, { Facing.x, 0.0f }, 0.1f, 0.1f, 1.0f, true, LastAttackID, SpitOnHit));
+		Projectiles.Append(Projectile(Position + Vec2(0.2f, -1.2f), { Facing.x * 0.5f, 0.0f }, 0.3f, { Facing.x, 0.0f }, 0.1f, 0.1f, 1.0f, true, LastAttackID, NormProjFuncs::SpitOnHit, NormProjFuncs::SpitUpdate, NormProjFuncs::SpitDraw, GiraffePen, SpitBrush));
 	}
 	else if ((State & STATE_JUMPING) && (State & STATE_WEAK) && (State & STATE_BACK) && AnimFrame == 7) {
 		Facing.x *= -1;
@@ -408,7 +407,7 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 		}
 	}
 	for (int p = 0; p < Projectiles.Size(); ++p) {
-		Projectiles[p].Velocity.y += Gravity;
+		Projectiles[p].Update(Projectiles[p], *this);
 	}
 
 	//Adding Friction/Air resitance
@@ -575,9 +574,8 @@ void NormGiraffe::Move(Stage& stage, const int frameNumber)
 void NormGiraffe::Draw(HDC hdc, Vec2 Scale)
 {
 	SelectObject(hdc, GiraffePen);
-	SelectObject(hdc, SpitBrush);
 	for (int i = 0; i < Projectiles.Size(); ++i) {
-		Ellipse(hdc, Scale.x * (Projectiles[i].Position.x - Projectiles[i].Radius), Scale.y * (Projectiles[i].Position.y - Projectiles[i].Radius), Scale.x * (Projectiles[i].Position.x + Projectiles[i].Radius), Scale.y * (Projectiles[i].Position.y + Projectiles[i].Radius));
+		Projectiles[i].Draw(Projectiles[i], *this, hdc, Scale);
 	}
 	
 	int CurrentAnim = 0;

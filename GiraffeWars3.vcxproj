@@ -156,6 +156,7 @@
     <ClInclude Include="giraffewar.h" />
     <ClInclude Include="NormGiraffe.h" />
     <ClInclude Include="NormMoveSet.h" />
+    <ClInclude Include="NormProjFuncs.h" />
     <ClInclude Include="Projectile.h" />
     <ClInclude Include="renderer.h" />
     <ClInclude Include="Stage.h" />

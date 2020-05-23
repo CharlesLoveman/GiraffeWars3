@@ -19,8 +19,6 @@ public:
 	void Draw(HDC hdc, Vec2 Scale);
 private:
 	HBRUSH SpitBrush;
-
-	friend void SpitOnHit(Projectile& self, Giraffe& parent, Giraffe* collided);
 };
 
 #endif // !_NORMGIRAFFE_H_

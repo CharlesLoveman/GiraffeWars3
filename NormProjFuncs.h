@@ -7,9 +7,10 @@ struct NormProjFuncs {
 	{
 		//Do nothing
 	}
-	static void SpitUpdate(Projectile& self, Giraffe& parent)
+	static bool SpitUpdate(Projectile& self, Giraffe& parent, int frameNumber)
 	{
 		self.Velocity.y += parent.Gravity;
+		return (frameNumber >= self.LifeSpan);
 	}
 	static void SpitDraw(Projectile& self, Giraffe& parent, HDC hdc, Vec2 Scale)
 	{
@@ -19,22 +20,30 @@ struct NormProjFuncs {
 	}
 	static void NeckGrabOnHit(Projectile& self, Giraffe& parent, Giraffe* collided)
 	{
-		parent.Velocity += Vec2(0.2f, 0.3f) * (self.Position - parent.Position);
+		Vec2 diff = Vec2(0.2f, 0.3f) * (self.Position - parent.Position);
+		parent.Velocity += diff;
+		parent.State &= ~(STATE_HEAVY | STATE_UP);
+		if (collided != nullptr) {
+			collided->Velocity -= diff;
+		}
 	}
-	static void NeckGrabUpdate(Projectile& self, Giraffe& parent)
+	static bool NeckGrabUpdate(Projectile& self, Giraffe& parent, int frameNumber)
 	{
-		//No Special Updates;
+		self.Velocity.y += parent.Gravity;
+		return (frameNumber >= self.LifeSpan);
 	}
 	static void NeckGrabDraw(Projectile& self, Giraffe& parent, HDC hdc, Vec2 Scale)
 	{
 		SelectObject(hdc, self.Pen);
-		POINT points[5];
+		POINT points[7];
 
-		for (int i = 0; i < 5; ++i) {
+		points[0] = (Scale * (parent.Position + parent.Facing * (*(parent.Moves)->GetSkelPoints(0, 0))[26])).ToPoint();
+		points[6] = (Scale * (parent.Position + parent.Facing * (*(parent.Moves)->GetSkelPoints(0, 0))[36])).ToPoint();
+		for (int i = 1; i < 6; ++i) {
 			points[i] = (Scale * (self.Position + parent.Facing * (*(parent.Moves)->GetSkelPoints(0, 0))[29 + i])).ToPoint();
 		}
 
-		Polyline(hdc, points, 5);
+		Polyline(hdc, points, 7);
 	}
 };
 

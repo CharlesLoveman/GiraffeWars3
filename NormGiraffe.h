@@ -19,6 +19,7 @@ public:
 	void Draw(HDC hdc, Vec2 Scale);
 private:
 	HBRUSH SpitBrush;
+	void DrawSelf(HDC hdc, Vec2 Scale, int CurrentFrame, int CurrentAnim);
 };
 
 #endif // !_NORMGIRAFFE_H_

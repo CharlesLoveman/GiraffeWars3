@@ -11,14 +11,15 @@ Projectile::Projectile()
 	Scale = 1.0f;
 	Fixed = false;
 	ID = 0;
+	LifeSpan = 0;
 	OnHit = nullptr;
 	Update = nullptr;
 	Draw = nullptr;
-	Pen = CreatePen(PS_SOLID, 1, RGB(255, 255, 255));
-	Brush = CreateSolidBrush(RGB(255, 255, 255));
+	Pen = nullptr;
+	Brush = nullptr;
 }
 
-Projectile::Projectile(Vec2 Pos, Vec2 Vel, float Rad, Vec2 Frc, float Dmg, float Knk, float Scl, bool Fix, int _ID, ProjectileOnHit _OnHit, ProjectileUpdate _Update, ProjectileDraw _Draw, HPEN _Pen, HBRUSH _Brush)
+Projectile::Projectile(Vec2 Pos, Vec2 Vel, float Rad, Vec2 Frc, float Dmg, float Knk, float Scl, bool Fix, int _ID, int _LifeSpan, ProjectileOnHit _OnHit, ProjectileUpdate _Update, ProjectileDraw _Draw, HPEN _Pen, HBRUSH _Brush)
 {
 	Position = Pos;
 	Velocity = Vel;
@@ -29,6 +30,7 @@ Projectile::Projectile(Vec2 Pos, Vec2 Vel, float Rad, Vec2 Frc, float Dmg, float
 	Scale = Scl;
 	Fixed = Fix;
 	ID = _ID;
+	LifeSpan = _LifeSpan;
 	OnHit = _OnHit;
 	Update = _Update;
 	Draw = _Draw;

@@ -11,9 +11,10 @@ Projectile::Projectile()
 	Scale = 1.0f;
 	Fixed = false;
 	ID = 0;
+	OnHit = nullptr;
 }
 
-Projectile::Projectile(Vec2 Pos, Vec2 Vel, float Rad, Vec2 Frc, float Dmg, float Knk, float Scl, bool Fix, int _ID)
+Projectile::Projectile(Vec2 Pos, Vec2 Vel, float Rad, Vec2 Frc, float Dmg, float Knk, float Scl, bool Fix, int _ID, ProjectileFunc _OnHit)
 {
 	Position = Pos;
 	Velocity = Vel;
@@ -24,4 +25,5 @@ Projectile::Projectile(Vec2 Pos, Vec2 Vel, float Rad, Vec2 Frc, float Dmg, float
 	Scale = Scl;
 	Fixed = Fix;
 	ID = _ID;
+	OnHit = _OnHit;
 }

@@ -1,5 +1,12 @@
 #include "NormGiraffe.h"
 
+
+void SpitOnHit(Projectile& self, Giraffe& parent, Giraffe* collided)
+{
+	//Do nothing
+	//parent.Velocity += 0.1f * (self.Position - parent.Position);
+}
+
 NormGiraffe::NormGiraffe(Vec2 _Position, MoveSet* _Moves, HPEN _GiraffePen)
 {
 	//Movement
@@ -251,6 +258,11 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 			//Neutral B
 			AttackNum = 30;
 		}
+		if (State & STATE_JUMPING) {
+			if (State & STATE_UP) {
+				AttackNum = 23;
+			}
+		}
 		AttackDelay = frameNumber + Moves->GetMoveLength(AttackNum);
 		++LastAttackID;
 		AnimFrame = 0;
@@ -374,7 +386,7 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 		++LastAttackID;
 	}
 	else if ((State & STATE_HEAVY) && !(State & (STATE_UP | STATE_FORWARD | STATE_BACK | STATE_DOWN)) && AnimFrame == 13) {
-		Projectiles.Append(Projectile(Position + Vec2(0.2f, -1.2f), { Facing.x * 0.5f, 0.0f }, 0.3f, { Facing.x, 0.0f }, 0.1f, 0.1f, 1.0f, true, LastAttackID));
+		Projectiles.Append(Projectile(Position + Vec2(0.2f, -1.2f), { Facing.x * 0.5f, 0.0f }, 0.3f, { Facing.x, 0.0f }, 0.1f, 0.1f, 1.0f, true, LastAttackID, SpitOnHit));
 	}
 	else if ((State & STATE_JUMPING) && (State & STATE_WEAK) && (State & STATE_BACK) && AnimFrame == 7) {
 		Facing.x *= -1;
@@ -420,6 +432,7 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 		for (int j = 0; j < num_giraffes; ++j) {
 			if (j != i) {
 				if ((*giraffes[j]).ProjectileHit(Projectiles[p])) {
+					Projectiles[p].OnHit(Projectiles[p], *this, giraffes[j]);
 					Projectiles.Remove(p);
 					break;
 				}
@@ -481,6 +494,7 @@ void NormGiraffe::Move(Stage& stage, const int frameNumber)
 	for (int i = Projectiles.Size() - 1; i >= 0; --i) {
 		Projectiles[i].Position += Projectiles[i].Velocity;
 		if (stage.KillProjectile(Projectiles[i])) {
+			Projectiles[i].OnHit(Projectiles[i], *this, nullptr);
 			Projectiles.Remove(i);
 		};
 	}

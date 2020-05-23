@@ -201,13 +201,13 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 		if (State & STATE_KNOCKDOWN) {
 			State &= ~STATE_KNOCKDOWN;
 			State |= STATE_GETUPATTACK;
-			AttackNum = 18;
+			AttackNum = 17;
 		}
 		else if (State & STATE_LEDGEHOG) {
 			State &= ~STATE_LEDGEHOG;
 			stage.Ledges[LedgeID].Hogged = false;
 			State |= STATE_GETUPATTACK;
-			AttackNum = 18;
+			AttackNum = 17;
 			Position += Vec2(2.5f, -2.5f) * Facing;
 		}
 		else if ((inputs & INPUT_RIGHT && Facing.x == 1) || (inputs & INPUT_LEFT && Facing.x == -1)) {
@@ -384,6 +384,9 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 	}
 	else if ((State & STATE_ROLLING) && AnimFrame == 10) {
 		State &= ~STATE_INTANGIBLE;
+	}
+	else if ((State & STATE_GETUPATTACK) && (7 <= AnimFrame) && (AnimFrame <= 10)) {
+		Facing.x *= -1;
 	}
 
 	//Adding Gravity

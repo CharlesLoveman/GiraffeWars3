@@ -286,6 +286,11 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 		State |= STATE_SHORTHOP;
 	}
 	if (inputs & INPUT_SHIELD) {
+		if (!(State & (STATE_TECHLAG | STATE_TECHATTEMPT))) {
+			State |= STATE_TECHATTEMPT;
+			TechDelay = frameNumber + 20;
+		}
+		
 		if (inputs & INPUT_DOWN && State & STATE_JUMPSQUAT && HasAirDash) {
 			HasAirDash = false;
 			State &= ~(STATE_JUMPSQUAT | STATE_SHORTHOP);
@@ -299,10 +304,6 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 			else if (inputs & INPUT_RIGHT) {
 				Velocity.x += DashSpeed;
 			}
-		}
-		else if ((State & STATE_HITSTUN) && !(State & (STATE_TECHLAG | STATE_TECHATTEMPT))) {
-			State |= STATE_TECHATTEMPT;
-			TechDelay = frameNumber + 20;
 		}
 		else if (State & STATE_JUMPING && !(State & (STATE_WEAK | STATE_HEAVY | STATE_HITSTUN)) && HasAirDash) {
 			HasAirDash = false;
@@ -527,7 +528,7 @@ void NormGiraffe::Move(Stage& stage, const int frameNumber)
 				else {
 					if (State & (STATE_WEAK | STATE_HEAVY)) {
 						State |= STATE_ATTACKSTUN;
-						AttackDelay = Moves->GetLandingLag(AttackNum - 25);
+						AttackDelay = Moves->GetLandingLag(max(0,(AttackNum - 25)));
 					}
 					else if (State & STATE_TECHATTEMPT) {
 						State &= ~STATE_TECHATTEMPT;

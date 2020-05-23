@@ -49,7 +49,7 @@ NormGiraffe::NormGiraffe(Vec2 _Position, MoveSet* _Moves, HPEN _GiraffePen)
 	GiraffePen = _GiraffePen;
 	IntangiblePen = CreatePen(PS_SOLID, 1, RGB(255,255,255));
 	ShieldBrush = CreateHatchBrush(HS_BDIAGONAL, RGB(0, 255, 127));
-	SpitBrush = CreateSolidBrush(RGB(194, 245, 66));
+	SpitBrush = CreateSolidBrush(RGB(90, 210, 180));
 }
 
 NormGiraffe::~NormGiraffe()
@@ -249,7 +249,7 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 		else
 		{
 			//Neutral B
-			AttackNum = 18;
+			AttackNum = 30;
 		}
 		AttackDelay = frameNumber + Moves->GetMoveLength(AttackNum);
 		++LastAttackID;
@@ -373,7 +373,7 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 	if ((State & STATE_HEAVY) && (State & STATE_UP) && AnimFrame == 17) {
 		++LastAttackID;
 	}
-	else if ((State & STATE_HEAVY) && !(State & (STATE_UP | STATE_FORWARD | STATE_BACK | STATE_DOWN)) && AnimFrame == 10) {
+	else if ((State & STATE_HEAVY) && !(State & (STATE_UP | STATE_FORWARD | STATE_BACK | STATE_DOWN)) && AnimFrame == 13) {
 		Projectiles.Append(Projectile(Position + Vec2(0.2f, -1.2f), { Facing.x * 0.5f, 0.0f }, 0.3f, { Facing.x, 0.0f }, 0.1f, 0.1f, 1.0f, true, LastAttackID));
 	}
 	else if ((State & STATE_JUMPING) && (State & STATE_WEAK) && (State & STATE_BACK) && AnimFrame == 7) {
@@ -477,7 +477,7 @@ void NormGiraffe::Move(Stage& stage, const int frameNumber)
 	}
 	numIncoming = 0;
 	
-
+	//Test projectile intersection with stage
 	for (int i = Projectiles.Size() - 1; i >= 0; --i) {
 		Projectiles[i].Position += Projectiles[i].Velocity;
 		if (stage.KillProjectile(Projectiles[i])) {
@@ -512,7 +512,7 @@ void NormGiraffe::Move(Stage& stage, const int frameNumber)
 					TechDelay = frameNumber + 30;
 				}
 				else {
-					if (State & STATE_WEAK) {
+					if (State & (STATE_WEAK | STATE_HEAVY)) {
 						State |= STATE_ATTACKSTUN;
 						AttackDelay = Moves->GetLandingLag(AttackNum - 25);
 					}

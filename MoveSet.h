@@ -5,7 +5,7 @@
 #include <vector>
 #include <array>
 
-constexpr int NUM_MOVES = 30;
+constexpr int NUM_MOVES = 34;
 constexpr int NUM_POINTS = 38;
 
 struct MoveSet {

@@ -131,7 +131,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="ArrayQueue.cpp" />
     <ClCompile Include="Collider.cpp" />
     <ClCompile Include="gamestate.cpp" />
     <ClCompile Include="gdi_renderer.cpp" />
@@ -140,11 +139,13 @@
     <ClCompile Include="giraffewar.cpp" />
     <ClCompile Include="NormGiraffe.cpp" />
     <ClCompile Include="NormMoveSet.cpp" />
+    <ClCompile Include="Projectile.cpp" />
     <ClCompile Include="Stage.cpp" />
     <ClCompile Include="Vec2.cpp" />
     <ClCompile Include="VecRect.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ArrayList.h" />
     <ClInclude Include="ArrayQueue.h" />
     <ClInclude Include="Collider.h" />
     <ClInclude Include="gamestate.h" />
@@ -155,6 +156,7 @@
     <ClInclude Include="giraffewar.h" />
     <ClInclude Include="NormGiraffe.h" />
     <ClInclude Include="NormMoveSet.h" />
+    <ClInclude Include="Projectile.h" />
     <ClInclude Include="renderer.h" />
     <ClInclude Include="Stage.h" />
     <ClInclude Include="Vec2.h" />

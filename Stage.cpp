@@ -117,6 +117,11 @@ bool Stage::Intersects(Vec2 pos, Collider col, bool down, bool jumping, bool fal
 	return true;
 }
 
+bool Stage::KillProjectile(Projectile p)
+{
+	return !(p.Position.x + p.Radius < Box.left || p.Position.x - p.Radius > Box.right || p.Position.y + p.Radius < Box.top || p.Position.y - p.Radius > Box.bottom);
+}
+
 void Stage::Draw(HDC hdc, Vec2 Scale, HBRUSH Brush)
 {
 	SelectObject(hdc, Brush);

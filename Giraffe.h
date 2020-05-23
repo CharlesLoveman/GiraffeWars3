@@ -2,12 +2,15 @@
 #define _GIRAFFE_H_
 
 #include "ArrayQueue.h"
+#include "ArrayList.h"
 #include "Collider.h"
 #include "Vec2.h"
 #include "giraffewar.h"
 #include "Stage.h"
 #include <vector>
 #include <array>
+#include "MoveSet.h"
+#include "Projectile.h"
 
 class Giraffe;
 enum GiraffeStates {
@@ -52,9 +55,10 @@ class Giraffe {
 public:
 	virtual ~Giraffe() { };
 	virtual void Update(std::array<Giraffe*, 4> giraffes, const int num_giraffes, const int i, const int inputs, const int frameNumber, Stage& stage) = 0;
-	virtual void Draw(HDC hdc, Vec2 Scale, HBRUSH ShieldBrush, HPEN GiraffePen, HPEN IntangiblePen) = 0;
+	virtual void Draw(HDC hdc, Vec2 Scale) = 0;
 	virtual void Move(Stage& stage, const int frameNumber) = 0;
 	void AddHit(HitCollider hit, int ID, Vec2 facing, Vec2 position);
+	bool ProjectileHit(Projectile p);
 
 	Vec2 Position;
 	Vec2 Velocity;
@@ -85,6 +89,7 @@ protected:
 	int Stocks;
 	float Mass;
 	int LedgeID;
+	ArrayList<Projectile> Projectiles;
 
 
 	//State Management
@@ -94,24 +99,22 @@ protected:
 	int MaxJumpDelay;
 	int MaxShieldDelay;
 	int AttackNum;
-	
-
+	MoveSet* Moves;
 
 	//Collision
-	//Head, Neck1, Neck2, Body, FrontLegs, BackLegs
 	Collider Fullbody;
 	Collider StageCollider;
-	//HitCollider Hitboxes[6]; //Ranked by priority
-	
 	HitWID IncomingHits[GGPO_MAX_PLAYERS - 1];
-	ArrayQueue PrevHitQueue;
-	//int AttackID;
+	ArrayQueue<int> PrevHitQueue;
 	int LastAttackID;
 	int numIncoming;
 	int numHitboxes;
 
 	//Animation
 	int AnimFrame;
+	HPEN GiraffePen;
+	HPEN IntangiblePen;
+	HBRUSH ShieldBrush;
 };
 
 #endif // !_GIRAFFE_H_

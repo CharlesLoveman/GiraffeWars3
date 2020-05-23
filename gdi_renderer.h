@@ -29,10 +29,7 @@ protected:
 	HGLRC _hrc;
 	char _status[1024];
 	COLORREF _giraffeColours[4];
-	HPEN _giraffePens[4];
-	HPEN _intangiblePen;
 	HBRUSH _redBrush;
 	HBRUSH _stageBrush;
-	HBRUSH _shieldBrush;
 };
 #endif

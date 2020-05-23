@@ -1,6 +1,6 @@
 #include "NormGiraffe.h"
 
-NormGiraffe::NormGiraffe(Vec2 _Position, MoveSet* _Moves)
+NormGiraffe::NormGiraffe(Vec2 _Position, MoveSet* _Moves, HPEN _GiraffePen)
 {
 	//Movement
 	Position = _Position;
@@ -25,8 +25,9 @@ NormGiraffe::NormGiraffe(Vec2 _Position, MoveSet* _Moves)
 	Hurtboxes = nullptr;
 	numHitboxes = 0;
 	numIncoming = 0;
-	PrevHitQueue = ArrayQueue();
+	PrevHitQueue = ArrayQueue<int>();
 	LastAttackID = 0;
+	Projectiles = ArrayList<Projectile>();
 
 	//State
 	State = 0;
@@ -38,23 +39,6 @@ NormGiraffe::NormGiraffe(Vec2 _Position, MoveSet* _Moves)
 	TechDelay = 0;
 	Moves = _Moves;
 
-	/*std::ofstream file("NormalizedHitboxes.txt");
-	Vec2 normForce;
-	for (int i = 8; i < 20; ++i) {
-		file << "{";
-		for (int f = 0; f < Moves->Hitboxes[i].size(); ++f) {
-			file << "{";
-			for (int v = 0; v < Moves->Hitboxes[i][f].size(); ++v) {
-				normForce = Moves->Hitboxes[i][f][v].Force;
-				normForce = normForce.Normalise();
-				file << "HitCollider(" << "{" << Moves->Hitboxes[i][f][v].Position.x << "f," << Moves->Hitboxes[i][f][v].Position.y << "f}," << Moves->Hitboxes[i][f][v].Radius << "f,{" << normForce.x << "f," << normForce.y << "f}," << Moves->Hitboxes[i][f][v].Damage << "f),";
-			}
-			file << "},";
-		}
-		file << "};\n";
-	}
-	file.close();*/
-
 	//Misc
 	Stocks = 3;
 	Knockback = 0;
@@ -62,6 +46,10 @@ NormGiraffe::NormGiraffe(Vec2 _Position, MoveSet* _Moves)
 
 	//Animation
 	AnimFrame = 0;
+	GiraffePen = _GiraffePen;
+	IntangiblePen = CreatePen(PS_SOLID, 1, RGB(255,255,255));
+	ShieldBrush = CreateHatchBrush(HS_BDIAGONAL, RGB(0, 255, 127));
+	SpitBrush = CreateSolidBrush(RGB(194, 245, 66));
 }
 
 NormGiraffe::~NormGiraffe()
@@ -241,21 +229,27 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 	}
 	if (inputs & INPUT_HEAVY && !(State & (STATE_WEAK | STATE_HEAVY | STATE_SHIELDING | STATE_DROPSHIELD | STATE_JUMPSQUAT | STATE_JUMPLAND | STATE_HITSTUN | STATE_WAVEDASH | STATE_ATTACKSTUN | STATE_LEDGEHOG | STATE_KNOCKDOWN | STATE_KNOCKDOWNLAG | STATE_TECHING | STATE_ROLLING))) {
 		State &= ~STATE_CROUCH;
+		State |= STATE_HEAVY;
 		if ((inputs & INPUT_RIGHT && Facing.x == 1) || (inputs & INPUT_LEFT && Facing.x == -1)) {
 			//Fsmash
-			State |= STATE_HEAVY | STATE_FORWARD;
+			State |= STATE_FORWARD;
 			AttackNum = 22;
 		}
 		else if (inputs & INPUT_UP) {
 			//Upsmash
-			State |= STATE_HEAVY | STATE_UP;
+			State |= STATE_UP;
 			AttackNum = 23;
 		}
 		else if (inputs & INPUT_DOWN)
 		{
 			//Dsmash
-			State |= STATE_HEAVY | STATE_DOWN;
+			State |= STATE_DOWN;
 			AttackNum = 24;
+		}
+		else
+		{
+			//Neutral B
+			AttackNum = 18;
 		}
 		AttackDelay = frameNumber + Moves->GetMoveLength(AttackNum);
 		++LastAttackID;
@@ -379,6 +373,9 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 	if ((State & STATE_HEAVY) && (State & STATE_UP) && AnimFrame == 17) {
 		++LastAttackID;
 	}
+	else if ((State & STATE_HEAVY) && !(State & (STATE_UP | STATE_FORWARD | STATE_BACK | STATE_DOWN)) && AnimFrame == 10) {
+		Projectiles.Append(Projectile(Position + Vec2(0.2f, -1.2f), { Facing.x * 0.5f, 0.0f }, 0.3f, { Facing.x, 0.0f }, 0.1f, 0.1f, 1.0f, true, LastAttackID));
+	}
 	else if ((State & STATE_JUMPING) && (State & STATE_WEAK) && (State & STATE_BACK) && AnimFrame == 7) {
 		Facing.x *= -1;
 	}
@@ -398,6 +395,9 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 			Velocity.y += 3 * Gravity;
 		}
 	}
+	for (int p = 0; p < Projectiles.Size(); ++p) {
+		Projectiles[p].Velocity.y += Gravity;
+	}
 
 	//Adding Friction/Air resitance
 	if (!(State & STATE_JUMPING)) {
@@ -412,17 +412,32 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 		}
 	}
 
+
+
+
 	//Apply hits to other giraffes
+	for (int p = Projectiles.Size() - 1; p >= 0; --p) {
+		for (int j = 0; j < num_giraffes; ++j) {
+			if (j != i) {
+				if ((*giraffes[j]).ProjectileHit(Projectiles[p])) {
+					Projectiles.Remove(p);
+					break;
+				}
+			}
+		}
+	}
+
+
 	if (!(Hitboxes == nullptr)) {
 		for (int j = 0; j < num_giraffes; ++j) {
 			if (j != i) {
 				for (int h = 0; h < numHitboxes; ++h) {
 					(*giraffes[j]).AddHit((*Hitboxes)[h], LastAttackID, Facing, Position);
-					
 				}
 			}
 		}
 	}
+
 }
 
 void NormGiraffe::Move(Stage& stage, const int frameNumber)
@@ -446,7 +461,7 @@ void NormGiraffe::Move(Stage& stage, const int frameNumber)
 					KnockbackApplied = IncomingHits[j].hit.Knockback;
 				}
 				else {
-					KnockbackApplied = ((((Knockback / 10 + (Knockback * IncomingHits[j].hit.Damage / 20)) * (200 / (Mass + 100)) * 1.4 + 0.18) * IncomingHits[j].hit.Scale) + IncomingHits[j].hit.Knockback);
+					KnockbackApplied = ((((Knockback / 10 + (Knockback * IncomingHits[j].hit.Damage / 20)) * (200 / (Mass + 100)) * 1.4f + 0.18f) * IncomingHits[j].hit.Scale) + IncomingHits[j].hit.Knockback);
 				}
 				Velocity += KnockbackApplied * IncomingHits[j].hit.Force;
 				if (State & STATE_LEDGEHOG) {
@@ -462,6 +477,13 @@ void NormGiraffe::Move(Stage& stage, const int frameNumber)
 	}
 	numIncoming = 0;
 	
+
+	for (int i = Projectiles.Size() - 1; i >= 0; --i) {
+		Projectiles[i].Position += Projectiles[i].Velocity;
+		if (stage.KillProjectile(Projectiles[i])) {
+			Projectiles.Remove(i);
+		};
+	}
 	
 	Position += Velocity;
 	//Correct intersection with the stage
@@ -536,11 +558,17 @@ void NormGiraffe::Move(Stage& stage, const int frameNumber)
 
 }
 
-void NormGiraffe::Draw(HDC hdc, Vec2 Scale, HBRUSH ShieldBrush, HPEN GiraffePen, HPEN IntangiblePen)
+void NormGiraffe::Draw(HDC hdc, Vec2 Scale)
 {
+	SelectObject(hdc, GiraffePen);
+	SelectObject(hdc, SpitBrush);
+	for (int i = 0; i < Projectiles.Size(); ++i) {
+		Ellipse(hdc, Scale.x * (Projectiles[i].Position.x - Projectiles[i].Radius), Scale.y * (Projectiles[i].Position.y - Projectiles[i].Radius), Scale.x * (Projectiles[i].Position.x + Projectiles[i].Radius), Scale.y * (Projectiles[i].Position.y + Projectiles[i].Radius));
+	}
+	
 	int CurrentAnim = 0;
 	int CurrentFrame = 0;
-	SelectObject(hdc, GiraffePen);
+
 
 	if (State & STATE_INTANGIBLE) {
 		SelectObject(hdc, IntangiblePen);

@@ -16,3 +16,18 @@ void Giraffe::AddHit(HitCollider hit, int ID, Vec2 facing2, Vec2 position2)
 		}
 	}
 }
+
+bool Giraffe::ProjectileHit(Projectile p)
+{
+	if ((p.Position - Position).Length() < (p.Radius + Fullbody.Radius)) {
+		for (int k = 0; k < 6; ++k) {
+			if ((p.Position - (Position + (*Hurtboxes)[k].Position)).Length() < (p.Radius + (*Hurtboxes)[k].Radius)) {
+				IncomingHits[numIncoming].hit = p;
+				IncomingHits[numIncoming].ID = p.ID;
+				++numIncoming;
+				return true;
+			}
+		}
+	}
+	return false;
+}

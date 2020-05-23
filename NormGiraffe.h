@@ -11,14 +11,14 @@ constexpr int NUM_POINTS_NORM = 38;
 
 class NormGiraffe : public Giraffe {
 public:
-	NormGiraffe(Vec2 _Position, MoveSet* _Moves);
+	NormGiraffe(Vec2 _Position, MoveSet* _Moves, HPEN _GiraffePen);
 	~NormGiraffe();
 
 	void Update(std::array<Giraffe*, 4> giraffes, const int num_giraffes, const int i, const int inputs, const int frameNumber, Stage& stage);
 	void Move(Stage& stage, const int frameNumber);
-	void Draw(HDC hdc, Vec2 Scale, HBRUSH ShieldBrush, HPEN GiraffePen, HPEN IntangiblePen);
+	void Draw(HDC hdc, Vec2 Scale);
 private:
-	MoveSet* Moves;
+	HBRUSH SpitBrush;
 };
 
 #endif // !_NORMGIRAFFE_H_

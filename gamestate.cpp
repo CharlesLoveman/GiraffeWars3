@@ -29,8 +29,14 @@ void GameState::Init(HWND hwnd, int num_players, const std::array<MoveSet*, 4> M
 	float stageheight = 5.0f;
 	float stagetop = 30.0f;
 
+	COLORREF _giraffeColours[4];
+	_giraffeColours[0] = RGB(255, 0, 0);
+	_giraffeColours[1] = RGB(0, 255, 0);
+	_giraffeColours[2] = RGB(0, 0, 255);
+	_giraffeColours[3] = RGB(255, 255, 0);
+
 	for (int i = 0; i < _num_giraffes; ++i) {
-		normGiraffes.push_back(NormGiraffe(Vec2(stageleft + stagewidth * (2.0f * i + 1.0f) / (2.0f * _num_giraffes), 20), MoveSets[0]));
+		normGiraffes.push_back(NormGiraffe(Vec2(stageleft + stagewidth * (2.0f * i + 1.0f) / (2.0f * _num_giraffes), 20), MoveSets[0], CreatePen(PS_SOLID, 1, _giraffeColours[i])));
 	}
 
 	for (int i = 0; i < normGiraffes.size(); ++i) {

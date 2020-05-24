@@ -61,7 +61,7 @@ public:
 	virtual void Move(Stage& stage, const int frameNumber, std::array<Giraffe*, 4> giraffes) = 0;
 	void AddHit(HitCollider hit, int ID, Vec2 facing, Vec2 position);
 	bool ProjectileHit(Projectile p);
-	bool GrabHit(Collider col, Vec2 _Facing);
+	bool GrabHit(Collider col, Vec2 _Facing, int frameNumber);
 
 	Vec2 Position;
 	Vec2 Velocity;

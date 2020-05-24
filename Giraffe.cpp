@@ -32,7 +32,7 @@ bool Giraffe::ProjectileHit(Projectile p)
 	return false;
 }
 
-bool Giraffe::GrabHit(Collider col, Vec2 _Facing)
+bool Giraffe::GrabHit(Collider col, Vec2 _Facing, int frameNumber)
 {
 	if (State & (STATE_GRABBED | STATE_INTANGIBLE) || incomingGrab) {
 		return false;
@@ -45,6 +45,7 @@ bool Giraffe::GrabHit(Collider col, Vec2 _Facing)
 				Facing.x = -1 * _Facing.x;
 				Position.x = col.Position.x - 1.0f * Facing.x;
 				Velocity = { 0,0 };
+				TechDelay = frameNumber + 30;
 				return true;
 			}
 		}

@@ -117,6 +117,9 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 		State &= ~STATE_KNOCKDOWNLAG;
 		State |= STATE_KNOCKDOWN;
 	}
+	else if (State & (STATE_GRABBING | STATE_GRABBED) && frameNumber >= TechDelay) {
+		State &= ~(STATE_GRABBED | STATE_GRABBING);
+	}
 	
 	//Read Inputs
 	if (!(State & (STATE_WEAK | STATE_HEAVY | STATE_JUMPSQUAT | STATE_JUMPLAND | STATE_DROPSHIELD | STATE_SHIELDSTUN | STATE_HITSTUN | STATE_KNOCKDOWNLAG | STATE_ROLLING | STATE_GRABBED | STATE_THROW))) {
@@ -290,7 +293,7 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 			AttackNum = 30;
 		}
 		if (State & STATE_JUMPING) {
-			if (State & (STATE_UP | STATE_DOWN)) {
+			if (State & (STATE_UP | STATE_DOWN | STATE_FORWARD)) {
 				AttackNum += 9;
 			}
 		}
@@ -331,7 +334,7 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 	}
 
 	if (inputs & INPUT_SHIELD) {
-		if ((State & STATE_JUMPING) && !(State & (STATE_TECHLAG | STATE_TECHATTEMPT))) {
+		if ((State & STATE_JUMPING) && !(State & (STATE_TECHLAG | STATE_TECHATTEMPT | STATE_GRABBING | STATE_GRABBED))) {
 			State |= STATE_TECHATTEMPT;
 			TechDelay = frameNumber + 20;
 		}
@@ -390,9 +393,10 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 		Collider grabCol = { {Position.x + 1.885000f * Facing.x, Position.y - 0.650000f}, 0.855862f };
 		for (int j = 0; j < num_giraffes; ++j) {
 			if (j != i) {
-				if (giraffes[j]->GrabHit(grabCol, Facing)) {
+				if (giraffes[j]->GrabHit(grabCol, Facing, frameNumber)) {
 					State &= ~(STATE_WEAK | STATE_HEAVY| STATE_RUNNING);
 					State |= STATE_GRABBING;
+					TechDelay = frameNumber + 30;
 					//GrabPointer = j;
 					break;
 				}
@@ -409,10 +413,12 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 		Collider grabCol = { {Position.x + 1.885000f * Facing.x, Position.y - 0.650000f}, 0.855862f };
 		for (int j = 0; j < num_giraffes; ++j) {
 			if (j != i) {
-				if (giraffes[j]->GrabHit(grabCol, Facing)) {
+				if (giraffes[j]->GrabHit(grabCol, Facing, frameNumber)) {
 					State &= ~(STATE_WEAK | STATE_HEAVY | STATE_RUNNING);
 					State |= STATE_GRABBING;
+					TechDelay = frameNumber + 30;
 					giraffes[j]->Velocity = Velocity;
+					giraffes[j]->State |= STATE_JUMPING;
 					CommandGrabPointer = j;
 					break;
 				}
@@ -654,7 +660,7 @@ void NormGiraffe::Move(Stage& stage, const int frameNumber, std::array<Giraffe*,
 			}
 		}
 		else if (!(State & (STATE_JUMPING | STATE_GRABBED))) {
-			State &= ~(STATE_UP | STATE_BACK | STATE_DOWN | STATE_FORWARD | STATE_WEAK | STATE_HEAVY | STATE_SHIELDING | STATE_DROPSHIELD | STATE_SHIELDSTUN | STATE_JUMPSQUAT | STATE_SHORTHOP | STATE_JUMPLAND | STATE_WAVEDASH | STATE_CROUCH | STATE_GRABBING | STATE_GRABBED | STATE_THROW);
+			State &= ~(STATE_UP | STATE_BACK | STATE_DOWN | STATE_FORWARD | STATE_WEAK | STATE_HEAVY | STATE_SHIELDING | STATE_DROPSHIELD | STATE_SHIELDSTUN | STATE_JUMPSQUAT | STATE_SHORTHOP | STATE_JUMPLAND | STATE_WAVEDASH | STATE_CROUCH | STATE_GRABBING | STATE_THROW);
 			State |= STATE_JUMPING | STATE_DOUBLEJUMPWAIT;
 			JumpDelay = frameNumber + MaxJumpDelay * 2;
 		}

@@ -671,15 +671,19 @@ void NormGiraffe::Move(Stage& stage, const int frameNumber, std::array<Giraffe*,
 	//Remove this later
 	if (Position.y > 60) {
 		Position.y = 0;
+		Knockback = 0;
 	}
 	else if (Position.y < 0) {
 		Position.y = 60;
+		Knockback = 0;
 	}
 	if (Position.x > 60) {
 		Position.x = 0;
+		Knockback = 0;
 	}
 	else if (Position.x < 0) {
 		Position.x = 60;
+		Knockback = 0;
 	}
 
 

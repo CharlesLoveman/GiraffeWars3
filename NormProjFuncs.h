@@ -33,7 +33,7 @@ struct NormProjFuncs {
 	static bool NeckGrabUpdate(Projectile& self, Giraffe& parent, int frameNumber)
 	{
 		self.Velocity.y += parent.Gravity;
-		return (frameNumber >= self.LifeSpan);
+		return (frameNumber >= self.LifeSpan) || !(parent.State & STATE_JUMPING);
 	}
 	static void NeckGrabDraw(Projectile& self, Giraffe& parent, HDC hdc, Vec2 Scale)
 	{

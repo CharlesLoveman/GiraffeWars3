@@ -21,6 +21,7 @@ private:
 	HBRUSH SpitBrush;
 	HBRUSH ShineBrush;
 	void DrawSelf(HDC hdc, Vec2 Scale, int CurrentFrame, int CurrentAnim);
+	void DrawHitbox(HDC hdc, Vec2 Scale, Vec2 Pos, float Rad);
 };
 
 #endif // !_NORMGIRAFFE_H_

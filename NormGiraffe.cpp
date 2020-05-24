@@ -29,6 +29,7 @@ NormGiraffe::NormGiraffe(Vec2 _Position, MoveSet* _Moves, HPEN _GiraffePen)
 	PrevHitQueue = ArrayQueue<int>();
 	LastAttackID = 0;
 	Projectiles = ArrayList<Projectile>();
+	incomingGrab = false;
 
 	//State
 	State = 0;
@@ -85,7 +86,7 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 		State &= ~STATE_WAVEDASH;
 	}
 	if (State & (STATE_WEAK | STATE_HEAVY | STATE_THROW) && frameNumber >= AttackDelay) {
-		State &= ~(STATE_UP | STATE_BACK | STATE_DOWN | STATE_FORWARD | STATE_WEAK | STATE_HEAVY | STATE_THROW);
+		State &= ~(STATE_UP | STATE_BACK | STATE_DOWN | STATE_FORWARD | STATE_WEAK | STATE_HEAVY | STATE_THROW | STATE_GETUPATTACK);
 		numHitboxes = 0;
 	}
 	else if (State & STATE_HITSTUN && frameNumber >= AttackDelay) {
@@ -131,8 +132,8 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 			if ((inputs & INPUT_RIGHT && Facing.x == 1) || (inputs & INPUT_LEFT && Facing.x == -1)) {
 				State &= ~STATE_GRABBING;
 				State |= STATE_FORWARD | STATE_THROW;
-				AttackDelay = frameNumber + 18;//Length of forward throw
-				AttackNum = 18;//13
+				AttackDelay = frameNumber + Moves->GetMoveLength(13);//Length of forward throw
+				AttackNum = 13;
 				AnimFrame = 0;
 			}
 			else if (inputs & INPUT_UP) {
@@ -233,7 +234,7 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 		else if ((inputs & INPUT_SHIELD || State & STATE_SHIELDING) && !(State & (STATE_JUMPING))) {
 			State &= ~STATE_SHIELDING;
 			State |= STATE_HEAVY;//Code grabs as weak and heavy
-			AttackNum = 24;
+			AttackNum = 12;
 		}
 		else if ((inputs & INPUT_RIGHT && Facing.x == 1) || (inputs & INPUT_LEFT && Facing.x == -1)) {
 			State |= STATE_FORWARD;
@@ -386,10 +387,10 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 
 	//Grab
 	if (State & STATE_WEAK && State & STATE_HEAVY && AnimFrame == 7) {
-		Collider grabCol = { {Position.x + 2 * Facing.x, Position.y}, 0.5f };
+		Collider grabCol = { {Position.x + 1.885000f * Facing.x, Position.y - 0.650000f}, 0.855862f };
 		for (int j = 0; j < num_giraffes; ++j) {
 			if (j != i) {
-				if (giraffes[j]->GrabHit(grabCol)) {
+				if (giraffes[j]->GrabHit(grabCol, Facing)) {
 					State &= ~(STATE_WEAK | STATE_HEAVY| STATE_RUNNING);
 					State |= STATE_GRABBING;
 					//GrabPointer = j;
@@ -464,7 +465,7 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 			Hurtboxes = Moves->GetHurtboxes(6, AnimFrame % 9);
 		}
 		else if (State & STATE_GRABBING) {
-			Hurtboxes = Moves->GetHurtboxes(0, 0); //Should be 12
+			Hurtboxes = Moves->GetHurtboxes(12, 7); //Should be 12
 		}
 		else { //Idle
 			Hurtboxes = Moves->GetHurtboxes(0,0);
@@ -631,7 +632,7 @@ void NormGiraffe::Move(Stage& stage, const int frameNumber)
 				State &= ~(STATE_UP | STATE_BACK | STATE_DOWN | STATE_FORWARD | STATE_WEAK | STATE_HEAVY | STATE_JUMPING | STATE_FASTFALL | STATE_HITSTUN | STATE_TECHLAG | STATE_THROW);
 			}
 		}
-		else if (!(State & STATE_JUMPING)) {
+		else if (!(State & (STATE_JUMPING | STATE_GRABBED))) {
 			State &= ~(STATE_UP | STATE_BACK | STATE_DOWN | STATE_FORWARD | STATE_WEAK | STATE_HEAVY | STATE_SHIELDING | STATE_DROPSHIELD | STATE_SHIELDSTUN | STATE_JUMPSQUAT | STATE_SHORTHOP | STATE_JUMPLAND | STATE_WAVEDASH | STATE_CROUCH | STATE_GRABBING | STATE_GRABBED | STATE_THROW);
 			State |= STATE_JUMPING | STATE_DOUBLEJUMPWAIT;
 			JumpDelay = frameNumber + MaxJumpDelay * 2;
@@ -721,15 +722,12 @@ void NormGiraffe::Draw(HDC hdc, Vec2 Scale)
 		return;
 	}
 
-
-	/*if (State & STATE_WEAK && State & STATE_HEAVY) {
-		SelectObject(hdc, ShineBrush);
-		Ellipse(hdc, Scale.x * (Position.x + 2 * Facing.x - 0.5f), Scale.y * (Position.y - 0.5f), Scale.x * (Position.x + 2 * Facing.x + 0.5f), Scale.y * (Position.y + 0.5f));
-	}*/
-
 	if (State & (STATE_WEAK | STATE_HEAVY | STATE_THROW)) {
 		CurrentAnim = AttackNum;
 		CurrentFrame = AnimFrame;
+		for (int i = 0; i < numHitboxes; ++i) {
+			DrawHitbox(hdc, Scale, (*Hitboxes)[i].Position, (*Hitboxes)[i].Radius);
+		}
 	}
 	else {
 		if (State & STATE_HITSTUN) {
@@ -738,13 +736,15 @@ void NormGiraffe::Draw(HDC hdc, Vec2 Scale)
 		}
 		else if (State & STATE_SHIELDSTUN) {
 			SelectObject(hdc, ShieldBrush);
-			Ellipse(hdc, (Position.x - 2.5f) * Scale.x, (Position.y - 2.5f) * Scale.y, (Position.x + 2.5f) * Scale.x, (Position.y + 2.5f) * Scale.y);
+			DrawHitbox(hdc, Scale, { 0,0 }, 2.5f);
+			//Ellipse(hdc, (Position.x - 2.5f) * Scale.x, (Position.y - 2.5f) * Scale.y, (Position.x + 2.5f) * Scale.x, (Position.y + 2.5f) * Scale.y);
 			CurrentAnim = 6;
 			CurrentFrame = AnimFrame % 9;
 		}
 		else if (State & STATE_SHIELDING) {
 			SelectObject(hdc, ShieldBrush);
-			Ellipse(hdc, (Position.x - 2.5f) * Scale.x, (Position.y - 2.5f) * Scale.y, (Position.x + 2.5f) * Scale.x, (Position.y + 2.5f) * Scale.y);
+			DrawHitbox(hdc, Scale, { 0,0 }, 2.5f);
+			//Ellipse(hdc, (Position.x - 2.5f) * Scale.x, (Position.y - 2.5f) * Scale.y, (Position.x + 2.5f) * Scale.x, (Position.y + 2.5f) * Scale.y);
 			CurrentAnim = 0;
 			CurrentFrame = 0;
 		}
@@ -789,8 +789,8 @@ void NormGiraffe::Draw(HDC hdc, Vec2 Scale)
 			CurrentFrame = AnimFrame % 9;
 		}
 		else if (State & STATE_GRABBING) {
-			CurrentAnim = 0; //12
-			CurrentFrame = 0;
+			CurrentAnim = 12;
+			CurrentFrame = 7;
 		}
 	}
 	DrawSelf(hdc, Scale, CurrentFrame, CurrentAnim);
@@ -809,5 +809,10 @@ void NormGiraffe::DrawSelf(HDC hdc, Vec2 Scale, int CurrentFrame, int CurrentAni
 	Polyline(hdc, &points[29], 5);
 	PolyBezier(hdc, &points[33], 4);
 	Polyline(hdc, &points[36], 2);
+}
+
+void NormGiraffe::DrawHitbox(HDC hdc, Vec2 Scale, Vec2 Pos,float Rad)
+{
+	Ellipse(hdc, Scale.x * (Position.x + Facing.x * Pos.x - Rad), Scale.y * (Position.y + Facing.y * Pos.y - Rad), Scale.x * (Position.x + Facing.x * Pos.x + Rad), Scale.y * (Position.y + Facing.y * Pos.y + Rad));
 }
 

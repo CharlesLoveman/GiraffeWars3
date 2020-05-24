@@ -31,7 +31,7 @@ bool Stage::Intersects(Vec2 pos, Collider col, bool down, bool jumping, bool fal
 
 	float bounceLim = 1.0f;
 	if (hitstun) {
-		bounceLim = 0.5f;
+		bounceLim = 0.6f;
 	}
 
 	//Land on platforms

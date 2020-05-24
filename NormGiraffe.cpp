@@ -153,8 +153,8 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 			else if ((inputs & INPUT_LEFT && Facing.x == 1) || (inputs & INPUT_RIGHT && Facing.x == -1)) {
 				State &= ~STATE_GRABBING;
 				State |= STATE_BACK | STATE_THROW;
-				AttackDelay = frameNumber + 18;//Length of back throw
-				AttackNum = 18;
+				AttackNum = 16;
+				AttackDelay = frameNumber + Moves->GetMoveLength(AttackNum);
 				AnimFrame = 0;
 			}
 		}

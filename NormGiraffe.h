@@ -15,11 +15,12 @@ public:
 	~NormGiraffe();
 
 	void Update(std::array<Giraffe*, 4> giraffes, const int num_giraffes, const int i, const int inputs, const int frameNumber, Stage& stage);
-	void Move(Stage& stage, const int frameNumber);
+	void Move(Stage& stage, const int frameNumber, std::array<Giraffe*, 4> giraffes);
 	void Draw(HDC hdc, Vec2 Scale);
 private:
 	HBRUSH SpitBrush;
 	HBRUSH ShineBrush;
+	int CommandGrabPointer;
 	void DrawSelf(HDC hdc, Vec2 Scale, int CurrentFrame, int CurrentAnim);
 	void DrawHitbox(HDC hdc, Vec2 Scale, Vec2 Pos, float Rad);
 };

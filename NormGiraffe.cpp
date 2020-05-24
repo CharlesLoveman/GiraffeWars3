@@ -405,6 +405,22 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 	}
 	
 	//Character Move-Specific Updates
+	if ((State & STATE_JUMPING) && (State & STATE_HEAVY) && (State & STATE_FORWARD) && AnimFrame == 7) {
+		Collider grabCol = { {Position.x + 1.885000f * Facing.x, Position.y - 0.650000f}, 0.855862f };
+		for (int j = 0; j < num_giraffes; ++j) {
+			if (j != i) {
+				if (giraffes[j]->GrabHit(grabCol, Facing)) {
+					State &= ~(STATE_WEAK | STATE_HEAVY | STATE_RUNNING);
+					State |= STATE_GRABBING;
+					giraffes[j]->Velocity = Velocity;
+					CommandGrabPointer = j;
+					break;
+				}
+			}
+		}
+	}
+
+
 	if ((State & STATE_HEAVY) && (State & STATE_UP)) {
 		//Fire neck
 		if (State & STATE_JUMPING) {
@@ -531,7 +547,7 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 
 }
 
-void NormGiraffe::Move(Stage& stage, const int frameNumber)
+void NormGiraffe::Move(Stage& stage, const int frameNumber, std::array<Giraffe*, 4> giraffes)
 {
 	//Recieve incoming hits
 	if (!(State & STATE_INTANGIBLE)) {
@@ -612,6 +628,10 @@ void NormGiraffe::Move(Stage& stage, const int frameNumber)
 					AnimFrame = 0;
 					TechDelay = frameNumber + 30;
 				}
+				else if (State & STATE_GRABBING) {
+					State &= ~STATE_GRABBING;
+					giraffes[CommandGrabPointer]->State &= ~STATE_GRABBED;
+				}
 				else {
 					if (State & (STATE_WEAK | STATE_HEAVY)) {
 						State |= STATE_HITSTUN;
@@ -629,7 +649,8 @@ void NormGiraffe::Move(Stage& stage, const int frameNumber)
 					JumpDelay = frameNumber + MaxJumpDelay / 2;
 					AnimFrame = 0;
 				}
-				State &= ~(STATE_UP | STATE_BACK | STATE_DOWN | STATE_FORWARD | STATE_WEAK | STATE_HEAVY | STATE_JUMPING | STATE_FASTFALL | STATE_HITSTUN | STATE_TECHLAG | STATE_THROW);
+
+				State &= ~(STATE_UP | STATE_BACK | STATE_DOWN | STATE_FORWARD | STATE_WEAK | STATE_HEAVY | STATE_JUMPING | STATE_FASTFALL | STATE_HITSTUN | STATE_TECHLAG | STATE_THROW | STATE_GRABBED | STATE_GRABBING);
 			}
 		}
 		else if (!(State & (STATE_JUMPING | STATE_GRABBED))) {
@@ -654,6 +675,7 @@ void NormGiraffe::Move(Stage& stage, const int frameNumber)
 	else if (Position.x < 0) {
 		Position.x = 60;
 	}
+
 
 	//This is the last stateful part of the update loop
 

@@ -58,7 +58,7 @@ public:
 	virtual ~Giraffe() { };
 	virtual void Update(std::array<Giraffe*, 4> giraffes, const int num_giraffes, const int i, const int inputs, const int frameNumber, Stage& stage) = 0;
 	virtual void Draw(HDC hdc, Vec2 Scale) = 0;
-	virtual void Move(Stage& stage, const int frameNumber) = 0;
+	virtual void Move(Stage& stage, const int frameNumber, std::array<Giraffe*, 4> giraffes) = 0;
 	void AddHit(HitCollider hit, int ID, Vec2 facing, Vec2 position);
 	bool ProjectileHit(Projectile p);
 	bool GrabHit(Collider col, Vec2 _Facing);

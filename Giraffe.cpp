@@ -31,3 +31,24 @@ bool Giraffe::ProjectileHit(Projectile p)
 	}
 	return false;
 }
+
+bool Giraffe::GrabHit(Collider col, Vec2 _Facing)
+{
+	if (State & (STATE_GRABBED | STATE_INTANGIBLE) || incomingGrab) {
+		return false;
+	}
+	
+	if ((col.Position - Position).Length() < (col.Radius + Fullbody.Radius)) {
+		for (int k = 0; k < 6; ++k) {
+			if ((col.Position - (Position + (*Hurtboxes)[k].Position)).Length() < (col.Radius + (*Hurtboxes)[k].Radius)) {
+				incomingGrab = true;
+				Facing.x = -1 * _Facing.x;
+				Position.x = col.Position.x - 1.0f * Facing.x;
+				Velocity = { 0,0 };
+				return true;
+			}
+		}
+	}
+
+	return false;
+}

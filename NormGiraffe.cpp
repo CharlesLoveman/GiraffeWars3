@@ -51,6 +51,7 @@ NormGiraffe::NormGiraffe(Vec2 _Position, MoveSet* _Moves, HPEN _GiraffePen)
 	IntangiblePen = CreatePen(PS_SOLID, 1, RGB(255,255,255));
 	ShieldBrush = CreateHatchBrush(HS_BDIAGONAL, RGB(0, 255, 127));
 	SpitBrush = CreateSolidBrush(RGB(90, 210, 180));
+	ShineBrush = CreateSolidBrush(RGB(0, 255, 255));
 }
 
 NormGiraffe::~NormGiraffe()
@@ -253,16 +254,17 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 			AttackNum = 30;
 		}
 		if (State & STATE_JUMPING) {
-			if (State & STATE_UP) {
-				AttackNum = 32;
+			if (State & (STATE_UP | STATE_DOWN)) {
+				AttackNum += 9;
 			}
 		}
 		AttackDelay = frameNumber + Moves->GetMoveLength(AttackNum);
 		++LastAttackID;
 		AnimFrame = 0;
 	}
+	
 	if (inputs & INPUT_JUMP && !(State & (STATE_WEAK | STATE_HEAVY | STATE_JUMPSQUAT | STATE_JUMPLAND | STATE_HITSTUN | STATE_SHIELDSTUN | STATE_WAVEDASH | STATE_ATTACKSTUN | STATE_KNOCKDOWNLAG | STATE_TECHING | STATE_ROLLING))) {
-		if (State & STATE_LEDGEHOG) {
+		if (State & STATE_LEDGEHOG && !(State & STATE_HEAVY)) {
 			State &= ~STATE_LEDGEHOG;
 			stage.Ledges[LedgeID].Hogged = false;
 			State |= STATE_JUMPING | STATE_DOUBLEJUMPWAIT;
@@ -270,13 +272,13 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 			Velocity.y = -JumpSpeed;
 			AnimFrame = 0;
 		}
-		else if (!(State & STATE_JUMPING)) {
+		else if (!(State & (STATE_JUMPING | STATE_HEAVY))) {
 			State |= STATE_JUMPSQUAT;
 			JumpDelay = frameNumber + MaxJumpDelay;
 			AnimFrame = 0;
 			State &= ~(STATE_SHIELDING | STATE_DROPSHIELD | STATE_RUNNING | STATE_CROUCH | STATE_KNOCKDOWN);
 		}
-		else if (HasDoubleJump) {
+		else if (HasDoubleJump && (!(State & STATE_HEAVY) || (State & STATE_DOWN && AnimFrame >= 4))) {
 			HasDoubleJump = false;
 			Velocity.y = -JumpSpeed;
 			State &= ~STATE_FASTFALL;
@@ -285,6 +287,13 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 	else if (!(inputs & INPUT_JUMP) && (State & STATE_JUMPSQUAT)) {
 		State |= STATE_SHORTHOP;
 	}
+	else if (inputs & INPUT_JUMP && State & STATE_HEAVY && State & STATE_DOWN && State & STATE_JUMPING && HasDoubleJump) {
+		State &= ~(STATE_HEAVY | STATE_DOWN);
+		HasDoubleJump = false;
+		Velocity.y = -JumpSpeed;
+		State &= ~STATE_FASTFALL;
+	}
+
 	if (inputs & INPUT_SHIELD) {
 		if ((State & STATE_JUMPING) && !(State & (STATE_TECHLAG | STATE_TECHATTEMPT))) {
 			State |= STATE_TECHATTEMPT;
@@ -614,6 +623,32 @@ void NormGiraffe::Draw(HDC hdc, Vec2 Scale)
 			else {
 				DrawSelf(hdc, Scale, AnimFrame, AttackNum);
 			}
+		}
+		else if (State & STATE_DOWN) {
+			DrawSelf(hdc, Scale, AnimFrame, AttackNum);
+			SelectObject(hdc, ShineBrush);
+			POINT points[12];
+			float r = 2.5f * sinf(AnimFrame / 15.0f * 3.1415f);
+			float r1 = 0.5f * r;
+			float r2 = 0.866025f * r;
+			points[0] = (Scale * (Position + Vec2(r, 0))).ToPoint();
+			points[1] = (Scale * (Position + Vec2(r1, r2))).ToPoint();
+			points[2] = (Scale * (Position + Vec2(-r1, r2))).ToPoint();
+			points[3] = (Scale * (Position + Vec2(-r, 0))).ToPoint();
+			points[4] = (Scale * (Position + Vec2(-r1, -r2))).ToPoint();
+			points[5] = (Scale * (Position + Vec2(r1, -r2))).ToPoint();
+
+			r *= 0.6f;
+			r1 *= 0.6f;
+			r2 *= 0.6f;
+			points[6] = (Scale * (Position + Vec2(r, 0))).ToPoint();
+			points[7] = (Scale * (Position + Vec2(r1, r2))).ToPoint();
+			points[8] = (Scale * (Position + Vec2(-r1, r2))).ToPoint();
+			points[9] = (Scale * (Position + Vec2(-r, 0))).ToPoint();
+			points[10] = (Scale * (Position + Vec2(-r1, -r2))).ToPoint();
+			points[11] = (Scale * (Position + Vec2(r1, -r2))).ToPoint();
+
+			Polygon(hdc, points, 12);
 		}
 		else {
 			DrawSelf(hdc, Scale, AnimFrame, AttackNum);

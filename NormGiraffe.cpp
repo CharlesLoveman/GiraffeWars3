@@ -132,29 +132,29 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 			if ((inputs & INPUT_RIGHT && Facing.x == 1) || (inputs & INPUT_LEFT && Facing.x == -1)) {
 				State &= ~STATE_GRABBING;
 				State |= STATE_FORWARD | STATE_THROW;
-				AttackDelay = frameNumber + Moves->GetMoveLength(13);//Length of forward throw
 				AttackNum = 13;
+				AttackDelay = frameNumber + Moves->GetMoveLength(AttackNum);
 				AnimFrame = 0;
 			}
 			else if (inputs & INPUT_UP) {
 				State &= ~STATE_GRABBING;
 				State |= STATE_UP | STATE_THROW;
-				AttackDelay = frameNumber + 18;//Length of up throw
-				AttackNum = 18;//14
+				AttackNum = 14;
+				AttackDelay = frameNumber + Moves->GetMoveLength(AttackNum);
 				AnimFrame = 0;
 			}
 			else if (inputs & INPUT_DOWN) {
 				State &= ~STATE_GRABBING;
 				State |= STATE_DOWN | STATE_THROW;
-				AttackDelay = frameNumber + 18;//Length of down throw
-				AttackNum = 18;//14
+				AttackNum = 15;
+				AttackDelay = frameNumber + Moves->GetMoveLength(AttackNum);
 				AnimFrame = 0;
 			}
 			else if ((inputs & INPUT_LEFT && Facing.x == 1) || (inputs & INPUT_RIGHT && Facing.x == -1)) {
 				State &= ~STATE_GRABBING;
 				State |= STATE_BACK | STATE_THROW;
 				AttackDelay = frameNumber + 18;//Length of back throw
-				AttackNum = 18;//14
+				AttackNum = 18;
 				AnimFrame = 0;
 			}
 		}
@@ -591,7 +591,7 @@ void NormGiraffe::Move(Stage& stage, const int frameNumber)
 	bool bounced = false;
 	Vec2 offset;
 	if (!(State & STATE_LEDGEHOG)) {
-		if (stage.Intersects(Position, StageCollider, State & (STATE_CROUCH | STATE_FASTFALL), State & STATE_JUMPING, Velocity.y > -0.00001, landed, bounced, Facing, offset, Velocity, hogging, LedgeID)) {
+		if (stage.Intersects(Position, StageCollider, State & (STATE_CROUCH | STATE_FASTFALL), State & STATE_JUMPING, Velocity.y > -0.00001, State & STATE_HITSTUN, landed, bounced, Facing, offset, Velocity, hogging, LedgeID)) {
 			Position += offset;
 			if (hogging) {
 				State &= ~(STATE_UP | STATE_BACK | STATE_DOWN | STATE_FORWARD | STATE_WEAK | STATE_HEAVY | STATE_JUMPING | STATE_FASTFALL | STATE_GETUPATTACK | STATE_GRABBING | STATE_GRABBED | STATE_THROW);
@@ -725,9 +725,9 @@ void NormGiraffe::Draw(HDC hdc, Vec2 Scale)
 	if (State & (STATE_WEAK | STATE_HEAVY | STATE_THROW)) {
 		CurrentAnim = AttackNum;
 		CurrentFrame = AnimFrame;
-		for (int i = 0; i < numHitboxes; ++i) {
+		/*for (int i = 0; i < numHitboxes; ++i) {
 			DrawHitbox(hdc, Scale, (*Hitboxes)[i].Position, (*Hitboxes)[i].Radius);
-		}
+		}*/
 	}
 	else {
 		if (State & STATE_HITSTUN) {

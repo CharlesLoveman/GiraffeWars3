@@ -22,7 +22,7 @@ public:
 	VecRect Box;
 	std::vector<VecRect> Platforms;
 	std::vector<Ledge> Ledges;
-	bool Intersects(Vec2 pos, Collider col, bool down, bool jumping, bool falling, bool& landed, bool& bounced, Vec2& facing, Vec2& offset, Vec2& deltaV, bool& hogging, int& ledgeID);
+	bool Intersects(Vec2 pos, Collider col, bool down, bool jumping, bool falling, bool hitstun, bool& landed, bool& bounced, Vec2& facing, Vec2& offset, Vec2& deltaV, bool& hogging, int& ledgeID);
 	bool KillProjectile(Projectile p);
 	void Draw(HDC hdc, Vec2 Scale, HBRUSH Brush);
 };

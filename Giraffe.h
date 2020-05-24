@@ -32,19 +32,19 @@ enum GiraffeStates {
 	STATE_WAVEDASH = (1 << 15),
 	STATE_RUNNING = (1 << 16),
 	STATE_SHORTHOP = (1 << 17),
-	STATE_ATTACKSTUN = (1 << 18),
-	STATE_CROUCH = (1 << 19),
-	STATE_LEDGEHOG = (1 << 20),
-	STATE_TECHATTEMPT = (1 << 21),
-	STATE_TECHLAG = (1 << 22),
-	STATE_TECHING = (1 << 23),
-	STATE_KNOCKDOWN = (1 << 24),
-	STATE_KNOCKDOWNLAG = (1 << 25),
-	STATE_ROLLING = (1 << 26),
-	STATE_INTANGIBLE = (1 << 27),
-	STATE_GETUPATTACK = (1 << 28),
-	STATE_GRABBING = (1 << 29),
-	STATE_GRABBED = (1 << 30),
+	STATE_CROUCH = (1 << 18),
+	STATE_LEDGEHOG = (1 << 19),
+	STATE_TECHATTEMPT = (1 << 20),
+	STATE_TECHLAG = (1 << 21),
+	STATE_TECHING = (1 << 22),
+	STATE_KNOCKDOWN = (1 << 23),
+	STATE_KNOCKDOWNLAG = (1 << 24),
+	STATE_ROLLING = (1 << 25),
+	STATE_INTANGIBLE = (1 << 26),
+	STATE_GETUPATTACK = (1 << 27),
+	STATE_GRABBING = (1 << 28),
+	STATE_GRABBED = (1 << 29),
+	STATE_THROW = (1 << 30),
 };
 
 
@@ -61,6 +61,7 @@ public:
 	virtual void Move(Stage& stage, const int frameNumber) = 0;
 	void AddHit(HitCollider hit, int ID, Vec2 facing, Vec2 position);
 	bool ProjectileHit(Projectile p);
+	bool GrabHit(Collider col);
 
 	Vec2 Position;
 	Vec2 Velocity;
@@ -113,6 +114,10 @@ protected:
 	int LastAttackID;
 	int numIncoming;
 	int numHitboxes;
+
+	//Grabs
+	bool incomingGrab;
+	//int GrabPointer;
 
 	//Animation
 	int AnimFrame;

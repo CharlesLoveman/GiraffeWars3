@@ -5,6 +5,7 @@
 #include "Projectile.h"
 #include <vector>
 #include "SimpleMath.h"
+#include "VecRect.h"
 
 using namespace DirectX::SimpleMath;
 
@@ -21,8 +22,8 @@ struct Ledge {
 
 struct Stage {
 public:
-	DirectX::SimpleMath::Rectangle Box;
-	std::vector<DirectX::SimpleMath::Rectangle> Platforms;
+	VecRect Box;
+	std::vector<VecRect> Platforms;
 	std::vector<Ledge> Ledges;
 	bool Intersects(Vector2 pos, Collider col, bool down, bool jumping, bool falling, bool hitstun, bool& landed, bool& bounced, Vector2& facing, Vector2& offset, Vector2& deltaV, bool& hogging, int& ledgeID);
 	bool KillProjectile(Projectile p);

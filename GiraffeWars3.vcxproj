@@ -141,6 +141,7 @@
     <ClCompile Include="NormMoveSet.cpp" />
     <ClCompile Include="Projectile.cpp" />
     <ClCompile Include="Stage.cpp" />
+    <ClCompile Include="VecRect.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ArrayList.h" />
@@ -159,6 +160,7 @@
     <ClInclude Include="renderer.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Stage.h" />
+    <ClInclude Include="VecRect.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

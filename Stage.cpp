@@ -36,16 +36,14 @@ bool Stage::Intersects(Vector2 pos, Collider col, bool down, bool jumping, bool 
 
 	//Land on platforms
 	if (falling) {
-		Vector2 base = position + col.Position;
-		base.x += col.Radius;
 		for (int p = 0; p < Platforms.size(); ++p) {
-			if (Platforms[p].Contains(base)) {
+			if (position.y < Platforms[p].top && Platforms[p].top - position.y - EPSILON < col.Radius && position.x < Platforms[p].right && position.x > Platforms[p].left) {
 				if (down) {
 					return false;
 				}
 				else {
 					landed = true;
-					offset = { 0, Platforms[p].y - col.Radius - position.y };
+					offset = { 0, Platforms[p].top - col.Radius - position.y };
 					if (deltaV.LengthSquared() > bounceLim) {
 						deltaV.y *= -0.8f;
 						bounced = true;
@@ -62,12 +60,12 @@ bool Stage::Intersects(Vector2 pos, Collider col, bool down, bool jumping, bool 
 
 
 	//Land on stage
-	if (position.x + col.Radius < Box.y || position.x - col.Radius > Box.y + Box.width || position.y + col.Radius < Box.y || position.y - col.Radius > Box.y + Box.height) {
+	if (position.x + col.Radius < Box.left || position.x - col.Radius > Box.right || position.y + col.Radius < Box.top || position.y - col.Radius > Box.bottom) {
 		return false;
 	}
 
-	if (position.y < Box.y && position.x + col.Radius > Box.x && position.x - col.Radius < Box.x + Box.width) {
-		offset = { 0, Box.y - col.Radius - position.y };
+	if (position.y < Box.top && position.x + col.Radius > Box.left && position.x - col.Radius < Box.right) {
+		offset = { 0, Box.top - col.Radius - position.y };
 
 		if (deltaV.LengthSquared() > bounceLim) {
 			deltaV.y *= -0.8f;
@@ -78,8 +76,8 @@ bool Stage::Intersects(Vector2 pos, Collider col, bool down, bool jumping, bool 
 		}
 		landed = true;
 	}
-	else if (position.x < Box.x) {
-		offset = { Box.x - col.Radius - position.x, 0 };
+	else if (position.x < Box.left) {
+		offset = { Box.left - col.Radius - position.x, 0 };
 		if (deltaV.LengthSquared() > bounceLim) {
 			deltaV.x *= -0.8f;
 			bounced = true;
@@ -88,8 +86,8 @@ bool Stage::Intersects(Vector2 pos, Collider col, bool down, bool jumping, bool 
 			deltaV.x = 0;
 		}
 	}
-	else if (position.x > Box.x + Box.width) {
-		offset = { Box.x + Box.width + col.Radius - position.x, 0 };
+	else if (position.x > Box.right) {
+		offset = { Box.right + col.Radius - position.x, 0 };
 		if (deltaV.LengthSquared() > bounceLim) {
 			deltaV.x *= -0.8f;
 			bounced = true;
@@ -98,8 +96,8 @@ bool Stage::Intersects(Vector2 pos, Collider col, bool down, bool jumping, bool 
 			deltaV.x = 0;
 		}
 	}
-	else if (position.y > Box.y + Box.height) {
-		offset = { 0, Box.y + Box.height + col.Radius - position.y };
+	else if (position.y > Box.bottom) {
+		offset = { 0, Box.bottom + col.Radius - position.y };
 		if (deltaV.LengthSquared() > bounceLim) {
 			deltaV.y *= -0.8f;
 			bounced = true;
@@ -111,7 +109,7 @@ bool Stage::Intersects(Vector2 pos, Collider col, bool down, bool jumping, bool 
 	else {
 		//Just send them up if they are in the middle
 		landed = true;
-		offset = { 0, Box.y - col.Radius - position.y };
+		offset = { 0, Box.top - col.Radius - position.y };
 		if (deltaV.LengthSquared() > bounceLim) {
 			deltaV.y *= -0.8f;
 			bounced = true;
@@ -126,16 +124,14 @@ bool Stage::Intersects(Vector2 pos, Collider col, bool down, bool jumping, bool 
 
 bool Stage::KillProjectile(Projectile p)
 {
-	return !(p.Position.x + p.Radius < Box.x || p.Position.x - p.Radius > Box.x + Box.width || p.Position.y + p.Radius < Box.y || p.Position.y - p.Radius > Box.y + Box.height);
+	return !(p.Position.x + p.Radius < Box.left || p.Position.x - p.Radius > Box.right || p.Position.y + p.Radius < Box.top || p.Position.y - p.Radius > Box.bottom);
 }
 
 void Stage::Draw(HDC hdc, Vector2 Scale, HBRUSH Brush)
 {
 	SelectObject(hdc, Brush);
-	RECT scaleBox = { (int)(Box.x * Scale.x), (int)(Box.y * Scale.y), (int)((Box.x + Box.width) * Scale.x), (int)((Box.y + Box.height) * Scale.y) };
-	FillRect(hdc, &scaleBox, Brush);
+	FillRect(hdc, &Box.toRect(Scale), Brush);
 	for (int p = 0; p < Platforms.size(); ++p) {
-		scaleBox = { (int)(Platforms[p].x * Scale.x), (int)(Platforms[p].y * Scale.y), (int)((Platforms[p].x + Platforms[p].width) * Scale.x), (int)((Platforms[p].y + Platforms[p].height) * Scale.y) };
-		FillRect(hdc, &scaleBox, Brush);
+		FillRect(hdc, &Platforms[p].toRect(Scale), Brush);
 	}
 }

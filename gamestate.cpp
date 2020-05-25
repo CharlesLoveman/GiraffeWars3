@@ -17,6 +17,9 @@ void GameState::Init(HWND hwnd, int num_players, const std::array<MoveSet*, 4> M
 	GetClientRect(hwnd, &_bounds);
 	InflateRect(&_bounds, -8, -8);
 
+	//hInst = (HINSTANCE)GetWindowLongPtr(hwnd, GWLP_HINSTANCE);
+	PlaySound(MAKEINTRESOURCE(IDR_JUMP1), GetModuleHandle(NULL), SND_RESOURCE | SND_ASYNC);
+
 	w = _bounds.right - _bounds.left;
 	h = _bounds.bottom - _bounds.top;
 

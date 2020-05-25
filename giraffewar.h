@@ -2,6 +2,7 @@
 #define _GiraffeWar_H_
 
 #include "ggponet.h"
+#include "resource.h"
 #include <Windows.h>
 //Interface to the GiraffeWar application
 

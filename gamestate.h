@@ -29,6 +29,7 @@ struct GameState
 	std::array<Giraffe*, 4> giraffes;
 	std::vector<NormGiraffe> normGiraffes;
 	Stage stage;
+	//HINSTANCE hInst;
 };
 #endif // !_GAMESTATE_H_
 

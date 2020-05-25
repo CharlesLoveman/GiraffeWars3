@@ -159,9 +159,23 @@
     <ClInclude Include="NormProjFuncs.h" />
     <ClInclude Include="Projectile.h" />
     <ClInclude Include="renderer.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="Stage.h" />
     <ClInclude Include="Vec2.h" />
     <ClInclude Include="VecRect.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Resource.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="Sounds\Hit1.wav" />
+    <Media Include="Sounds\Hit2.wav" />
+    <Media Include="Sounds\Jump.wav" />
+    <Media Include="Sounds\JumpLand.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="wave1.bin" />
+    <None Include="wave2.bin" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />

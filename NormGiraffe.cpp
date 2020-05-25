@@ -45,6 +45,7 @@ NormGiraffe::NormGiraffe(Vec2 _Position, MoveSet* _Moves, HPEN _GiraffePen)
 	Stocks = 3;
 	Knockback = 0;
 	Mass = 100;
+	hInst = GetModuleHandle(NULL);
 
 	//Animation
 	AnimFrame = 0;
@@ -74,6 +75,7 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 		State &= ~(STATE_JUMPSQUAT | STATE_SHORTHOP);
 		State |= STATE_JUMPING | STATE_DOUBLEJUMPWAIT;
 		JumpDelay = frameNumber + MaxJumpDelay * 2;
+		PlaySound(MAKEINTRESOURCE(IDR_JUMP1), hInst, SND_RESOURCE | SND_ASYNC | SND_NOSTOP);
 	}
 	else if (State & STATE_JUMPLAND && frameNumber >= JumpDelay) {
 		State &= ~STATE_JUMPLAND;
@@ -321,6 +323,7 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 			HasDoubleJump = false;
 			Velocity.y = -JumpSpeed;
 			State &= ~STATE_FASTFALL;
+			PlaySound(MAKEINTRESOURCE(IDR_JUMP1), hInst, SND_RESOURCE | SND_ASYNC | SND_NOSTOP);
 		}
 	}
 	else if (!(inputs & INPUT_JUMP) && (State & STATE_JUMPSQUAT)) {
@@ -545,7 +548,9 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 		for (int j = 0; j < num_giraffes; ++j) {
 			if (j != i) {
 				for (int h = 0; h < numHitboxes; ++h) {
-					(*giraffes[j]).AddHit((*Hitboxes)[h], LastAttackID, Facing, Position);
+					if ((*giraffes[j]).AddHit((*Hitboxes)[h], LastAttackID, Facing, Position)) {
+						PlaySound(MAKEINTRESOURCE(IDR_HIT1), hInst, SND_RESOURCE | SND_ASYNC | SND_NOSTOP);
+					}
 				}
 			}
 		}
@@ -628,6 +633,7 @@ void NormGiraffe::Move(Stage& stage, const int frameNumber, std::array<Giraffe*,
 				}
 			}
 			else if (landed && (State & STATE_JUMPING)) {
+				PlaySound(MAKEINTRESOURCE(IDR_JUMP2), hInst, SND_RESOURCE | SND_ASYNC | SND_NOSTOP);
 				if (State & STATE_HITSTUN && !(State & STATE_TECHATTEMPT)) {
 					Velocity = { 0,0 };
 					State |= STATE_KNOCKDOWNLAG;

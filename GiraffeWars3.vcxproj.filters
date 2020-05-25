@@ -104,5 +104,35 @@
     <ClInclude Include="NormProjFuncs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Resource.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="Sounds\Jump.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="Sounds\JumpLand.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="Sounds\Hit1.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="Sounds\Hit2.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="wave2.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="wave1.bin">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

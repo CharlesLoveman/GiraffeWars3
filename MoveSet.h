@@ -13,7 +13,7 @@ public:
 	virtual ~MoveSet() { };
 	virtual std::vector<HitCollider>* GetHitboxes(int MoveId, int FrameNum) = 0;
 	virtual std::array<HurtCollider, 6>* GetHurtboxes(int MoveId, int FrameNum) = 0;
-	virtual std::array<Vec2, NUM_POINTS>* GetSkelPoints(int MoveId, int FrameNum) = 0;
+	virtual std::array<Vector2, NUM_POINTS>* GetSkelPoints(int MoveId, int FrameNum) = 0;
 	virtual int GetLandingLag(int MoveId) = 0;
 	virtual int GetMoveLength(int MoveId) = 0;
 };

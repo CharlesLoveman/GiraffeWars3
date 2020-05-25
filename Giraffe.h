@@ -4,13 +4,15 @@
 #include "ArrayQueue.h"
 #include "ArrayList.h"
 #include "Collider.h"
-#include "Vec2.h"
 #include "giraffewar.h"
 #include "Stage.h"
 #include <vector>
 #include <array>
 #include "MoveSet.h"
 #include "Projectile.h"
+#include "SimpleMath.h"
+
+using namespace DirectX::SimpleMath;
 
 class Giraffe;
 enum GiraffeStates {
@@ -57,14 +59,15 @@ class Giraffe {
 public:
 	virtual ~Giraffe() { };
 	virtual void Update(std::array<Giraffe*, 4> giraffes, const int num_giraffes, const int i, const int inputs, const int frameNumber, Stage& stage) = 0;
-	virtual void Draw(HDC hdc, Vec2 Scale) = 0;
+	virtual void Draw(HDC hdc, Vector2 Scale) = 0;
 	virtual void Move(Stage& stage, const int frameNumber, std::array<Giraffe*, 4> giraffes) = 0;
-	bool AddHit(HitCollider hit, int ID, Vec2 facing, Vec2 position);
+	bool AddHit(HitCollider hit, int ID, Vector2 facing, Vector2 position);
 	bool ProjectileHit(Projectile p);
-	bool GrabHit(Collider col, Vec2 _Facing, int frameNumber);
+	bool GrabHit(Collider col, Vector2 _Facing, int frameNumber);
+	static POINT VecToPoint(Vector2 vec, Vector2 scale);
 
-	Vec2 Position;
-	Vec2 Velocity;
+	Vector2 Position;
+	Vector2 Velocity;
 	int State;
 	const std::array<HurtCollider, 6>* Hurtboxes;
 	const std::vector<HitCollider>* Hitboxes;
@@ -76,11 +79,11 @@ protected:
 	//Movement
 	
 	float MaxGroundSpeed;
-	Vec2 MaxAirSpeed;
+	Vector2 MaxAirSpeed;
 	float RunAccel;
 	float AirAccel;
 	float Gravity;
-	Vec2 Facing;
+	Vector2 Facing;
 
 	//Jumping
 	bool HasDoubleJump;

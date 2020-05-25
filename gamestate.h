@@ -1,6 +1,5 @@
 #ifndef _GAMESTATE_H_
 #define _GAMESTATE_H_
-#include "Vec2.h"
 #include "Giraffe.h"
 #include "NormGiraffe.h"
 #include "Stage.h"

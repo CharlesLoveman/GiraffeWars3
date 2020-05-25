@@ -12,7 +12,7 @@ struct NormProjFuncs {
 		self.Velocity.y += parent.Gravity;
 		return (frameNumber >= self.LifeSpan);
 	}
-	static void SpitDraw(Projectile& self, Giraffe& parent, HDC hdc, Vec2 Scale)
+	static void SpitDraw(Projectile& self, Giraffe& parent, HDC hdc, Vector2 Scale)
 	{
 		SelectObject(hdc, self.Pen);
 		SelectObject(hdc, self.Brush);
@@ -20,9 +20,10 @@ struct NormProjFuncs {
 	}
 	static void NeckGrabOnHit(Projectile& self, Giraffe& parent, Giraffe* collided)
 	{
-		Vec2 diff = Vec2(0.2f, 0.3f) *(self.Position - parent.Position);
-		if (diff.Length() > 1) {
-			diff = 2.0f * diff.Normalise();
+		Vector2 diff = Vector2(0.2f, 0.3f) *(self.Position - parent.Position);
+		float len = diff.Length();
+		if (len > 1) {
+			diff *= 2.0f / len;
 		}
 		parent.Velocity += diff;
 		parent.State &= ~(STATE_HEAVY | STATE_UP);
@@ -35,15 +36,15 @@ struct NormProjFuncs {
 		self.Velocity.y += parent.Gravity;
 		return (frameNumber >= self.LifeSpan) || !(parent.State & STATE_JUMPING);
 	}
-	static void NeckGrabDraw(Projectile& self, Giraffe& parent, HDC hdc, Vec2 Scale)
+	static void NeckGrabDraw(Projectile& self, Giraffe& parent, HDC hdc, Vector2 Scale)
 	{
 		SelectObject(hdc, self.Pen);
 		POINT points[7];
 
-		points[0] = (Scale * (parent.Position + parent.Facing * (*(parent.Moves)->GetSkelPoints(0, 0))[26])).ToPoint();
-		points[6] = (Scale * (parent.Position + parent.Facing * (*(parent.Moves)->GetSkelPoints(0, 0))[36])).ToPoint();
+		points[0] = Giraffe::VecToPoint(parent.Position + parent.Facing * (*(parent.Moves)->GetSkelPoints(0, 0))[26], Scale);
+		points[6] = Giraffe::VecToPoint(parent.Position + parent.Facing * (*(parent.Moves)->GetSkelPoints(0, 0))[36], Scale);
 		for (int i = 1; i < 6; ++i) {
-			points[i] = (Scale * (self.Position + parent.Facing * (*(parent.Moves)->GetSkelPoints(0, 0))[29 + i])).ToPoint();
+			points[i] = Giraffe::VecToPoint(self.Position + parent.Facing * (*(parent.Moves)->GetSkelPoints(0, 0))[29 + i], Scale);
 		}
 
 		Polyline(hdc, points, 7);

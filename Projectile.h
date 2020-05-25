@@ -8,13 +8,13 @@ class Projectile;
 
 typedef void (*ProjectileOnHit)(Projectile&, Giraffe&, Giraffe*);
 typedef bool (*ProjectileUpdate)(Projectile&, Giraffe&, int);
-typedef void (*ProjectileDraw)(Projectile&, Giraffe&, HDC, Vec2);
+typedef void (*ProjectileDraw)(Projectile&, Giraffe&, HDC, Vector2);
 
 class Projectile : public HitCollider {
 public:
 	Projectile();
-	Projectile(Vec2 Pos, Vec2 Vel, float Rad, Vec2 Frc, float Dmg, float Knk, float Scl, bool Fix, int _ID, int _LifeSpan, ProjectileOnHit _OnHit, ProjectileUpdate _Update, ProjectileDraw _Draw, HPEN _Pen, HBRUSH _Brush);
-	Vec2 Velocity;
+	Projectile(Vector2 Pos, Vector2 Vel, float Rad, Vector2 Frc, float Dmg, float Knk, float Scl, bool Fix, int _ID, int _LifeSpan, ProjectileOnHit _OnHit, ProjectileUpdate _Update, ProjectileDraw _Draw, HPEN _Pen, HBRUSH _Brush);
+	Vector2 Velocity;
 	int ID;
 	int LifeSpan;
 	ProjectileOnHit OnHit;

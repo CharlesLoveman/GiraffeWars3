@@ -19,7 +19,7 @@ Projectile::Projectile()
 	Brush = nullptr;
 }
 
-Projectile::Projectile(Vec2 Pos, Vec2 Vel, float Rad, Vec2 Frc, float Dmg, float Knk, float Scl, bool Fix, int _ID, int _LifeSpan, ProjectileOnHit _OnHit, ProjectileUpdate _Update, ProjectileDraw _Draw, HPEN _Pen, HBRUSH _Brush)
+Projectile::Projectile(Vector2 Pos, Vector2 Vel, float Rad, Vector2 Frc, float Dmg, float Knk, float Scl, bool Fix, int _ID, int _LifeSpan, ProjectileOnHit _OnHit, ProjectileUpdate _Update, ProjectileDraw _Draw, HPEN _Pen, HBRUSH _Brush)
 {
 	Position = Pos;
 	Velocity = Vel;

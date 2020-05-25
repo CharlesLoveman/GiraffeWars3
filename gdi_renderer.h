@@ -22,7 +22,7 @@ protected:
 	void DrawGiraffeInfo(HDC hdc, Giraffe& giraffe, int i);
 	void CreateGDIFont(HDC hdc);
 
-	Vec2 Scale;
+	Vector2 Scale;
 	HFONT _font;
 	HWND _hwnd;
 	RECT _rc;

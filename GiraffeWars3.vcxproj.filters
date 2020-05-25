@@ -27,9 +27,6 @@
     <ClCompile Include="giraffewar.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Vec2.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Giraffe.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -37,9 +34,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Collider.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="VecRect.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="NormGiraffe.cpp">
@@ -68,9 +62,6 @@
     <ClInclude Include="giraffewar.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Vec2.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Giraffe.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -84,9 +75,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="MoveSet.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="VecRect.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="NormGiraffe.h">
@@ -134,5 +122,6 @@
     <None Include="wave1.bin">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>

@@ -1,7 +1,7 @@
 #include "Giraffe.h"
 #include "Collider.h"
 
-bool Giraffe::AddHit(HitCollider hit, int ID, Vec2 facing2, Vec2 position2)
+bool Giraffe::AddHit(HitCollider hit, int ID, Vector2 facing2, Vector2 position2)
 {
 	if (Intersect(position2, hit, facing2, Position, Fullbody, Facing)) {
 		for (int k = 0; k < 6; ++k) {
@@ -20,9 +20,9 @@ bool Giraffe::AddHit(HitCollider hit, int ID, Vec2 facing2, Vec2 position2)
 
 bool Giraffe::ProjectileHit(Projectile p)
 {
-	if ((p.Position - Position).Length() < (p.Radius + Fullbody.Radius)) {
+	if (Vector2::DistanceSquared(Position, p.Position) < (p.Radius * p.Radius + Fullbody.Radius * Fullbody.Radius)) {
 		for (int k = 0; k < 6; ++k) {
-			if ((p.Position - (Position + (*Hurtboxes)[k].Position)).Length() < (p.Radius + (*Hurtboxes)[k].Radius)) {
+			if (Vector2::DistanceSquared(Position, p.Position) < (p.Radius * p.Radius + (*Hurtboxes)[k].Radius * (*Hurtboxes)[k].Radius)) {
 				IncomingHits[numIncoming].hit = p;
 				IncomingHits[numIncoming].ID = p.ID;
 				++numIncoming;
@@ -33,15 +33,15 @@ bool Giraffe::ProjectileHit(Projectile p)
 	return false;
 }
 
-bool Giraffe::GrabHit(Collider col, Vec2 _Facing, int frameNumber)
+bool Giraffe::GrabHit(Collider col, Vector2 _Facing, int frameNumber)
 {
 	if (State & (STATE_GRABBED | STATE_INTANGIBLE) || incomingGrab) {
 		return false;
 	}
 	
-	if ((col.Position - Position).Length() < (col.Radius + Fullbody.Radius)) {
+	if (Vector2::DistanceSquared(col.Position, Position) < (col.Radius * col.Radius + Fullbody.Radius * Fullbody.Radius)) {
 		for (int k = 0; k < 6; ++k) {
-			if ((col.Position - (Position + (*Hurtboxes)[k].Position)).Length() < (col.Radius + (*Hurtboxes)[k].Radius)) {
+			if (Vector2::DistanceSquared(col.Position, (Position + (*Hurtboxes)[k].Position)) < (col.Radius * col.Radius + (*Hurtboxes)[k].Radius * (*Hurtboxes)[k].Radius)) {
 				incomingGrab = true;
 				Facing.x = -1 * _Facing.x;
 				Position.x = col.Position.x - 1.0f * Facing.x;
@@ -53,4 +53,9 @@ bool Giraffe::GrabHit(Collider col, Vec2 _Facing, int frameNumber)
 	}
 
 	return false;
+}
+
+POINT Giraffe::VecToPoint(Vector2 vec, Vector2 scale)
+{
+	return { (int)(vec.x * scale.x), (int)(vec.y * scale.y) };
 }

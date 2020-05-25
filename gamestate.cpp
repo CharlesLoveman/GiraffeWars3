@@ -5,6 +5,10 @@
 #include "gamestate.h"
 #include "MoveSet.h"
 #include "NormGiraffe.h"
+#include "SimpleMath.h"
+
+
+using namespace DirectX::SimpleMath;
 
 
 extern GGPOSession* ggpo;
@@ -39,15 +43,17 @@ void GameState::Init(HWND hwnd, int num_players, const std::array<MoveSet*, 4> M
 	_giraffeColours[3] = RGB(255, 255, 0);
 
 	for (int i = 0; i < _num_giraffes; ++i) {
-		normGiraffes.push_back(NormGiraffe(Vec2(stageleft + stagewidth * (2.0f * i + 1.0f) / (2.0f * _num_giraffes), 20), MoveSets[0], CreatePen(PS_SOLID, 1, _giraffeColours[i])));
+		normGiraffes.push_back(NormGiraffe(Vector2(stageleft + stagewidth * (2.0f * i + 1.0f) / (2.0f * _num_giraffes), 20), MoveSets[0], CreatePen(PS_SOLID, 1, _giraffeColours[i])));
 	}
 
 	for (int i = 0; i < normGiraffes.size(); ++i) {
 		giraffes[i] = &normGiraffes[i];
 	}
 
-
-	stage = { {stageleft, stagetop, stageleft + stagewidth, stagetop + stageheight}, {{(float)(stageleft + stagewidth / 2.0f - stagewidth / 10.0f), (float)(stagetop - 2 * stageheight - 0.1f), (float)(stageleft + stagewidth / 2.0f + stagewidth / 10.0f), (float)(stagetop - 2 * stageheight + 0.1f)}, {(float)(stageleft + stagewidth / 4.0f - stagewidth / 10.0f), (float)(stagetop - stageheight - 0.1f), (float)(stageleft + stagewidth / 4.0f + stagewidth / 10.0f), (float)(stagetop - stageheight + 0.1f)}, {(float)(stageleft + 3 * stagewidth / 4.0f - stagewidth / 10.0f), (float)(stagetop - stageheight - 0.1f), (float)(stageleft + 3 * stagewidth / 4.0f + stagewidth / 10.0f), (float)(stagetop - stageheight + 0.1f)}}, {{{{stageleft, stagetop + 0.5f}, 0.5f}, false, true}, {{{stageleft + stagewidth, stagetop + 0.5f}, 0.5f}, false, false}} };
+	stage.Box = { (int)stageleft, (int)stagetop, (int)stagewidth, (int)stageheight };
+	stage.Platforms = { {(int)(stageleft + stagewidth / 2.0f - stagewidth / 10.0f), (int)(stagetop - 2 * stageheight - 0.1f), (float)(stageleft + stagewidth / 2.0f + stagewidth / 10.0f), (float)(stagetop - 2 * stageheight + 0.1f)}, {(float)(stageleft + stagewidth / 4.0f - stagewidth / 10.0f), (float)(stagetop - stageheight - 0.1f), (float)(stageleft + stagewidth / 4.0f + stagewidth / 10.0f), (float)(stagetop - stageheight + 0.1f)}, {(float)(stageleft + 3 * stagewidth / 4.0f - stagewidth / 10.0f), (float)(stagetop - stageheight - 0.1f), (float)(stageleft + 3 * stagewidth / 4.0f + stagewidth / 10.0f), (float)(stagetop - stageheight + 0.1f)} };
+	stage.Ledges = { { { {stageleft, stagetop + 0.5f}, 0.5f}, false, true}, { {{stageleft + stagewidth, stagetop + 0.5f}, 0.5f}, false, false } };
+	//stage = { {stageleft, stagetop, stageleft + stagewidth, stagetop + stageheight}, {{(float)(stageleft + stagewidth / 2.0f - stagewidth / 10.0f), (float)(stagetop - 2 * stageheight - 0.1f), (float)(stageleft + stagewidth / 2.0f + stagewidth / 10.0f), (float)(stagetop - 2 * stageheight + 0.1f)}, {(float)(stageleft + stagewidth / 4.0f - stagewidth / 10.0f), (float)(stagetop - stageheight - 0.1f), (float)(stageleft + stagewidth / 4.0f + stagewidth / 10.0f), (float)(stagetop - stageheight + 0.1f)}, {(float)(stageleft + 3 * stagewidth / 4.0f - stagewidth / 10.0f), (float)(stagetop - stageheight - 0.1f), (float)(stageleft + 3 * stagewidth / 4.0f + stagewidth / 10.0f), (float)(stagetop - stageheight + 0.1f)}}, {{{{stageleft, stagetop + 0.5f}, 0.5f}, false, true}, {{{stageleft + stagewidth, stagetop + 0.5f}, 0.5f}, false, false}} };
 
 
 	InflateRect(&_bounds, -8, -8);

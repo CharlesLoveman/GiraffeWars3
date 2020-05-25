@@ -1,13 +1,13 @@
 #include "NormGiraffe.h"
 #include "NormProjFuncs.h"
 
-NormGiraffe::NormGiraffe(Vec2 _Position, MoveSet* _Moves, HPEN _GiraffePen)
+NormGiraffe::NormGiraffe(Vector2 _Position, MoveSet* _Moves, HPEN _GiraffePen)
 {
 	//Movement
 	Position = _Position;
-	Velocity = Vec2(0, 0);
+	Velocity = Vector2(0, 0);
 	MaxGroundSpeed = 0.4f;
-	MaxAirSpeed = Vec2(0.3f, 0.7f);
+	MaxAirSpeed = Vector2(0.3f, 0.7f);
 	RunAccel = 0.1f;
 	AirAccel = 0.03f;
 	Gravity = 0.02f;
@@ -20,8 +20,8 @@ NormGiraffe::NormGiraffe(Vec2 _Position, MoveSet* _Moves, HPEN _GiraffePen)
 	HasAirDash = true;
 
 	//Collision
-	Fullbody = { Vec2(0.0f,0.0f), 2.5f };
-	StageCollider = { Vec2(0.0f,0.7f), 1.0f };
+	Fullbody = { Vector2(0.0f,0.0f), 2.5f };
+	StageCollider = { Vector2(0.0f,0.7f), 1.0f };
 	Hitboxes = nullptr;
 	Hurtboxes = nullptr;
 	numHitboxes = 0;
@@ -234,7 +234,7 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 			stage.Ledges[LedgeID].Hogged = false;
 			State |= STATE_GETUPATTACK;
 			AttackNum = 17;
-			Position += Vec2(2.5f, -2.5f) * Facing;
+			Position += Vector2(2.5f, -2.5f) * Facing;
 		}
 		else if ((inputs & INPUT_SHIELD || State & STATE_SHIELDING) && !(State & (STATE_JUMPING))) {
 			State &= ~STATE_SHIELDING;
@@ -434,7 +434,7 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 		//Fire neck
 		if (State & STATE_JUMPING) {
 			if (AnimFrame == 10) {
-				Projectiles.Append(Projectile(Position + Vec2(0.2f, -1.2f), { Facing.x * 0.65f, -0.65f }, 0.3f, { 0.0f, 0.0f }, 0.1f, 0.1f, 1.0f, true, LastAttackID, AttackDelay - 10, NormProjFuncs::NeckGrabOnHit, NormProjFuncs::NeckGrabUpdate, NormProjFuncs::NeckGrabDraw, GiraffePen, SpitBrush));
+				Projectiles.Append(Projectile(Position + Vector2(0.2f, -1.2f), { Facing.x * 0.65f, -0.65f }, 0.3f, { 0.0f, 0.0f }, 0.1f, 0.1f, 1.0f, true, LastAttackID, AttackDelay - 10, NormProjFuncs::NeckGrabOnHit, NormProjFuncs::NeckGrabUpdate, NormProjFuncs::NeckGrabDraw, GiraffePen, SpitBrush));
 			}
 		}
 		//Main hit of upsmash
@@ -444,7 +444,7 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 	}
 	//Fire spit
 	else if ((State & STATE_HEAVY) && !(State & (STATE_WEAK | STATE_UP | STATE_FORWARD | STATE_BACK | STATE_DOWN)) && AnimFrame == 13) {
-		Projectiles.Append(Projectile(Position + Vec2(0.2f, -1.2f), { Facing.x * 0.5f, 0.0f }, 0.3f, { Facing.x, 0.0f }, 0.1f, 0.1f, 1.0f, true, LastAttackID, frameNumber + 100, NormProjFuncs::SpitOnHit, NormProjFuncs::SpitUpdate, NormProjFuncs::SpitDraw, GiraffePen, SpitBrush));
+		Projectiles.Append(Projectile(Position + Vector2(0.2f, -1.2f), { Facing.x * 0.5f, 0.0f }, 0.3f, { Facing.x, 0.0f }, 0.1f, 0.1f, 1.0f, true, LastAttackID, frameNumber + 100, NormProjFuncs::SpitOnHit, NormProjFuncs::SpitUpdate, NormProjFuncs::SpitDraw, GiraffePen, SpitBrush));
 	}
 	//Reverse direction in bair
 	else if ((State & STATE_JUMPING) && (State & STATE_WEAK) && (State & STATE_BACK) && AnimFrame == 7) {
@@ -616,7 +616,7 @@ void NormGiraffe::Move(Stage& stage, const int frameNumber, std::array<Giraffe*,
 	bool landed = false;
 	bool hogging = false;
 	bool bounced = false;
-	Vec2 offset;
+	Vector2 offset;
 	if (!(State & STATE_LEDGEHOG)) {
 		if (stage.Intersects(Position, StageCollider, State & (STATE_CROUCH | STATE_FASTFALL), State & STATE_JUMPING, Velocity.y > -0.00001, State & STATE_HITSTUN, landed, bounced, Facing, offset, Velocity, hogging, LedgeID)) {
 			Position += offset;
@@ -697,7 +697,7 @@ void NormGiraffe::Move(Stage& stage, const int frameNumber, std::array<Giraffe*,
 
 }
 
-void NormGiraffe::Draw(HDC hdc, Vec2 Scale)
+void NormGiraffe::Draw(HDC hdc, Vector2 Scale)
 {
 	SelectObject(hdc, GiraffePen);
 	for (int i = 0; i < Projectiles.Size(); ++i) {
@@ -719,7 +719,7 @@ void NormGiraffe::Draw(HDC hdc, Vec2 Scale)
 			if (AnimFrame >= 10 && AnimFrame <= 30) {
 				POINT points[NUM_POINTS];
 				for (int i = 0; i < NUM_POINTS; ++i) {
-					points[i] = (Scale * (Position + Facing * (*Moves->GetSkelPoints(CurrentAnim, CurrentFrame))[i])).ToPoint();
+					points[i] = Giraffe::VecToPoint(Position + Facing * (*Moves->GetSkelPoints(CurrentAnim, CurrentFrame))[i], Scale);
 				}
 				Polyline(hdc, points, 27);
 				Polyline(hdc, &points[36], 2);
@@ -735,22 +735,22 @@ void NormGiraffe::Draw(HDC hdc, Vec2 Scale)
 			float r = 2.5f * cosf(AnimFrame / 15.0f * 3.1415f);
 			float r1 = 0.5f * r;
 			float r2 = 0.866025f * r;
-			points[0] = (Scale * (Position + Vec2(r, 0))).ToPoint();
-			points[1] = (Scale * (Position + Vec2(r1, r2))).ToPoint();
-			points[2] = (Scale * (Position + Vec2(-r1, r2))).ToPoint();
-			points[3] = (Scale * (Position + Vec2(-r, 0))).ToPoint();
-			points[4] = (Scale * (Position + Vec2(-r1, -r2))).ToPoint();
-			points[5] = (Scale * (Position + Vec2(r1, -r2))).ToPoint();
+			points[0] = Giraffe::VecToPoint(Position + Vector2(r, 0), Scale);
+			points[1] = Giraffe::VecToPoint(Position + Vector2(r1, r2), Scale);
+			points[2] = Giraffe::VecToPoint(Position + Vector2(-r1, r2), Scale);
+			points[3] = Giraffe::VecToPoint(Position + Vector2(-r, 0), Scale);
+			points[4] = Giraffe::VecToPoint(Position + Vector2(-r1, -r2), Scale);
+			points[5] = Giraffe::VecToPoint(Position + Vector2(r1, -r2), Scale);
 
 			r *= 0.6f;
 			r1 *= 0.6f;
 			r2 *= 0.6f;
-			points[6] = (Scale * (Position + Vec2(r, 0))).ToPoint();
-			points[7] = (Scale * (Position + Vec2(r1, r2))).ToPoint();
-			points[8] = (Scale * (Position + Vec2(-r1, r2))).ToPoint();
-			points[9] = (Scale * (Position + Vec2(-r, 0))).ToPoint();
-			points[10] = (Scale * (Position + Vec2(-r1, -r2))).ToPoint();
-			points[11] = (Scale * (Position + Vec2(r1, -r2))).ToPoint();
+			points[6] = Giraffe::VecToPoint(Position + Vector2(r, 0), Scale);
+			points[7] = Giraffe::VecToPoint(Position + Vector2(r1, r2), Scale);
+			points[8] = Giraffe::VecToPoint(Position + Vector2(-r1, r2), Scale);
+			points[9] = Giraffe::VecToPoint(Position + Vector2(-r, 0), Scale);
+			points[10] = Giraffe::VecToPoint(Position + Vector2(-r1, -r2), Scale);
+			points[11] = Giraffe::VecToPoint(Position + Vector2(r1, -r2), Scale);
 
 			Polygon(hdc, points, 12);
 		}
@@ -834,12 +834,12 @@ void NormGiraffe::Draw(HDC hdc, Vec2 Scale)
 	DrawSelf(hdc, Scale, CurrentFrame, CurrentAnim);
 }
 
-void NormGiraffe::DrawSelf(HDC hdc, Vec2 Scale, int CurrentFrame, int CurrentAnim)
+void NormGiraffe::DrawSelf(HDC hdc, Vector2 Scale, int CurrentFrame, int CurrentAnim)
 {
 	POINT points[NUM_POINTS];
 
 	for (int i = 0; i < NUM_POINTS; ++i) {
-		points[i] = (Scale * (Position + Facing * (*Moves->GetSkelPoints(CurrentAnim, CurrentFrame))[i])).ToPoint();
+		points[i] = Giraffe::VecToPoint(Position + Facing * (*Moves->GetSkelPoints(CurrentAnim, CurrentFrame))[i], Scale);
 	}
 
 	Polyline(hdc, points, 27);
@@ -849,7 +849,7 @@ void NormGiraffe::DrawSelf(HDC hdc, Vec2 Scale, int CurrentFrame, int CurrentAni
 	Polyline(hdc, &points[36], 2);
 }
 
-void NormGiraffe::DrawHitbox(HDC hdc, Vec2 Scale, Vec2 Pos,float Rad)
+void NormGiraffe::DrawHitbox(HDC hdc, Vector2 Scale, Vector2 Pos,float Rad)
 {
 	Ellipse(hdc, Scale.x * (Position.x + Facing.x * Pos.x - Rad), Scale.y * (Position.y + Facing.y * Pos.y - Rad), Scale.x * (Position.x + Facing.x * Pos.x + Rad), Scale.y * (Position.y + Facing.y * Pos.y + Rad));
 }

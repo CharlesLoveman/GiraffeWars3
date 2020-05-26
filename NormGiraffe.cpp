@@ -259,6 +259,8 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 			State |= STATE_GETUPATTACK;
 			AttackNum = 17;
 			Position += Vector2(2.5f, -2.5f) * Facing;
+			SoundState |= SOUND_GETUPATTACK;
+			SoundDelay[XACT_WAVEBANK_TESTBANK_GETUPATTACK] = frameNumber + TESTBANK_GETUPATTACK_LENGTH;
 		}
 		else if ((inputs & INPUT_SHIELD || State & STATE_SHIELDING) && !(State & (STATE_JUMPING))) {
 			State &= ~STATE_SHIELDING;

@@ -22,7 +22,7 @@ bool Giraffe::ProjectileHit(Projectile p)
 {
 	if (Vector2::DistanceSquared(Position, p.Position) < (p.Radius * p.Radius + Fullbody.Radius * Fullbody.Radius)) {
 		for (int k = 0; k < 6; ++k) {
-			if (Vector2::DistanceSquared(Position, p.Position) < (p.Radius * p.Radius + (*Hurtboxes)[k].Radius * (*Hurtboxes)[k].Radius)) {
+			if (Vector2::DistanceSquared((Position + Facing * (*Hurtboxes)[k].Position), p.Position) < (p.Radius * p.Radius + (*Hurtboxes)[k].Radius * (*Hurtboxes)[k].Radius)) {
 				IncomingHits[numIncoming].hit = p;
 				IncomingHits[numIncoming].ID = p.ID;
 				++numIncoming;
@@ -41,7 +41,7 @@ bool Giraffe::GrabHit(Collider col, Vector2 _Facing, int frameNumber)
 	
 	if (Vector2::DistanceSquared(col.Position, Position) < (col.Radius * col.Radius + Fullbody.Radius * Fullbody.Radius)) {
 		for (int k = 0; k < 6; ++k) {
-			if (Vector2::DistanceSquared(col.Position, (Position + (*Hurtboxes)[k].Position)) < (col.Radius * col.Radius + (*Hurtboxes)[k].Radius * (*Hurtboxes)[k].Radius)) {
+			if (Vector2::DistanceSquared(col.Position, (Position + Facing * (*Hurtboxes)[k].Position)) < (col.Radius * col.Radius + (*Hurtboxes)[k].Radius * (*Hurtboxes)[k].Radius)) {
 				incomingGrab = true;
 				Facing.x = -1 * _Facing.x;
 				Position.x = col.Position.x - 1.0f * Facing.x;

@@ -9,6 +9,7 @@
 #include <array>
 #include "MoveSet.h"
 #include "NormMoveSet.h"
+#include "AudioPlayer.h"
 
 #pragma comment(lib, "Ws2_32.lib")
 #pragma comment(lib, "Winmm.lib")
@@ -21,6 +22,7 @@ struct {
 	int	input;
 } inputtable[8];
 Renderer* renderer = NULL;
+AudioPlayer* audioPlayer;
 GGPOSession* ggpo = NULL;
 
 int
@@ -181,6 +183,8 @@ void GiraffeWar_Init(HWND hwnd, unsigned short localport, GGPOPlayer* players, i
 {
 	GGPOErrorCode result;
 	renderer = new GDIRenderer(hwnd);
+	audioPlayer = new AudioPlayer();
+	
 
 	for (int i = 0; i < 4; ++i) {
 		MoveSets[i] = new NormMoveSet();
@@ -246,6 +250,7 @@ void GiraffeWar_InitSpectator(HWND hwnd, unsigned short localport, int num_playe
 {
 	GGPOErrorCode result;
 	renderer = new GDIRenderer(hwnd);
+	audioPlayer = new AudioPlayer();
 
 	//std::shared_ptr<NormMoveSet> pNorm = std::make_shared<NormMoveSet>();
 	for (int i = 0; i < 4; ++i) {
@@ -295,6 +300,9 @@ void GiraffeWar_DrawCurrentFrame()
 {
 	if (renderer != nullptr) {
 		renderer->Draw(gs, ngs);
+	}
+	if (audioPlayer != nullptr) {
+		audioPlayer->Update(gs);
 	}
 }
 
@@ -390,5 +398,5 @@ void GiraffeWar_Exit()
 		ggpo = NULL;
 	}
 	delete renderer;
-	renderer = NULL;
+	delete audioPlayer;
 }

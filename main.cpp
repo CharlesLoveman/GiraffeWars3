@@ -6,6 +6,8 @@
 #	include <crtdbg.h>
 #endif
 #include "giraffewar.h"
+#include "Audio.h"
+#include <memory>
 
 
 LRESULT CALLBACK MainWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -115,6 +117,13 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR,
 		{64, 600},
 		{740, 600}
 	};
+
+
+	HRESULT hr = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
+	if (FAILED(hr)) {
+		MessageBox(NULL, "Failed to initialise audio", "Error", 0);
+		return 1;
+	}
 
 #if defined(_DEBUG)
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);

@@ -11,6 +11,7 @@
 #include "MoveSet.h"
 #include "Projectile.h"
 #include "SimpleMath.h"
+#include "testbankheader.h"
 
 using namespace DirectX::SimpleMath;
 
@@ -49,6 +50,36 @@ enum GiraffeStates {
 	STATE_THROW = (1 << 30),
 };
 
+enum GiraffeSoundStates {
+	SOUND_AIRDASH = (1 << 0),
+	SOUND_BACKTHROW = (1 << 1),
+	SOUND_BAIR = (1 << 2),
+	SOUND_DAIR = (1 << 3),
+	SOUND_DOWNB = (1 << 4),
+	SOUND_DOWNTHROW = (1 << 5),
+	SOUND_DSMASH = (1 << 6),
+	SOUND_DTILT = (1 << 7),
+	SOUND_FAIR = (1 << 8),
+	SOUND_FSMASH = (1 << 9),
+	SOUND_FTHROW = (1 << 10),
+	SOUND_FTILT = (1 << 11),
+	SOUND_GETUPATTACK = (1 << 12),
+	SOUND_GRAB = (1 << 13),
+	SOUND_JAB = (1 << 14),
+	SOUND_JUMP = (1 << 15),
+	SOUND_JUMPLAND = (1 << 16),
+	SOUND_NAIR = (1 << 17),
+	SOUND_NEUTRALB = (1 << 18),
+	SOUND_ROLL = (1 << 19),
+	SOUND_SIDEB = (1 << 20),
+	SOUND_UPAIR = (1 << 21),
+	SOUND_UPB = (1 << 22),
+	SOUND_UPSMASH = (1 << 23),
+	SOUND_UPTHROW = (1 << 24),
+	SOUND_UPTILT = (1 << 25),
+	SOUND_WAVEDASH = (1 << 26),
+};
+
 
 struct HitWID {
 	HitCollider hit;
@@ -69,6 +100,8 @@ public:
 	Vector2 Position;
 	Vector2 Velocity;
 	int State;
+	int SoundState;
+	int SoundDelay[XACT_WAVEBANK_TESTBANK_ENTRY_COUNT];
 	const std::array<HurtCollider, 6>* Hurtboxes;
 	const std::vector<HitCollider>* Hitboxes;
 	float Knockback;

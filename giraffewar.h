@@ -4,6 +4,7 @@
 #include "ggponet.h"
 #include "resource.h"
 #include <Windows.h>
+#include "Audio.h"
 //Interface to the GiraffeWar application
 
 

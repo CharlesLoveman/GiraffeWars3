@@ -96,6 +96,9 @@
       <AdditionalLibraryDirectories>C:\Users\charl\source\repos\ggpo\build\lib\x64\Debug</AdditionalLibraryDirectories>
       <AdditionalDependencies>GGPO.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <ResourceCompile>
+      <Culture>0x0809</Culture>
+    </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -131,6 +134,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AudioPlayer.cpp" />
     <ClCompile Include="Collider.cpp" />
     <ClCompile Include="gamestate.cpp" />
     <ClCompile Include="gdi_renderer.cpp" />
@@ -146,6 +150,7 @@
   <ItemGroup>
     <ClInclude Include="ArrayList.h" />
     <ClInclude Include="ArrayQueue.h" />
+    <ClInclude Include="AudioPlayer.h" />
     <ClInclude Include="Collider.h" />
     <ClInclude Include="gamestate.h" />
     <ClInclude Include="gdi_renderer.h" />
@@ -160,6 +165,7 @@
     <ClInclude Include="renderer.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Stage.h" />
+    <ClInclude Include="testbankheader.h" />
     <ClInclude Include="VecRect.h" />
   </ItemGroup>
   <ItemGroup>
@@ -173,6 +179,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <CopyFileToFolders Include="testbank.xwb">
+      <DeploymentContent>true</DeploymentContent>
+      <FileType>Document</FileType>
+    </CopyFileToFolders>
     <None Include="wave1.bin" />
     <None Include="wave2.bin" />
   </ItemGroup>

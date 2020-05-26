@@ -12,6 +12,7 @@ Fthrow.wav
 Ftilt.wav
 GetUpAttack.wav
 Grab.wav
+Hit.wav
 Jab.wav
 Jump.wav
 JumpLand.wav

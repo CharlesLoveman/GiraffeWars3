@@ -590,7 +590,7 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 			Hurtboxes = Moves->GetHurtboxes(6, AnimFrame % 9);
 		}
 		else if (State & STATE_GRABBING) {
-			Hurtboxes = Moves->GetHurtboxes(12, 7); //Should be 12
+			Hurtboxes = Moves->GetHurtboxes(12, 7);
 		}
 		else { //Idle
 			Hurtboxes = Moves->GetHurtboxes(0,0);
@@ -649,8 +649,8 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 			if (j != i) {
 				for (int h = 0; h < numHitboxes; ++h) {
 					if ((*giraffes[j]).AddHit((*Hitboxes)[h], LastAttackID, Facing, Position)) {
-						/*SoundState |= SOUND_HARD;
-						SoundDelay[XACT_WAVEBANK_TESTBANK_HIT3] = frameNumber + 20;*/
+						SoundState |= SOUND_HIT;
+						SoundDelay[XACT_WAVEBANK_TESTBANK_HIT] = frameNumber + TESTBANK_HIT_LENGTH;
 					}
 				}
 			}

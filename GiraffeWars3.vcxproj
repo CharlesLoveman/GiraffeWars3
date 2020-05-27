@@ -150,11 +150,13 @@
   <ItemGroup>
     <ClInclude Include="ArrayList.h" />
     <ClInclude Include="ArrayQueue.h" />
+    <ClInclude Include="attackbankheader.h" />
     <ClInclude Include="AudioPlayer.h" />
     <ClInclude Include="Collider.h" />
     <ClInclude Include="gamestate.h" />
     <ClInclude Include="gdi_renderer.h" />
     <ClInclude Include="Giraffe.h" />
+    <ClInclude Include="movebankheader.h" />
     <ClInclude Include="MoveSet.h" />
     <ClInclude Include="nongamestate.h" />
     <ClInclude Include="giraffewar.h" />
@@ -165,7 +167,6 @@
     <ClInclude Include="renderer.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Stage.h" />
-    <ClInclude Include="testbankheader.h" />
     <ClInclude Include="VecRect.h" />
   </ItemGroup>
   <ItemGroup>
@@ -178,11 +179,15 @@
     <Media Include="Sounds\JumpLand.wav" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
-    <CopyFileToFolders Include="testbank.xwb">
+    <CopyFileToFolders Include="attackbank.xwb">
       <DeploymentContent>true</DeploymentContent>
       <FileType>Document</FileType>
     </CopyFileToFolders>
+    <CopyFileToFolders Include="movebank.xwb">
+      <DeploymentContent>true</DeploymentContent>
+      <FileType>Document</FileType>
+    </CopyFileToFolders>
+    <None Include="packages.config" />
     <None Include="wave1.bin" />
     <None Include="wave2.bin" />
   </ItemGroup>

@@ -16,6 +16,8 @@ public:
 	virtual std::array<Vector2, NUM_POINTS>* GetSkelPoints(int MoveId, int FrameNum) = 0;
 	virtual int GetLandingLag(int MoveId) = 0;
 	virtual int GetMoveLength(int MoveId) = 0;
+	virtual int GetAttackSoundLength(int AttackId) = 0;
+	virtual int GetMoveSoundLength(int MoveId) = 0;
 };
 
 #endif // !_MOVESET_H_

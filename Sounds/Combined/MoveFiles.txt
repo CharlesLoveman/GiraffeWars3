@@ -1,0 +1,15 @@
+Run.wav
+Jump.wav
+JumpLand.wav
+Knockdown.wav
+Hitstun.wav
+Wavedash.wav
+Roll.wav
+Crouch.wav
+Doublejump.wav
+Airdash.wav
+Fastfall.wav
+Tech.wav
+Bounce.wav
+Shield.wav
+Death.wav

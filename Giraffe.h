@@ -11,7 +11,8 @@
 #include "MoveSet.h"
 #include "Projectile.h"
 #include "SimpleMath.h"
-#include "testbankheader.h"
+#include "movebankheader.h"
+#include "attackbankheader.h"
 
 using namespace DirectX::SimpleMath;
 
@@ -50,35 +51,50 @@ enum GiraffeStates {
 	STATE_THROW = (1 << 30),
 };
 
-enum GiraffeSoundStates {
-	SOUND_AIRDASH = (1 << 0),
-	SOUND_BACKTHROW = (1 << 1),
-	SOUND_BAIR = (1 << 2),
-	SOUND_DAIR = (1 << 3),
-	SOUND_DOWNB = (1 << 4),
-	SOUND_DOWNTHROW = (1 << 5),
-	SOUND_DSMASH = (1 << 6),
-	SOUND_DTILT = (1 << 7),
-	SOUND_FAIR = (1 << 8),
-	SOUND_FSMASH = (1 << 9),
-	SOUND_FTHROW = (1 << 10),
-	SOUND_FTILT = (1 << 11),
-	SOUND_GETUPATTACK = (1 << 12),
-	SOUND_GRAB = (1 << 13),
-	SOUND_HIT = (1 << 14),
-	SOUND_JAB = (1 << 15),
-	SOUND_JUMP = (1 << 16),
-	SOUND_JUMPLAND = (1 << 17),
-	SOUND_NAIR = (1 << 18),
-	SOUND_NEUTRALB = (1 << 19),
-	SOUND_ROLL = (1 << 20),
-	SOUND_SIDEB = (1 << 21),
-	SOUND_UPAIR = (1 << 22),
-	SOUND_UPB = (1 << 23),
-	SOUND_UPSMASH = (1 << 24),
-	SOUND_UPTHROW = (1 << 25),
-	SOUND_UPTILT = (1 << 26),
-	SOUND_WAVEDASH = (1 << 27),
+enum GiraffeSoundMoveStates {
+	SOUND_RUN = (1 << 0),
+	SOUND_JUMP = (1 << 1),
+	SOUND_JUMPLAND = (1 << 2),
+	SOUND_KNOCKDOWN = (1 << 3),
+	SOUND_HITSTUN = (1 << 4),
+	SOUND_WAVEDASH = (1 << 5),
+	SOUND_ROLL = (1 << 6),
+	SOUND_CROUCH = (1 << 7),
+	SOUND_DOUBLEJUMP = (1 << 8),
+	SOUND_AIRDASH = (1 << 9),
+	SOUND_FASTFALL = (1 << 10),
+	SOUND_TECH = (1 << 11),
+	SOUND_BOUNCE = (1 << 12),
+	SOUND_SHIELD = (1 << 13),
+	SOUND_DEATH = (1 << 14),
+};
+
+enum GiraffeSoundAttackStates {
+	SOUND_GRAB = (1 << 0),
+	SOUND_FTHROW = (1 << 1),
+	SOUND_UPTHROW = (1 << 2),
+	SOUND_BACKTHROW = (1 << 3),
+	SOUND_DOWNTHROW = (1 << 4),
+	SOUND_GETUPATTACK = (1 << 5),
+	SOUND_JAB = (1 << 6),
+	SOUND_FTILT = (1 << 7),
+	SOUND_UPTILT = (1 << 8),
+	SOUND_DTILT = (1 << 9),
+	SOUND_FSMASH = (1 << 10),
+	SOUND_UPSMASH = (1 << 11),
+	SOUND_DSMASH = (1 << 12),
+	SOUND_NAIR = (1 << 13),
+	SOUND_FAIR = (1 << 14),
+	SOUND_UPAIR = (1 << 15),
+	SOUND_DAIR = (1 << 16),
+	SOUND_BAIR = (1 << 17),
+	SOUND_NEUTRALB = (1 << 18),
+	SOUND_SIDEB = (1 << 19),
+	SOUND_UPB = (1 << 20),
+	SOUND_DOWNB = (1 << 21),
+	SOUND_WEAK = (1 << 22),
+	SOUND_MEDIUM = (1 << 23),
+	SOUND_HEAVY = (1 << 24),
 };
 
 
@@ -101,8 +117,10 @@ public:
 	Vector2 Position;
 	Vector2 Velocity;
 	int State;
-	int SoundState;
-	int SoundDelay[XACT_WAVEBANK_TESTBANK_ENTRY_COUNT];
+	int SoundMoveState;
+	int SoundAttackState;
+	int SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_ENTRY_COUNT];
+	int SoundAttackDelay[XACT_WAVEBANK_ATTACKBANK_ENTRY_COUNT];
 	const std::array<HurtCollider, 6>* Hurtboxes;
 	const std::vector<HitCollider>* Hitboxes;
 	float Knockback;

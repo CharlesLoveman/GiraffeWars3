@@ -107,7 +107,10 @@
     <ClInclude Include="AudioPlayer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="testbankheader.h">
+    <ClInclude Include="attackbankheader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="movebankheader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -140,6 +143,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <CopyFileToFolders Include="testbank.xwb" />
+    <CopyFileToFolders Include="attackbank.xwb" />
+    <CopyFileToFolders Include="movebank.xwb" />
   </ItemGroup>
 </Project>

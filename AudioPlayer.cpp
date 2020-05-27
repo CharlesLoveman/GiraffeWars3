@@ -9,10 +9,15 @@ AudioPlayer::AudioPlayer()
 #endif
 	audEngine = std::make_unique<AudioEngine>(eflags);
 	for (int i = 0; i < 4; ++i) {
-		waveBanks[i] = std::make_unique<WaveBank>(audEngine.get(), L"testbank.xwb");
-		for (int j = 0; j < XACT_WAVEBANK_TESTBANK_ENTRY_COUNT; ++j) {
-			soundInstances[i][j] = waveBanks[i]->CreateInstance(j);
+		moveBanks[i] = std::make_unique<WaveBank>(audEngine.get(), L"movebank.xwb");
+		attackBanks[i] = std::make_unique<WaveBank>(audEngine.get(), L"attackbank.xwb");
+		for (int j = 0; j < XACT_WAVEBANK_MOVEBANK_ENTRY_COUNT; ++j) {
+			soundMoveInstances[i][j] = moveBanks[i]->CreateInstance(j);
 		}
+		for (int j = 0; j < XACT_WAVEBANK_ATTACKBANK_ENTRY_COUNT; ++j) {
+			soundAttackInstances[i][j] = attackBanks[i]->CreateInstance(j);
+		}
+		//soundMoveInstances[i][13]->l
 	}
 }
 
@@ -20,17 +25,30 @@ void AudioPlayer::Update(GameState gs)
 {
 	audEngine->Update();
 	for (int i = 0; i < gs._num_giraffes; ++i) {
-		int changes = gs.giraffes[i]->SoundState ^ soundStates[i];
-		for (int j = 0; j < XACT_WAVEBANK_TESTBANK_ENTRY_COUNT; ++j) {
+		int changes = gs.giraffes[i]->SoundMoveState ^ soundMoveStates[i];
+		for (int j = 0; j < XACT_WAVEBANK_MOVEBANK_ENTRY_COUNT; ++j) {
 			if (changes & (1 << j)) {
-				if (soundStates[i] & (1 << j)) {
-					soundInstances[i][j]->Stop();
+				if (soundMoveStates[i] & (1 << j)) {
+					soundMoveInstances[i][j]->Stop(true);
 				}
 				else {
-					soundInstances[i][j]->Play();
+					soundMoveInstances[i][j]->Play(true);
 				}
 			}
 		}
-		soundStates[i] = gs.giraffes[i]->SoundState;
+		soundMoveStates[i] = gs.giraffes[i]->SoundMoveState;
+
+		changes = gs.giraffes[i]->SoundAttackState ^ soundAttackStates[i];
+		for (int j = 0; j < XACT_WAVEBANK_ATTACKBANK_ENTRY_COUNT; ++j) {
+			if (changes & (1 << j)) {
+				if (soundAttackStates[i] & (1 << j)) {
+					soundAttackInstances[i][j]->Stop(true);
+				}
+				else {
+					soundAttackInstances[i][j]->Play(true);
+				}
+			}
+		}
+		soundAttackStates[i] = gs.giraffes[i]->SoundAttackState;
 	}
 }

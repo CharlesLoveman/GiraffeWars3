@@ -33,7 +33,8 @@ NormGiraffe::NormGiraffe(Vector2 _Position, MoveSet* _Moves, HPEN _GiraffePen)
 
 	//State
 	State = 0;
-	SoundState = 0;
+	SoundMoveState = 0;
+	SoundAttackState = 0;
 	JumpDelay = 0;
 	MaxJumpDelay = 4;
 	AttackDelay = 0;
@@ -47,6 +48,7 @@ NormGiraffe::NormGiraffe(Vector2 _Position, MoveSet* _Moves, HPEN _GiraffePen)
 	Knockback = 0;
 	Mass = 100;
 	hInst = GetModuleHandle(NULL);
+	CommandGrabPointer = 0;
 
 	//Animation
 	AnimFrame = 0;
@@ -77,8 +79,8 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 		State &= ~(STATE_JUMPSQUAT | STATE_SHORTHOP);
 		State |= STATE_JUMPING | STATE_DOUBLEJUMPWAIT;
 		JumpDelay = frameNumber + MaxJumpDelay * 2;
-		SoundState |= SOUND_JUMP;
-		SoundDelay[XACT_WAVEBANK_TESTBANK_JUMP] = frameNumber + TESTBANK_JUMP_LENGTH;
+		SoundMoveState |= SOUND_JUMP;
+		SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_JUMP] = frameNumber + Moves->GetMoveSoundLength(XACT_WAVEBANK_MOVEBANK_JUMP);
 	}
 	else if (State & STATE_JUMPLAND && frameNumber >= JumpDelay) {
 		State &= ~STATE_JUMPLAND;
@@ -96,6 +98,7 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 	}
 	else if (State & STATE_HITSTUN && frameNumber >= AttackDelay) {
 		State &= ~STATE_HITSTUN;
+		SoundMoveState &= ~SOUND_HITSTUN;
 	}
 	else if (State & STATE_SHIELDSTUN && frameNumber >= AttackDelay) {
 		State &= ~STATE_SHIELDSTUN;
@@ -126,9 +129,14 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 		State &= ~(STATE_GRABBED | STATE_GRABBING);
 	}
 
-	for (int i = 0; i < XACT_WAVEBANK_TESTBANK_ENTRY_COUNT; ++i) {
-		if (SoundState & (1 << i) && frameNumber >= SoundDelay[i]) {
-			SoundState &= ~(1 << i);
+	for (int i = 0; i < XACT_WAVEBANK_MOVEBANK_ENTRY_COUNT; ++i) {
+		if (SoundMoveState & (1 << i) && frameNumber >= SoundMoveDelay[i]) {
+			SoundMoveState &= ~(1 << i);
+		}
+	}
+	for (int i = 0; i < XACT_WAVEBANK_ATTACKBANK_ENTRY_COUNT; ++i) {
+		if (SoundAttackState & (1 << i) && frameNumber >= SoundAttackDelay[i]) {
+			SoundAttackState &= ~(1 << i);
 		}
 	}
 
@@ -141,6 +149,7 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 				stage.Ledges[LedgeID].Hogged = false;
 				State |= STATE_JUMPING | STATE_DOUBLEJUMPWAIT;
 				JumpDelay = frameNumber + MaxJumpDelay * 2;
+				SoundMoveState &= ~SOUND_HITSTUN;
 			}
 		}
 		else if (State & STATE_GRABBING) {
@@ -150,8 +159,8 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 				AttackNum = 13;
 				AttackDelay = frameNumber + Moves->GetMoveLength(AttackNum);
 				AnimFrame = 0;
-				SoundState |= SOUND_FTHROW;
-				SoundDelay[XACT_WAVEBANK_TESTBANK_FTHROW] = frameNumber + TESTBANK_FTHROW_LENGTH;
+				SoundAttackState |= SOUND_FTHROW;
+				SoundAttackDelay[XACT_WAVEBANK_ATTACKBANK_FTHROW] = frameNumber + Moves->GetAttackSoundLength(XACT_WAVEBANK_ATTACKBANK_FTHROW);
 			}
 			else if (inputs & INPUT_UP) {
 				State &= ~STATE_GRABBING;
@@ -159,8 +168,8 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 				AttackNum = 14;
 				AttackDelay = frameNumber + Moves->GetMoveLength(AttackNum);
 				AnimFrame = 0;
-				SoundState |= SOUND_UPTHROW;
-				SoundDelay[XACT_WAVEBANK_TESTBANK_UPTHROW] = frameNumber + TESTBANK_UPTHROW_LENGTH;
+				SoundAttackState |= SOUND_UPTHROW;
+				SoundAttackDelay[XACT_WAVEBANK_ATTACKBANK_UPTHROW] = frameNumber + Moves->GetAttackSoundLength(XACT_WAVEBANK_ATTACKBANK_UPTHROW);
 			}
 			else if (inputs & INPUT_DOWN) {
 				State &= ~STATE_GRABBING;
@@ -168,8 +177,8 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 				AttackNum = 15;
 				AttackDelay = frameNumber + Moves->GetMoveLength(AttackNum);
 				AnimFrame = 0;
-				SoundState |= SOUND_DOWNTHROW;
-				SoundDelay[XACT_WAVEBANK_TESTBANK_DOWNTHROW] = frameNumber + TESTBANK_DOWNTHROW_LENGTH;
+				SoundAttackState |= SOUND_DOWNTHROW;
+				SoundAttackDelay[XACT_WAVEBANK_ATTACKBANK_DOWNTHROW] = frameNumber + Moves->GetAttackSoundLength(XACT_WAVEBANK_ATTACKBANK_DOWNTHROW);
 			}
 			else if ((inputs & INPUT_LEFT && Facing.x == 1) || (inputs & INPUT_RIGHT && Facing.x == -1)) {
 				State &= ~STATE_GRABBING;
@@ -177,8 +186,8 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 				AttackNum = 16;
 				AttackDelay = frameNumber + Moves->GetMoveLength(AttackNum);
 				AnimFrame = 0;
-				SoundState |= SOUND_BACKTHROW;
-				SoundDelay[XACT_WAVEBANK_TESTBANK_BACKTHROW] = frameNumber + TESTBANK_BACKTHROW_LENGTH;
+				SoundAttackState |= SOUND_BACKTHROW;
+				SoundAttackDelay[XACT_WAVEBANK_ATTACKBANK_BACKTHROW] = frameNumber + Moves->GetAttackSoundLength(XACT_WAVEBANK_ATTACKBANK_BACKTHROW);
 			}
 		}
 		else if (State & STATE_JUMPING) {
@@ -192,51 +201,61 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 					Velocity.x += AirAccel;
 				}
 			}
-			if (inputs & INPUT_DOWN && !(inputs & (INPUT_WEAK | INPUT_HEAVY))) {
+			if (inputs & INPUT_DOWN && !(inputs & (INPUT_WEAK | INPUT_HEAVY)) && !(State & STATE_FASTFALL)) {
 				State |= STATE_FASTFALL;
+				SoundMoveState |= SOUND_FASTFALL;
+				SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_FASTFALL] = frameNumber + Moves->GetMoveSoundLength(XACT_WAVEBANK_MOVEBANK_FASTFALL);
 			}
 		}
 		else{
 			if (inputs & INPUT_LEFT) {
 				if (State & (STATE_TECHING | STATE_SHIELDING | STATE_KNOCKDOWN)) {
-					State &= ~(STATE_TECHING | STATE_SHIELDING | STATE_KNOCKDOWN);
+					State &= ~(STATE_TECHING | STATE_SHIELDING | STATE_KNOCKDOWN | STATE_CROUCH);
 					State |= STATE_ROLLING | STATE_INTANGIBLE;
 					AttackDelay = frameNumber + 20;
 					AnimFrame = 0;
 					Facing = { -1, 1 };
-					SoundState |= SOUND_ROLL;
-					SoundDelay[XACT_WAVEBANK_TESTBANK_ROLL] = frameNumber + TESTBANK_ROLL_LENGTH;
+					SoundMoveState |= SOUND_ROLL;
+					SoundMoveState &= ~SOUND_SHIELD;
+					SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_ROLL] = frameNumber + Moves->GetMoveSoundLength(XACT_WAVEBANK_MOVEBANK_ROLL);
 				}
 				else if (Velocity.x > -MaxGroundSpeed) {
 					Velocity.x -= RunAccel;
 					State &= ~STATE_CROUCH;
 					State |= STATE_RUNNING;
 					Facing = { -1, 1 };
+					SoundMoveState |= SOUND_RUN;
+					SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_RUN] = frameNumber + Moves->GetMoveSoundLength(XACT_WAVEBANK_MOVEBANK_RUN);
 				}
 			}
 			else if (inputs & INPUT_RIGHT) {
 				if (State & (STATE_TECHING | STATE_SHIELDING | STATE_KNOCKDOWN)) {
-					State &= ~(STATE_TECHING | STATE_SHIELDING | STATE_KNOCKDOWN);
+					State &= ~(STATE_TECHING | STATE_SHIELDING | STATE_KNOCKDOWN | STATE_CROUCH);
 					State |= STATE_ROLLING | STATE_INTANGIBLE;
 					AttackDelay = frameNumber + 20;
 					AnimFrame = 0;
 					Facing = { 1, 1 };
-					SoundState |= SOUND_ROLL;
-					SoundDelay[XACT_WAVEBANK_TESTBANK_ROLL] = frameNumber + TESTBANK_ROLL_LENGTH;
+					SoundMoveState |= SOUND_ROLL;
+					SoundMoveState &= ~SOUND_SHIELD;
+					SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_ROLL] = frameNumber + Moves->GetMoveSoundLength(XACT_WAVEBANK_MOVEBANK_ROLL);
 				}
 				else if (Velocity.x < MaxGroundSpeed) {
 					Velocity.x += RunAccel;
 					State &= ~STATE_CROUCH;
 					State |= STATE_RUNNING;
 					Facing = { 1, 1 };
+					SoundMoveState |= SOUND_RUN;
+					SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_RUN] = frameNumber + Moves->GetMoveSoundLength(XACT_WAVEBANK_MOVEBANK_RUN);
 				}
 			}
 			else {
 				State &= ~STATE_RUNNING;
 			}
 
-			if (inputs & INPUT_DOWN && !(inputs & (INPUT_WEAK | INPUT_HEAVY))) {
+			if (inputs & INPUT_DOWN && !(inputs & (INPUT_WEAK | INPUT_HEAVY)) && !(State & (STATE_CROUCH | STATE_ROLLING))) {
 				State |= STATE_CROUCH;
+				SoundMoveState |= SOUND_CROUCH;
+				SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_CROUCH] = frameNumber + Moves->GetMoveSoundLength(XACT_WAVEBANK_MOVEBANK_CROUCH);
 			}
 			else if (!(inputs & INPUT_DOWN) && State & STATE_CROUCH) {
 				State &= ~STATE_CROUCH;
@@ -250,86 +269,49 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 			State &= ~STATE_KNOCKDOWN;
 			State |= STATE_GETUPATTACK;
 			AttackNum = 17;
-			SoundState |= SOUND_GETUPATTACK;
-			SoundDelay[XACT_WAVEBANK_TESTBANK_GETUPATTACK] = frameNumber + TESTBANK_GETUPATTACK_LENGTH;
+			SoundMoveState &= ~SOUND_HITSTUN;
 		}
 		else if (State & STATE_LEDGEHOG) {
 			State &= ~STATE_LEDGEHOG;
 			stage.Ledges[LedgeID].Hogged = false;
+			SoundMoveState &= ~SOUND_HITSTUN;
 			State |= STATE_GETUPATTACK;
 			AttackNum = 17;
 			Position += Vector2(2.5f, -2.5f) * Facing;
-			SoundState |= SOUND_GETUPATTACK;
-			SoundDelay[XACT_WAVEBANK_TESTBANK_GETUPATTACK] = frameNumber + TESTBANK_GETUPATTACK_LENGTH;
 		}
 		else if ((inputs & INPUT_SHIELD || State & STATE_SHIELDING) && !(State & (STATE_JUMPING))) {
 			State &= ~STATE_SHIELDING;
 			State |= STATE_HEAVY;//Code grabs as weak and heavy
 			AttackNum = 12;
-			SoundState |= SOUND_GRAB;
-			SoundDelay[XACT_WAVEBANK_TESTBANK_GRAB] = frameNumber + TESTBANK_GRAB_LENGTH;
 		}
 		else if ((inputs & INPUT_RIGHT && Facing.x == 1) || (inputs & INPUT_LEFT && Facing.x == -1)) {
 			State |= STATE_FORWARD;
 			AttackNum = 19;
-			SoundState |= SOUND_FTILT;
-			SoundDelay[XACT_WAVEBANK_TESTBANK_FTILT] = frameNumber + TESTBANK_FTILT_LENGTH;
 		}
 		else if (inputs & INPUT_UP) {
 			State |= STATE_UP;
 			AttackNum = 20;
-			SoundState |= SOUND_UPTILT;
-			SoundDelay[XACT_WAVEBANK_TESTBANK_UPTILT] = frameNumber + TESTBANK_UPTILT_LENGTH;
 		}
 		else if (inputs & INPUT_DOWN) {
 			State |= STATE_DOWN;
 			AttackNum = 21;
-			SoundState |= SOUND_DTILT;
-			SoundDelay[XACT_WAVEBANK_TESTBANK_DTILT] = frameNumber + TESTBANK_DTILT_LENGTH;
 		}
 		else {//Neutral
 			AttackNum = 18;
-			SoundState |= SOUND_JAB;
-			SoundDelay[XACT_WAVEBANK_TESTBANK_JAB] = frameNumber + TESTBANK_JAB_LENGTH;
 		}
 		if (State & STATE_JUMPING) {
 			if ((inputs & INPUT_RIGHT && Facing.x == -1) || (inputs & INPUT_LEFT && Facing.x == 1)) {
 				//Bair
 				State |= STATE_BACK;
 				AttackNum = 29;
-				SoundState |= SOUND_BAIR;
-				SoundDelay[XACT_WAVEBANK_TESTBANK_BAIR] = frameNumber + TESTBANK_BAIR_LENGTH;
 			}
 			else {
 				AttackNum += 7;
-				switch (AttackNum)
-				{
-				case 25:
-					SoundState &= ~SOUND_JAB;
-					SoundState |= SOUND_NAIR;
-					SoundDelay[XACT_WAVEBANK_TESTBANK_NAIR] = frameNumber + TESTBANK_NAIR_LENGTH;
-					break;
-				case 26:
-					SoundState &= ~SOUND_FTILT;
-					SoundState |= SOUND_FAIR;
-					SoundDelay[XACT_WAVEBANK_TESTBANK_FAIR] = frameNumber + TESTBANK_FAIR_LENGTH;
-					break;
-				case 27:
-					SoundState &= ~SOUND_UPTILT;
-					SoundState |= SOUND_UPAIR;
-					SoundDelay[XACT_WAVEBANK_TESTBANK_UPAIR] = frameNumber + TESTBANK_UPAIR_LENGTH;
-					break;
-				case 28:
-					SoundState &= ~SOUND_DTILT;
-					SoundState |= SOUND_DAIR;
-					SoundDelay[XACT_WAVEBANK_TESTBANK_DAIR] = frameNumber + TESTBANK_DAIR_LENGTH;
-					break;
-				default:
-					break;
-				}
 			}
 		}
 		AttackDelay = frameNumber + Moves->GetMoveLength(AttackNum);
+		SoundAttackState |= (1 << (AttackNum - 12));
+		SoundAttackDelay[AttackNum - 12] = frameNumber + Moves->GetAttackSoundLength(AttackNum - 12);
 		++LastAttackID;
 		AnimFrame = 0;
 	}
@@ -340,57 +322,31 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 			//Fsmash
 			State |= STATE_FORWARD;
 			AttackNum = 22;
-			SoundState |= SOUND_FSMASH;
-			SoundDelay[XACT_WAVEBANK_TESTBANK_FSMASH] = frameNumber + TESTBANK_FSMASH_LENGTH;
 		}
 		else if (inputs & INPUT_UP) {
 			//Upsmash
 			State |= STATE_UP;
 			AttackNum = 23;
-			SoundState |= SOUND_UPSMASH;
-			SoundDelay[XACT_WAVEBANK_TESTBANK_UPSMASH] = frameNumber + TESTBANK_UPSMASH_LENGTH;
 		}
 		else if (inputs & INPUT_DOWN)
 		{
 			//Dsmash
 			State |= STATE_DOWN;
 			AttackNum = 24;
-			SoundState |= SOUND_DSMASH;
-			SoundDelay[XACT_WAVEBANK_TESTBANK_DSMASH] = frameNumber + TESTBANK_DSMASH_LENGTH;
 		}
 		else
 		{
 			//Neutral B
 			AttackNum = 30;
-			SoundState |= SOUND_NEUTRALB;
-			SoundDelay[XACT_WAVEBANK_TESTBANK_NEUTRALB] = frameNumber + TESTBANK_NEUTRALB_LENGTH;
 		}
 		if (State & STATE_JUMPING) {
 			if (State & (STATE_UP | STATE_DOWN | STATE_FORWARD)) {
 				AttackNum += 9;
-				switch (AttackNum)
-				{
-				case 31:
-					SoundState &= ~SOUND_FSMASH;
-					SoundState |= SOUND_SIDEB;
-					SoundDelay[XACT_WAVEBANK_TESTBANK_SIDEB] = frameNumber + TESTBANK_SIDEB_LENGTH;
-					break;
-				case 32:
-					SoundState &= ~SOUND_UPSMASH;
-					SoundState |= SOUND_UPB;
-					SoundDelay[XACT_WAVEBANK_TESTBANK_UPB] = frameNumber + TESTBANK_UPB_LENGTH;
-					break;
-				case 33:
-					SoundState &= ~SOUND_DSMASH;
-					SoundState |= SOUND_DOWNB;
-					SoundDelay[XACT_WAVEBANK_TESTBANK_DOWNB] = frameNumber + TESTBANK_DOWNB_LENGTH;
-					break;
-				default:
-					break;
-				}
 			}
 		}
 		AttackDelay = frameNumber + Moves->GetMoveLength(AttackNum);
+		SoundAttackState |= (1 << (AttackNum - 12));
+		SoundAttackDelay[AttackNum - 12] = frameNumber + Moves->GetAttackSoundLength(AttackNum - 12);
 		++LastAttackID;
 		AnimFrame = 0;
 	}
@@ -403,21 +359,23 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 			JumpDelay = frameNumber + MaxJumpDelay;
 			Velocity.y = -JumpSpeed;
 			AnimFrame = 0;
-			SoundState |= SOUND_JUMP;
-			SoundDelay[XACT_WAVEBANK_TESTBANK_JUMP] = frameNumber + TESTBANK_JUMP_LENGTH;
+			SoundMoveState |= SOUND_JUMP;
+			SoundMoveState &= ~SOUND_HITSTUN;
+			SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_JUMP] = frameNumber + Moves->GetMoveSoundLength(XACT_WAVEBANK_MOVEBANK_JUMP);
 		}
 		else if (!(State & STATE_JUMPING)) {
 			State |= STATE_JUMPSQUAT;
 			JumpDelay = frameNumber + MaxJumpDelay;
 			AnimFrame = 0;
 			State &= ~(STATE_SHIELDING | STATE_DROPSHIELD | STATE_RUNNING | STATE_CROUCH | STATE_KNOCKDOWN);
+			SoundMoveState &= ~(SOUND_SHIELD | SOUND_RUN);
 		}
 		else if (HasDoubleJump) {
 			HasDoubleJump = false;
 			Velocity.y = -JumpSpeed;
 			State &= ~STATE_FASTFALL;
-			SoundState |= SOUND_JUMP;
-			SoundDelay[XACT_WAVEBANK_TESTBANK_JUMP] = frameNumber + TESTBANK_JUMP_LENGTH;
+			SoundMoveState |= SOUND_DOUBLEJUMP;
+			SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_DOUBLEJUMP] = frameNumber + Moves->GetMoveSoundLength(XACT_WAVEBANK_MOVEBANK_DOUBLEJUMP);
 		}
 	}
 	else if (!(inputs & INPUT_JUMP) && (State & STATE_JUMPSQUAT)) {
@@ -428,8 +386,8 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 		HasDoubleJump = false;
 		Velocity.y = -JumpSpeed;
 		State &= ~STATE_FASTFALL;
-		SoundState |= SOUND_JUMP;
-		SoundDelay[XACT_WAVEBANK_TESTBANK_JUMP] = frameNumber + TESTBANK_JUMP_LENGTH;
+		SoundMoveState |= SOUND_DOUBLEJUMP;
+		SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_DOUBLEJUMP] = frameNumber + Moves->GetMoveSoundLength(XACT_WAVEBANK_MOVEBANK_DOUBLEJUMP);
 	}
 
 	if (inputs & INPUT_SHIELD) {
@@ -443,8 +401,8 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 			State &= ~(STATE_JUMPSQUAT | STATE_SHORTHOP);
 			State |= STATE_WAVEDASH;
 			JumpDelay = frameNumber + 2 * MaxJumpDelay;
-			SoundState |= SOUND_WAVEDASH;
-			SoundDelay[XACT_WAVEBANK_TESTBANK_WAVEDASH] = frameNumber + TESTBANK_WAVEDASH_LENGTH;
+			SoundMoveState |= SOUND_WAVEDASH;
+			SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_WAVEDASH] = frameNumber + Moves->GetMoveSoundLength(XACT_WAVEBANK_MOVEBANK_WAVEDASH);
 
 			Velocity.y += DashSpeed;
 			if (inputs & INPUT_LEFT) {
@@ -457,8 +415,8 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 		else if (State & STATE_JUMPING && !(State & (STATE_WEAK | STATE_HEAVY | STATE_HITSTUN)) && HasAirDash) {
 			HasAirDash = false;
 			State &= ~STATE_FASTFALL;
-			SoundState |= SOUND_AIRDASH;
-			SoundDelay[XACT_WAVEBANK_TESTBANK_AIRDASH] = frameNumber + TESTBANK_AIRDASH_LENGTH;
+			SoundMoveState |= SOUND_AIRDASH;
+			SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_AIRDASH] = frameNumber + Moves->GetMoveSoundLength(XACT_WAVEBANK_MOVEBANK_AIRDASH);
 			if (inputs & INPUT_LEFT) {
 				Velocity.x -= DashSpeed;
 			}
@@ -476,12 +434,15 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 			State &= ~(STATE_DROPSHIELD | STATE_WAVEDASH | STATE_RUNNING);
 			State |= STATE_SHIELDING;
 			Velocity.x = 0;
+			SoundMoveState |= SOUND_SHIELD;
+			SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_SHIELD] = 1000000000;
 		}
 	}
 	else if (State & STATE_SHIELDING) {
 		State &= ~STATE_SHIELDING;
 		State |= STATE_DROPSHIELD;
 		AttackDelay = frameNumber + MaxShieldDelay;
+		SoundMoveState &= ~SOUND_SHIELD;
 	}
 
 	if (State & STATE_ROLLING) {
@@ -637,6 +598,8 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 				if ((*giraffes[j]).ProjectileHit(Projectiles[p])) {
 					Projectiles[p].OnHit(Projectiles[p], *this, giraffes[j]);
 					Projectiles.Remove(p);
+					SoundAttackState |= SOUND_WEAK;
+					SoundAttackDelay[XACT_WAVEBANK_ATTACKBANK_WEAK] = frameNumber + Moves->GetAttackSoundLength(XACT_WAVEBANK_ATTACKBANK_WEAK);
 					break;
 				}
 			}
@@ -649,8 +612,18 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 			if (j != i) {
 				for (int h = 0; h < numHitboxes; ++h) {
 					if ((*giraffes[j]).AddHit((*Hitboxes)[h], LastAttackID, Facing, Position)) {
-						SoundState |= SOUND_HIT;
-						SoundDelay[XACT_WAVEBANK_TESTBANK_HIT] = frameNumber + TESTBANK_HIT_LENGTH;
+						if ((*Hitboxes)[h].Damage > 1) {
+							SoundAttackState |= SOUND_HEAVY;
+							SoundAttackDelay[XACT_WAVEBANK_ATTACKBANK_HEAVY] = frameNumber + Moves->GetAttackSoundLength(XACT_WAVEBANK_ATTACKBANK_HEAVY);
+						}
+						else if ((*Hitboxes)[h].Damage > 0.5f) {
+							SoundAttackState |= SOUND_MEDIUM;
+							SoundAttackDelay[XACT_WAVEBANK_ATTACKBANK_MEDIUM] = frameNumber + Moves->GetAttackSoundLength(XACT_WAVEBANK_ATTACKBANK_MEDIUM);
+						}
+						else {
+							SoundAttackState |= SOUND_WEAK;
+							SoundAttackDelay[XACT_WAVEBANK_ATTACKBANK_WEAK] = frameNumber + Moves->GetAttackSoundLength(XACT_WAVEBANK_ATTACKBANK_WEAK);
+						}
 					}
 				}
 			}
@@ -666,6 +639,7 @@ void NormGiraffe::Move(Stage& stage, const int frameNumber, std::array<Giraffe*,
 		if (incomingGrab) {
 			State &= ~(STATE_UP | STATE_BACK | STATE_DOWN | STATE_FORWARD | STATE_WEAK | STATE_HEAVY | STATE_SHIELDING | STATE_DROPSHIELD | STATE_SHIELDSTUN | STATE_JUMPSQUAT | STATE_JUMPLAND | STATE_HITSTUN | STATE_FASTFALL | STATE_DOUBLEJUMPWAIT | STATE_WAVEDASH | STATE_RUNNING | STATE_SHORTHOP | STATE_CROUCH | STATE_TECHATTEMPT | STATE_TECHLAG | STATE_TECHING | STATE_KNOCKDOWN | STATE_KNOCKDOWNLAG | STATE_ROLLING | STATE_GETUPATTACK | STATE_GRABBING | STATE_THROW);
 			State |= STATE_GRABBED;
+			SoundMoveState &= ~(SOUND_SHIELD | SOUND_RUN);
 			incomingGrab = false;
 		}
 		if (State & STATE_SHIELDING) {
@@ -695,6 +669,8 @@ void NormGiraffe::Move(Stage& stage, const int frameNumber, std::array<Giraffe*,
 					}
 					State &= ~(STATE_UP | STATE_BACK | STATE_DOWN | STATE_FORWARD | STATE_WEAK | STATE_HEAVY | STATE_JUMPSQUAT | STATE_JUMPLAND | STATE_SHORTHOP | STATE_KNOCKDOWN | STATE_KNOCKDOWNLAG | STATE_GETUPATTACK | STATE_GRABBING | STATE_GRABBED | STATE_THROW);
 					State |= STATE_HITSTUN;
+					SoundMoveState |= SOUND_HITSTUN;
+					SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_HITSTUN] = 100000000;
 					AttackDelay = (int)max(AttackDelay, frameNumber + min(KnockbackApplied * 40, 100));
 					PrevHitQueue.Push(IncomingHits[j].ID);
 				}
@@ -724,6 +700,8 @@ void NormGiraffe::Move(Stage& stage, const int frameNumber, std::array<Giraffe*,
 			if (hogging) {
 				State &= ~(STATE_UP | STATE_BACK | STATE_DOWN | STATE_FORWARD | STATE_WEAK | STATE_HEAVY | STATE_JUMPING | STATE_FASTFALL | STATE_GETUPATTACK | STATE_GRABBING | STATE_GRABBED | STATE_THROW);
 				State |= STATE_LEDGEHOG;
+				SoundMoveState |= SOUND_HITSTUN;
+				SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_HITSTUN] = 1000000000;
 			}
 			else if (bounced) {
 				if (State & STATE_TECHATTEMPT) {
@@ -734,13 +712,16 @@ void NormGiraffe::Move(Stage& stage, const int frameNumber, std::array<Giraffe*,
 				}
 			}
 			else if (landed && (State & STATE_JUMPING)) {
-				SoundState |= SOUND_JUMPLAND;
-				SoundDelay[XACT_WAVEBANK_TESTBANK_JUMPLAND] = frameNumber + TESTBANK_JUMPLAND_LENGTH;
+				SoundMoveState |= SOUND_JUMPLAND;
+				SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_JUMPLAND] = frameNumber + Moves->GetMoveSoundLength(XACT_WAVEBANK_MOVEBANK_JUMPLAND);
 				if (State & STATE_HITSTUN && !(State & STATE_TECHATTEMPT)) {
 					Velocity = { 0,0 };
 					State |= STATE_KNOCKDOWNLAG;
 					AnimFrame = 0;
 					TechDelay = frameNumber + 30;
+					SoundMoveState |= SOUND_KNOCKDOWN;
+					SoundMoveState &= ~SOUND_HITSTUN;
+					SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_KNOCKDOWN] = frameNumber + Moves->GetMoveSoundLength(XACT_WAVEBANK_MOVEBANK_KNOCKDOWN);
 				}
 				else if (State & STATE_GRABBING) {
 					State &= ~STATE_GRABBING;
@@ -749,12 +730,16 @@ void NormGiraffe::Move(Stage& stage, const int frameNumber, std::array<Giraffe*,
 				else {
 					if (State & (STATE_WEAK | STATE_HEAVY)) {
 						State |= STATE_HITSTUN;
-						AttackDelay = Moves->GetLandingLag(max(0,(AttackNum - 25)));
+						AttackDelay = frameNumber + Moves->GetLandingLag(max(0,(AttackNum - 25)));
+						SoundMoveState |= SOUND_HITSTUN;
+						SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_HITSTUN] = AttackDelay;
 					}
 					else if ((State & STATE_TECHATTEMPT) && (State & STATE_HITSTUN)) {
 						State &= ~STATE_TECHATTEMPT;
 						State |= STATE_TECHING | STATE_INTANGIBLE;
 						TechDelay = frameNumber + 20;
+						SoundMoveState |= SOUND_TECH;
+						SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_TECH] = frameNumber + Moves->GetMoveSoundLength(XACT_WAVEBANK_MOVEBANK_TECH);
 					}
 
 					State |= STATE_JUMPLAND;
@@ -763,7 +748,7 @@ void NormGiraffe::Move(Stage& stage, const int frameNumber, std::array<Giraffe*,
 					JumpDelay = frameNumber + MaxJumpDelay / 2;
 					AnimFrame = 0;
 				}
-
+				SoundAttackState &= ~(SOUND_DOWNB | SOUND_UPB);
 				State &= ~(STATE_UP | STATE_BACK | STATE_DOWN | STATE_FORWARD | STATE_WEAK | STATE_HEAVY | STATE_JUMPING | STATE_FASTFALL | STATE_HITSTUN | STATE_TECHLAG | STATE_THROW | STATE_GRABBED | STATE_GRABBING);
 			}
 		}
@@ -780,18 +765,26 @@ void NormGiraffe::Move(Stage& stage, const int frameNumber, std::array<Giraffe*,
 	if (Position.y > 60) {
 		Position.y = 0;
 		Knockback = 0;
+		SoundMoveState |= SOUND_DEATH;
+		SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_DEATH] = frameNumber + Moves->GetMoveSoundLength(XACT_WAVEBANK_MOVEBANK_DEATH);
 	}
 	else if (Position.y < 0) {
 		Position.y = 60;
 		Knockback = 0;
+		SoundMoveState |= SOUND_DEATH;
+		SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_DEATH] = frameNumber + Moves->GetMoveSoundLength(XACT_WAVEBANK_MOVEBANK_DEATH);
 	}
 	if (Position.x > 60) {
 		Position.x = 0;
 		Knockback = 0;
+		SoundMoveState |= SOUND_DEATH;
+		SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_DEATH] = frameNumber + Moves->GetMoveSoundLength(XACT_WAVEBANK_MOVEBANK_DEATH);
 	}
 	else if (Position.x < 0) {
 		Position.x = 60;
 		Knockback = 0;
+		SoundMoveState |= SOUND_DEATH;
+		SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_DEATH] = frameNumber + Moves->GetMoveSoundLength(XACT_WAVEBANK_MOVEBANK_DEATH);
 	}
 
 

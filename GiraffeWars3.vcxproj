@@ -191,6 +191,9 @@
     <None Include="wave1.bin" />
     <None Include="wave2.bin" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="Animations\Face.png" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
     <Import Project="packages\Microsoft.XAudio2.Redist.1.2.1\build\native\Microsoft.XAudio2.Redist.targets" Condition="Exists('packages\Microsoft.XAudio2.Redist.1.2.1\build\native\Microsoft.XAudio2.Redist.targets')" />

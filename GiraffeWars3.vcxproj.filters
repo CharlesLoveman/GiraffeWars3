@@ -146,4 +146,9 @@
     <CopyFileToFolders Include="attackbank.xwb" />
     <CopyFileToFolders Include="movebank.xwb" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="Animations\Face.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
 </Project>

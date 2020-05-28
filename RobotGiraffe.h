@@ -5,7 +5,6 @@
 #include "RobotMoveSet.h"
 
 constexpr int NUM_MOVES_ROBOT = 24;
-constexpr int NUM_POINTS_ROBOT = 38;
 
 class RobotGiraffe : public Giraffe {
 public:

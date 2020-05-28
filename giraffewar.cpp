@@ -190,7 +190,9 @@ void GiraffeWar_Init(HWND hwnd, unsigned short localport, GGPOPlayer* players, i
 	audioPlayer = new AudioPlayer();
 	
 
-	for (int i = 0; i < 4; ++i) {
+	MoveSets[0] = new NormMoveSet();
+	MoveSets[1] = new RobotMoveSet();
+	for (int i = 2; i < GGPO_MAX_PLAYERS; ++i) {
 		MoveSets[i] = new NormMoveSet();
 	}
 

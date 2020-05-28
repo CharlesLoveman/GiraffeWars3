@@ -6,11 +6,11 @@ RobotGiraffe::RobotGiraffe(Vector2 _Position, MoveSet* _Moves, HPEN _GiraffePen)
 	//Movement
 	Position = _Position;
 	Velocity = Vector2(0, 0);
-	MaxGroundSpeed = 0.4f;
-	MaxAirSpeed = Vector2(0.3f, 0.7f);
+	MaxGroundSpeed = 0.3f;
+	MaxAirSpeed = Vector2(0.2f, 0.7f);
 	RunAccel = 0.1f;
 	AirAccel = 0.03f;
-	Gravity = 0.02f;
+	Gravity = 0.025f;
 	Facing = { 1.0f, 1.0f };
 
 	//Jumping
@@ -46,7 +46,7 @@ RobotGiraffe::RobotGiraffe(Vector2 _Position, MoveSet* _Moves, HPEN _GiraffePen)
 	//Misc
 	Stocks = 3;
 	Knockback = 0;
-	Mass = 100;
+	Mass = 150;
 	hInst = GetModuleHandle(NULL);
 	CommandGrabPointer = 0;
 
@@ -934,18 +934,13 @@ void RobotGiraffe::Draw(HDC hdc, Vector2 Scale)
 
 void RobotGiraffe::DrawSelf(HDC hdc, Vector2 Scale, int CurrentFrame, int CurrentAnim)
 {
-	POINT points[NUM_POINTS];
+	std::vector<POINT> points;
+	std::vector<Vector2> vPoints = (*Moves->GetSkelPoints(CurrentAnim, CurrentFrame));
 
-	for (int i = 0; i < NUM_POINTS; ++i) {
-		points[i] = Giraffe::VecToPoint(Position + Facing * (*Moves->GetSkelPoints(CurrentAnim, CurrentFrame))[i], Scale);
+	for (int i = 0; i < vPoints.size(); ++i) {
+		points.push_back(Giraffe::VecToPoint(Position + Facing * vPoints[i], Scale));
 	}
-	Polyline(hdc, points, NUM_POINTS);
-
-	/*Polyline(hdc, points, 27);
-	PolyBezier(hdc, &points[26], 4);
-	Polyline(hdc, &points[29], 5);
-	PolyBezier(hdc, &points[33], 4);
-	Polyline(hdc, &points[36], 2);*/
+	Polyline(hdc, &points[0], points.size());
 }
 
 void RobotGiraffe::DrawHitbox(HDC hdc, Vector2 Scale, Vector2 Pos, float Rad)

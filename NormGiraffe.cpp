@@ -934,13 +934,14 @@ void NormGiraffe::Draw(HDC hdc, Vector2 Scale)
 
 void NormGiraffe::DrawSelf(HDC hdc, Vector2 Scale, int CurrentFrame, int CurrentAnim)
 {
-	POINT points[NUM_POINTS];
+	std::vector<POINT> points;
+	std::vector<Vector2> vPoints = (*Moves->GetSkelPoints(CurrentAnim, CurrentFrame));
 
-	for (int i = 0; i < NUM_POINTS; ++i) {
-		points[i] = Giraffe::VecToPoint(Position + Facing * (*Moves->GetSkelPoints(CurrentAnim, CurrentFrame))[i], Scale);
+	for (int i = 0; i < vPoints.size(); ++i) {
+		points.push_back(Giraffe::VecToPoint(Position + Facing * vPoints[i], Scale));
 	}
 
-	Polyline(hdc, points, 27);
+	Polyline(hdc, &points[0], 27);
 	PolyBezier(hdc, &points[26], 4);
 	Polyline(hdc, &points[29], 5);
 	PolyBezier(hdc, &points[33], 4);

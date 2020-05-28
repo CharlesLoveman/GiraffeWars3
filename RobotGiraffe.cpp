@@ -211,7 +211,7 @@ void RobotGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraff
 				if (State & (STATE_TECHING | STATE_SHIELDING | STATE_KNOCKDOWN)) {
 					State &= ~(STATE_TECHING | STATE_SHIELDING | STATE_KNOCKDOWN | STATE_CROUCH);
 					State |= STATE_ROLLING | STATE_INTANGIBLE;
-					AttackDelay = frameNumber + 20;
+					AttackDelay = frameNumber + 16;
 					AnimFrame = 0;
 					Facing = { -1, 1 };
 					SoundMoveState |= SOUND_ROLL;
@@ -231,7 +231,7 @@ void RobotGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraff
 				if (State & (STATE_TECHING | STATE_SHIELDING | STATE_KNOCKDOWN)) {
 					State &= ~(STATE_TECHING | STATE_SHIELDING | STATE_KNOCKDOWN | STATE_CROUCH);
 					State |= STATE_ROLLING | STATE_INTANGIBLE;
-					AttackDelay = frameNumber + 20;
+					AttackDelay = frameNumber + 16;
 					AnimFrame = 0;
 					Facing = { 1, 1 };
 					SoundMoveState |= SOUND_ROLL;

@@ -527,7 +527,7 @@ void RobotGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraff
 		Hitboxes = nullptr;
 		numHitboxes = 0;
 		if (State & STATE_HITSTUN) {
-			Hurtboxes = Moves->GetHurtboxes(6, AnimFrame % 9);
+			Hurtboxes = Moves->GetHurtboxes(6, AnimFrame % 6);
 		}
 		else if (State & STATE_RUNNING) {
 			Hurtboxes = Moves->GetHurtboxes(1, AnimFrame % 2);
@@ -548,7 +548,7 @@ void RobotGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraff
 			Hurtboxes = Moves->GetHurtboxes(8, 0);
 		}
 		else if (State & STATE_LEDGEHOG) {
-			Hurtboxes = Moves->GetHurtboxes(6, AnimFrame % 9);
+			Hurtboxes = Moves->GetHurtboxes(6, AnimFrame % 6);
 		}
 		else if (State & STATE_GRABBING) {
 			Hurtboxes = Moves->GetHurtboxes(12, 7);
@@ -868,14 +868,14 @@ void RobotGiraffe::Draw(HDC hdc, Vector2 Scale)
 	else {
 		if (State & STATE_HITSTUN) {
 			CurrentAnim = 6;
-			CurrentFrame = AnimFrame % 9;
+			CurrentFrame = AnimFrame % 6;
 		}
 		else if (State & STATE_SHIELDSTUN) {
 			SelectObject(hdc, ShieldBrush);
 			DrawHitbox(hdc, Scale, { 0,0 }, 2.5f);
 			//Ellipse(hdc, (Position.x - 2.5f) * Scale.x, (Position.y - 2.5f) * Scale.y, (Position.x + 2.5f) * Scale.x, (Position.y + 2.5f) * Scale.y);
 			CurrentAnim = 6;
-			CurrentFrame = AnimFrame % 9;
+			CurrentFrame = AnimFrame % 6;
 		}
 		else if (State & STATE_SHIELDING) {
 			SelectObject(hdc, ShieldBrush);
@@ -910,7 +910,7 @@ void RobotGiraffe::Draw(HDC hdc, Vector2 Scale)
 		}
 		else if (State & STATE_LEDGEHOG) {
 			CurrentAnim = 6;
-			CurrentFrame = AnimFrame % 9;
+			CurrentFrame = AnimFrame % 6;
 		}
 		else if (State & (STATE_WAVEDASH | STATE_CROUCH)) {
 			CurrentAnim = 7;
@@ -922,7 +922,7 @@ void RobotGiraffe::Draw(HDC hdc, Vector2 Scale)
 		}
 		else if (State & STATE_GRABBED) {
 			CurrentAnim = 6;
-			CurrentFrame = AnimFrame % 9;
+			CurrentFrame = AnimFrame % 6;
 		}
 		else if (State & STATE_GRABBING) {
 			CurrentAnim = 12;

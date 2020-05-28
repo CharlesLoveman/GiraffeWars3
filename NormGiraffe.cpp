@@ -250,6 +250,7 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 			}
 			else {
 				State &= ~STATE_RUNNING;
+				SoundMoveState &= ~SOUND_RUN;
 			}
 
 			if (inputs & INPUT_DOWN && !(inputs & (INPUT_WEAK | INPUT_HEAVY)) && !(State & (STATE_CROUCH | STATE_ROLLING))) {
@@ -269,7 +270,6 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 			State &= ~STATE_KNOCKDOWN;
 			State |= STATE_GETUPATTACK;
 			AttackNum = 17;
-			SoundMoveState &= ~SOUND_HITSTUN;
 		}
 		else if (State & STATE_LEDGEHOG) {
 			State &= ~STATE_LEDGEHOG;
@@ -386,6 +386,7 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 		HasDoubleJump = false;
 		Velocity.y = -JumpSpeed;
 		State &= ~STATE_FASTFALL;
+		SoundAttackState &= ~SOUND_DOWNB;
 		SoundMoveState |= SOUND_DOUBLEJUMP;
 		SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_DOUBLEJUMP] = frameNumber + Moves->GetMoveSoundLength(XACT_WAVEBANK_MOVEBANK_DOUBLEJUMP);
 	}
@@ -706,9 +707,11 @@ void NormGiraffe::Move(Stage& stage, const int frameNumber, std::array<Giraffe*,
 			else if (bounced) {
 				if (State & STATE_TECHATTEMPT) {
 					Velocity = { 0,0 };
-					State &= ~STATE_TECHATTEMPT;
+					State &= ~(STATE_TECHATTEMPT | STATE_HITSTUN);
 					State |= STATE_TECHING | STATE_INTANGIBLE;
 					TechDelay = frameNumber + 5;
+					SoundMoveState |= SOUND_TECH;
+					SoundMoveState &= ~SOUND_HITSTUN;
 				}
 			}
 			else if (landed && (State & STATE_JUMPING)) {
@@ -738,6 +741,7 @@ void NormGiraffe::Move(Stage& stage, const int frameNumber, std::array<Giraffe*,
 						State &= ~STATE_TECHATTEMPT;
 						State |= STATE_TECHING | STATE_INTANGIBLE;
 						TechDelay = frameNumber + 20;
+						SoundMoveState &= ~SOUND_HITSTUN;
 						SoundMoveState |= SOUND_TECH;
 						SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_TECH] = frameNumber + Moves->GetMoveSoundLength(XACT_WAVEBANK_MOVEBANK_TECH);
 					}

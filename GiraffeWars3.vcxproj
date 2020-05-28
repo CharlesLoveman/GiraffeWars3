@@ -144,6 +144,8 @@
     <ClCompile Include="NormGiraffe.cpp" />
     <ClCompile Include="NormMoveSet.cpp" />
     <ClCompile Include="Projectile.cpp" />
+    <ClCompile Include="RobotGiraffe.cpp" />
+    <ClCompile Include="RobotMoveSet.cpp" />
     <ClCompile Include="Stage.cpp" />
     <ClCompile Include="VecRect.cpp" />
   </ItemGroup>
@@ -166,6 +168,9 @@
     <ClInclude Include="Projectile.h" />
     <ClInclude Include="renderer.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="RobotGiraffe.h" />
+    <ClInclude Include="RobotMoveSet.h" />
+    <ClInclude Include="RobotProjFuncs.h" />
     <ClInclude Include="Stage.h" />
     <ClInclude Include="VecRect.h" />
   </ItemGroup>

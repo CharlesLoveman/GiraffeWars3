@@ -1,7 +1,7 @@
-#include "NormGiraffe.h"
-#include "NormProjFuncs.h"
+#include "RobotGiraffe.h"
+#include "RobotProjFuncs.h"
 
-NormGiraffe::NormGiraffe(Vector2 _Position, MoveSet* _Moves, HPEN _GiraffePen)
+RobotGiraffe::RobotGiraffe(Vector2 _Position, MoveSet* _Moves, HPEN _GiraffePen)
 {
 	//Movement
 	Position = _Position;
@@ -53,17 +53,17 @@ NormGiraffe::NormGiraffe(Vector2 _Position, MoveSet* _Moves, HPEN _GiraffePen)
 	//Animation
 	AnimFrame = 0;
 	GiraffePen = _GiraffePen;
-	IntangiblePen = CreatePen(PS_SOLID, 1, RGB(255,255,255));
+	IntangiblePen = CreatePen(PS_SOLID, 1, RGB(255, 255, 255));
 	ShieldBrush = CreateHatchBrush(HS_BDIAGONAL, RGB(0, 255, 127));
 	SpitBrush = CreateSolidBrush(RGB(90, 210, 180));
 	ShineBrush = CreateSolidBrush(RGB(0, 255, 255));
 }
 
-NormGiraffe::~NormGiraffe()
+RobotGiraffe::~RobotGiraffe()
 {
 }
 
-void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffes, const int i, const int inputs, const int frameNumber, Stage& stage)
+void RobotGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffes, const int i, const int inputs, const int frameNumber, Stage& stage)
 {
 	++AnimFrame;
 
@@ -139,7 +139,7 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 		}
 	}
 
-	
+
 	//Read Inputs
 	if (!(State & (STATE_WEAK | STATE_HEAVY | STATE_JUMPSQUAT | STATE_JUMPLAND | STATE_DROPSHIELD | STATE_SHIELDSTUN | STATE_HITSTUN | STATE_KNOCKDOWNLAG | STATE_ROLLING | STATE_GRABBED | STATE_THROW))) {
 		if (State & STATE_LEDGEHOG) {
@@ -206,7 +206,7 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 				SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_FASTFALL] = frameNumber + Moves->GetMoveSoundLength(XACT_WAVEBANK_MOVEBANK_FASTFALL);
 			}
 		}
-		else{
+		else {
 			if (inputs & INPUT_LEFT) {
 				if (State & (STATE_TECHING | STATE_SHIELDING | STATE_KNOCKDOWN)) {
 					State &= ~(STATE_TECHING | STATE_SHIELDING | STATE_KNOCKDOWN | STATE_CROUCH);
@@ -349,7 +349,7 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 		++LastAttackID;
 		AnimFrame = 0;
 	}
-	
+
 	if (inputs & INPUT_JUMP && !(State & (STATE_WEAK | STATE_HEAVY | STATE_JUMPSQUAT | STATE_JUMPLAND | STATE_HITSTUN | STATE_SHIELDSTUN | STATE_WAVEDASH | STATE_KNOCKDOWNLAG | STATE_TECHING | STATE_ROLLING | STATE_GRABBING | STATE_GRABBED | STATE_THROW))) {
 		if (State & STATE_LEDGEHOG) {
 			State &= ~STATE_LEDGEHOG;
@@ -395,7 +395,7 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 			State |= STATE_TECHATTEMPT;
 			TechDelay = frameNumber + 20;
 		}
-		
+
 		if (inputs & INPUT_DOWN && State & STATE_JUMPSQUAT && HasAirDash) {
 			HasAirDash = false;
 			State &= ~(STATE_JUMPSQUAT | STATE_SHORTHOP);
@@ -458,7 +458,7 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 		for (int j = 0; j < num_giraffes; ++j) {
 			if (j != i) {
 				if (giraffes[j]->GrabHit(grabCol, Facing, frameNumber)) {
-					State &= ~(STATE_WEAK | STATE_HEAVY| STATE_RUNNING);
+					State &= ~(STATE_WEAK | STATE_HEAVY | STATE_RUNNING);
 					State |= STATE_GRABBING;
 					TechDelay = frameNumber + 30;
 					//GrabPointer = j;
@@ -471,7 +471,7 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 	if ((State & STATE_HEAVY) && (State & STATE_JUMPING) && AnimFrame == 1 && (((inputs & INPUT_LEFT) && Facing.x == 1) || ((inputs & INPUT_RIGHT) && Facing.x == -1))) {
 		Facing.x *= -1;
 	}
-	
+
 	//Character Move-Specific Updates
 	if ((State & STATE_JUMPING) && (State & STATE_HEAVY) && (State & STATE_FORWARD) && AnimFrame == 7) {
 		Collider grabCol = { {Position.x + 1.885000f * Facing.x, Position.y - 0.650000f}, 0.855862f };
@@ -491,30 +491,30 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 	}
 
 
-	if ((State & STATE_HEAVY) && (State & STATE_UP)) {
-		//Fire neck
-		if (State & STATE_JUMPING) {
-			if (AnimFrame == 10) {
-				Projectiles.Append(Projectile(Position + Vector2(0.2f, -1.2f), { Facing.x * 0.65f, -0.65f }, 0.3f, { 0.0f, 0.0f }, 0.1f, 0.1f, 1.0f, true, LastAttackID, AttackDelay - 10, NormProjFuncs::NeckGrabOnHit, NormProjFuncs::NeckGrabUpdate, NormProjFuncs::NeckGrabDraw, GiraffePen, SpitBrush));
-			}
-		}
-		//Main hit of upsmash
-		else if (AnimFrame == 17) {
-			++LastAttackID;
-		}
-	}
-	//Fire spit
-	else if ((State & STATE_HEAVY) && !(State & (STATE_WEAK | STATE_UP | STATE_FORWARD | STATE_BACK | STATE_DOWN)) && AnimFrame == 13) {
-		Projectiles.Append(Projectile(Position + Vector2(0.2f, -1.2f), { Facing.x * 0.5f, 0.0f }, 0.3f, { Facing.x, 0.0f }, 0.1f, 0.1f, 1.0f, true, LastAttackID, frameNumber + 100, NormProjFuncs::SpitOnHit, NormProjFuncs::SpitUpdate, NormProjFuncs::SpitDraw, GiraffePen, SpitBrush));
-	}
-	//Reverse direction in bair
-	else if ((State & STATE_JUMPING) && (State & STATE_WEAK) && (State & STATE_BACK) && AnimFrame == 7) {
-		Facing.x *= -1;
-	}
-	//Spin like a maniac in get-up attack
-	else if ((State & STATE_GETUPATTACK) && (7 <= AnimFrame) && (AnimFrame <= 10)) {
-		Facing.x *= -1;
-	}
+	//if ((State & STATE_HEAVY) && (State & STATE_UP)) {
+	//	//Fire neck
+	//	if (State & STATE_JUMPING) {
+	//		if (AnimFrame == 10) {
+	//			Projectiles.Append(Projectile(Position + Vector2(0.2f, -1.2f), { Facing.x * 0.65f, -0.65f }, 0.3f, { 0.0f, 0.0f }, 0.1f, 0.1f, 1.0f, true, LastAttackID, AttackDelay - 10, RobotProjFuncs::NeckGrabOnHit, RobotProjFuncs::NeckGrabUpdate, RobotProjFuncs::NeckGrabDraw, GiraffePen, SpitBrush));
+	//		}
+	//	}
+	//	//Main hit of upsmash
+	//	else if (AnimFrame == 17) {
+	//		++LastAttackID;
+	//	}
+	//}
+	////Fire spit
+	//else if ((State & STATE_HEAVY) && !(State & (STATE_WEAK | STATE_UP | STATE_FORWARD | STATE_BACK | STATE_DOWN)) && AnimFrame == 13) {
+	//	Projectiles.Append(Projectile(Position + Vector2(0.2f, -1.2f), { Facing.x * 0.5f, 0.0f }, 0.3f, { Facing.x, 0.0f }, 0.1f, 0.1f, 1.0f, true, LastAttackID, frameNumber + 100, RobotProjFuncs::SpitOnHit, RobotProjFuncs::SpitUpdate, RobotProjFuncs::SpitDraw, GiraffePen, SpitBrush));
+	//}
+	////Reverse direction in bair
+	//else if ((State & STATE_JUMPING) && (State & STATE_WEAK) && (State & STATE_BACK) && AnimFrame == 7) {
+	//	Facing.x *= -1;
+	//}
+	////Spin like a maniac in get-up attack
+	//else if ((State & STATE_GETUPATTACK) && (7 <= AnimFrame) && (AnimFrame <= 10)) {
+	//	Facing.x *= -1;
+	//}
 
 
 	//Update State
@@ -554,11 +554,11 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 			Hurtboxes = Moves->GetHurtboxes(12, 7);
 		}
 		else { //Idle
-			Hurtboxes = Moves->GetHurtboxes(0,0);
+			Hurtboxes = Moves->GetHurtboxes(0, 0);
 		}
 	}
 
-	
+
 
 	//Adding Gravity
 	if (State & STATE_JUMPING) {
@@ -632,7 +632,7 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 
 }
 
-void NormGiraffe::Move(Stage& stage, const int frameNumber, std::array<Giraffe*, 4> giraffes)
+void RobotGiraffe::Move(Stage& stage, const int frameNumber, std::array<Giraffe*, 4> giraffes)
 {
 	//Recieve incoming hits
 	if (!(State & STATE_INTANGIBLE)) {
@@ -678,7 +678,7 @@ void NormGiraffe::Move(Stage& stage, const int frameNumber, std::array<Giraffe*,
 		}
 	}
 	numIncoming = 0;
-	
+
 	//Test projectile intersection with stage
 	for (int i = Projectiles.Size() - 1; i >= 0; --i) {
 		Projectiles[i].Position += Projectiles[i].Velocity;
@@ -687,7 +687,7 @@ void NormGiraffe::Move(Stage& stage, const int frameNumber, std::array<Giraffe*,
 			Projectiles.Remove(i);
 		};
 	}
-	
+
 	Position += Velocity;
 	//Correct intersection with the stage
 	bool landed = false;
@@ -732,7 +732,7 @@ void NormGiraffe::Move(Stage& stage, const int frameNumber, std::array<Giraffe*,
 				else {
 					if (State & (STATE_WEAK | STATE_HEAVY)) {
 						State |= STATE_HITSTUN;
-						AttackDelay = frameNumber + Moves->GetLandingLag(max(0,(AttackNum - 25)));
+						AttackDelay = frameNumber + Moves->GetLandingLag(max(0, (AttackNum - 25)));
 						SoundMoveState |= SOUND_HITSTUN;
 						SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_HITSTUN] = AttackDelay;
 					}
@@ -795,7 +795,7 @@ void NormGiraffe::Move(Stage& stage, const int frameNumber, std::array<Giraffe*,
 
 }
 
-void NormGiraffe::Draw(HDC hdc, Vector2 Scale)
+void RobotGiraffe::Draw(HDC hdc, Vector2 Scale)
 {
 	SelectObject(hdc, GiraffePen);
 	for (int i = 0; i < Projectiles.Size(); ++i) {
@@ -932,22 +932,23 @@ void NormGiraffe::Draw(HDC hdc, Vector2 Scale)
 	DrawSelf(hdc, Scale, CurrentFrame, CurrentAnim);
 }
 
-void NormGiraffe::DrawSelf(HDC hdc, Vector2 Scale, int CurrentFrame, int CurrentAnim)
+void RobotGiraffe::DrawSelf(HDC hdc, Vector2 Scale, int CurrentFrame, int CurrentAnim)
 {
 	POINT points[NUM_POINTS];
 
 	for (int i = 0; i < NUM_POINTS; ++i) {
 		points[i] = Giraffe::VecToPoint(Position + Facing * (*Moves->GetSkelPoints(CurrentAnim, CurrentFrame))[i], Scale);
 	}
+	Polyline(hdc, points, NUM_POINTS);
 
-	Polyline(hdc, points, 27);
+	/*Polyline(hdc, points, 27);
 	PolyBezier(hdc, &points[26], 4);
 	Polyline(hdc, &points[29], 5);
 	PolyBezier(hdc, &points[33], 4);
-	Polyline(hdc, &points[36], 2);
+	Polyline(hdc, &points[36], 2);*/
 }
 
-void NormGiraffe::DrawHitbox(HDC hdc, Vector2 Scale, Vector2 Pos,float Rad)
+void RobotGiraffe::DrawHitbox(HDC hdc, Vector2 Scale, Vector2 Pos, float Rad)
 {
 	Ellipse(hdc, Scale.x * (Position.x + Facing.x * Pos.x - Rad), Scale.y * (Position.y + Facing.y * Pos.y - Rad), Scale.x * (Position.x + Facing.x * Pos.x + Rad), Scale.y * (Position.y + Facing.y * Pos.y + Rad));
 }

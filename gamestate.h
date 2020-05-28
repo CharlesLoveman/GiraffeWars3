@@ -2,6 +2,7 @@
 #define _GAMESTATE_H_
 #include "Giraffe.h"
 #include "NormGiraffe.h"
+#include "RobotGiraffe.h"
 #include "Stage.h"
 #include "MoveSet.h"
 #include <memory>
@@ -27,6 +28,7 @@ struct GameState
 	RECT _bounds;
 	std::array<Giraffe*, 4> giraffes;
 	std::vector<NormGiraffe> normGiraffes;
+	std::vector<RobotGiraffe> robotGiraffes;
 	Stage stage;
 	//HINSTANCE hInst;
 };

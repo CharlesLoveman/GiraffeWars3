@@ -863,7 +863,7 @@ void RobotGiraffe::Draw(HDC hdc, Vector2 Scale)
 	if (State & STATE_WEAK && State & STATE_FORWARD && !(State & STATE_JUMPING)) {
 		DrawSelf(hdc, Scale, AnimFrame, 19);
 		if (AnimFrame >= 5 && AnimFrame <= 20) {
-			DrawAxe(hdc, Scale, ((*Moves->GetSkelPoints(19, AnimFrame))[25] + (*Moves->GetSkelPoints(19, AnimFrame))[30]) * 0.5f, ((*Moves->GetSkelPoints(19, AnimFrame))[27] + (*Moves->GetSkelPoints(19, AnimFrame))[28]) * 0.5f, AnimFrame);
+			DrawMace(hdc, Scale, ((*Moves->GetSkelPoints(19, AnimFrame))[25] + (*Moves->GetSkelPoints(19, AnimFrame))[30]) * 0.5f, ((*Moves->GetSkelPoints(19, AnimFrame))[27] + (*Moves->GetSkelPoints(19, AnimFrame))[28]) * 0.5f);
 		}
 		return;
 	}
@@ -958,9 +958,8 @@ void RobotGiraffe::DrawHitbox(HDC hdc, Vector2 Scale, Vector2 Pos, float Rad)
 	Ellipse(hdc, (int)(Scale.x * (Position.x + Facing.x * Pos.x - Rad)), (int)(Scale.y * (Position.y + Facing.y * Pos.y - Rad)), (int)(Scale.x * (Position.x + Facing.x * Pos.x + Rad)), (int)(Scale.y * (Position.y + Facing.y * Pos.y + Rad)));
 }
 
-void RobotGiraffe::DrawAxe(HDC hdc, Vector2 Scale, Vector2 Neck, Vector2 Head, int CurrentFrame)
+void RobotGiraffe::DrawAxe(HDC hdc, Vector2 Scale, Vector2 Neck, Vector2 Head)
 {
-	//Vector2 head = Position + ((*Moves->GetSkelPoints(19, CurrentFrame))[27] + (*Moves->GetSkelPoints(19, CurrentFrame))[28]) * 0.5f;
 	Vector2 dir = Head - Neck;
 	dir.Normalize();
 	Vector2 perp = { -dir.y, dir.x };
@@ -979,3 +978,44 @@ void RobotGiraffe::DrawAxe(HDC hdc, Vector2 Scale, Vector2 Neck, Vector2 Head, i
 	Polyline(hdc, points, 8);
 }
 
+void RobotGiraffe::DrawSword(HDC hdc, Vector2 Scale, Vector2 Neck, Vector2 Head)
+{
+	Vector2 dir = Head - Neck;
+	dir.Normalize();
+	Vector2 perp = { -dir.y, dir.x };
+	Vector2 Pos = Head + dir * 0.3f;
+
+	POINT points[6];
+	points[0] = Giraffe::VecToPoint(Position + Facing * Head, Scale);
+	points[1] = Giraffe::VecToPoint(Position + Facing * Pos, Scale);
+	points[2] = Giraffe::VecToPoint(Position + Facing * (Pos + perp * 0.2f), Scale);
+	points[3] = Giraffe::VecToPoint(Position + Facing * (Pos - perp * 0.2f), Scale);
+	points[4] = Giraffe::VecToPoint(Position + Facing * Pos, Scale);
+	points[5] = Giraffe::VecToPoint(Position + Facing * (Head + dir * 1.5f), Scale);
+
+	Polyline(hdc, points, 6);
+}
+
+void RobotGiraffe::DrawMace(HDC hdc, Vector2 Scale, Vector2 Neck, Vector2 Head)
+{
+	Vector2 dir = Head - Neck;
+	dir.Normalize();
+	Vector2 perp = { -dir.y, dir.x };
+	Vector2 Pos = Head + dir;
+
+	POINT points[11];
+
+	points[0] = Giraffe::VecToPoint(Position + Facing * Head, Scale);
+	points[1] = Giraffe::VecToPoint(Position + Facing * Pos, Scale);
+	points[2] = Giraffe::VecToPoint(Position + Facing * (Pos + perp * 0.3f), Scale);
+	points[3] = Giraffe::VecToPoint(Position + Facing * (Pos + perp * 0.3f + dir * 0.6f), Scale);
+	points[4] = Giraffe::VecToPoint(Position + Facing * (Pos + perp * -0.3f + dir * 0.6f), Scale);
+	points[5] = Giraffe::VecToPoint(Position + Facing * (Pos + perp * -0.3f), Scale);
+	points[6] = Giraffe::VecToPoint(Position + Facing * Pos, Scale);
+	points[7] = Giraffe::VecToPoint(Position + Facing * (Pos + perp * 0.3f + dir * 0.3f), Scale);
+	points[8] = Giraffe::VecToPoint(Position + Facing * (Pos + dir * 0.6f), Scale);
+	points[9] = Giraffe::VecToPoint(Position + Facing * (Pos + perp * -0.3f + dir * 0.3f), Scale);
+	points[10] = Giraffe::VecToPoint(Position + Facing * Pos, Scale);
+
+	Polyline(hdc, points, 11);
+}

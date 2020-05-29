@@ -20,7 +20,9 @@ private:
 	int CommandGrabPointer;
 	void DrawSelf(HDC hdc, Vector2 Scale, int CurrentFrame, int CurrentAnim);
 	void DrawHitbox(HDC hdc, Vector2 Scale, Vector2 Pos, float Rad);
-	void DrawAxe(HDC hdc, Vector2 Scale, Vector2 Neck, Vector2 Head, int CurrentFrame);
+	void DrawAxe(HDC hdc, Vector2 Scale, Vector2 Neck, Vector2 Head);
+	void DrawSword(HDC hdc, Vector2 Scale, Vector2 Neck, Vector2 Head);
+	void DrawMace(HDC hdc, Vector2 Scale, Vector2 Neck, Vector2 Head);
 };
 
 #endif // !_NORMGIRAFFE_H_

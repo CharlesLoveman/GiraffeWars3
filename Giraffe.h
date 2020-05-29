@@ -126,6 +126,7 @@ public:
 	float Knockback;
 
 	friend struct NormProjFuncs;
+	friend struct RobotProjFuncs;
 
 protected:
 	//Movement

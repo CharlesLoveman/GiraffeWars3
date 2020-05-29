@@ -596,7 +596,7 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 		for (int j = 0; j < num_giraffes; ++j) {
 			if (j != i) {
 				if ((*giraffes[j]).ProjectileHit(Projectiles[p])) {
-					Projectiles[p].OnHit(Projectiles[p], *this, giraffes[j]);
+					Projectiles[p].OnHit(Projectiles[p], *this, giraffes[j], frameNumber);
 					Projectiles.Remove(p);
 					SoundAttackState |= SOUND_WEAK;
 					SoundAttackDelay[XACT_WAVEBANK_ATTACKBANK_WEAK] = frameNumber + Moves->GetAttackSoundLength(XACT_WAVEBANK_ATTACKBANK_WEAK);
@@ -642,7 +642,7 @@ void NormGiraffe::Move(Stage& stage, const int frameNumber, std::array<Giraffe*,
 			SoundMoveState &= ~(SOUND_SHIELD | SOUND_RUN);
 			incomingGrab = false;
 		}
-		if (State & STATE_SHIELDING) {
+		else if (State & STATE_SHIELDING) {
 			for (int j = 0; j < numIncoming; ++j) {
 				if (!PrevHitQueue.Contains(IncomingHits[j].ID)) {
 					State |= STATE_SHIELDSTUN;
@@ -683,7 +683,7 @@ void NormGiraffe::Move(Stage& stage, const int frameNumber, std::array<Giraffe*,
 	for (int i = Projectiles.Size() - 1; i >= 0; --i) {
 		Projectiles[i].Position += Projectiles[i].Velocity;
 		if (stage.KillProjectile(Projectiles[i])) {
-			Projectiles[i].OnHit(Projectiles[i], *this, nullptr);
+			Projectiles[i].OnHit(Projectiles[i], *this, nullptr, frameNumber);
 			Projectiles.Remove(i);
 		};
 	}

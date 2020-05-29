@@ -3,7 +3,7 @@
 #include "Giraffe.h"
 
 struct NormProjFuncs {
-	static void SpitOnHit(Projectile& self, Giraffe& parent, Giraffe* collided)
+	static void SpitOnHit(Projectile& self, Giraffe& parent, Giraffe* collided, int frameNumber)
 	{
 		//Do nothing
 	}
@@ -18,7 +18,7 @@ struct NormProjFuncs {
 		SelectObject(hdc, self.Brush);
 		Ellipse(hdc, Scale.x * (self.Position.x - self.Radius), Scale.y * (self.Position.y - self.Radius), Scale.x * (self.Position.x + self.Radius), Scale.y * (self.Position.y + self.Radius));
 	}
-	static void NeckGrabOnHit(Projectile& self, Giraffe& parent, Giraffe* collided)
+	static void NeckGrabOnHit(Projectile& self, Giraffe& parent, Giraffe* collided, int frameNumber)
 	{
 		Vector2 diff = Vector2(0.2f, 0.3f) *(self.Position - parent.Position);
 		float len = diff.Length();

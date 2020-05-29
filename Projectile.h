@@ -6,7 +6,7 @@
 class Giraffe;
 class Projectile;
 
-typedef void (*ProjectileOnHit)(Projectile&, Giraffe&, Giraffe*);
+typedef void (*ProjectileOnHit)(Projectile&, Giraffe&, Giraffe*, int);
 typedef bool (*ProjectileUpdate)(Projectile&, Giraffe&, int);
 typedef void (*ProjectileDraw)(Projectile&, Giraffe&, HDC, Vector2);
 

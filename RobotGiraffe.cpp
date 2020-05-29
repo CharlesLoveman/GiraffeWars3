@@ -453,19 +453,20 @@ void RobotGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraff
 	}
 
 	//Grab
-	if (State & STATE_WEAK && State & STATE_HEAVY && AnimFrame == 7) {
-		Collider grabCol = { {Position.x + 1.885000f * Facing.x, Position.y - 0.650000f}, 0.855862f };
-		for (int j = 0; j < num_giraffes; ++j) {
-			if (j != i) {
-				if (giraffes[j]->GrabHit(grabCol, Facing, frameNumber)) {
-					State &= ~(STATE_WEAK | STATE_HEAVY | STATE_RUNNING);
-					State |= STATE_GRABBING;
-					TechDelay = frameNumber + 30;
-					//GrabPointer = j;
-					break;
-				}
-			}
-		}
+	if (State & STATE_WEAK && State & STATE_HEAVY && AnimFrame == 11) {
+		Projectiles.Append(Projectile(Position + Vector2(Facing.x * 0.5f, 0), { Facing.x * 0.6f, 0 }, 0.5f, { 0,0 }, 0, 0, 0, true, LastAttackID, frameNumber + 15, RobotProjFuncs::GrabberOnHit, RobotProjFuncs::GrabberUpdate, RobotProjFuncs::GrabberDraw, GiraffePen, ShieldBrush));
+		//Collider grabCol = { {Position.x + 1.885000f * Facing.x, Position.y - 0.650000f}, 0.855862f };
+		//for (int j = 0; j < num_giraffes; ++j) {
+		//	if (j != i) {
+		//		if (giraffes[j]->GrabHit(grabCol, Facing, frameNumber)) {
+		//			State &= ~(STATE_WEAK | STATE_HEAVY | STATE_RUNNING);
+		//			State |= STATE_GRABBING;
+		//			TechDelay = frameNumber + 30;
+		//			//GrabPointer = j;
+		//			break;
+		//		}
+		//	}
+		//}
 	}
 	//B-Reverse
 	if ((State & STATE_HEAVY) && (State & STATE_JUMPING) && AnimFrame == 1 && (((inputs & INPUT_LEFT) && Facing.x == 1) || ((inputs & INPUT_RIGHT) && Facing.x == -1))) {
@@ -489,6 +490,7 @@ void RobotGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraff
 			}
 		}
 	}
+
 
 
 	//if ((State & STATE_HEAVY) && (State & STATE_UP)) {
@@ -596,7 +598,7 @@ void RobotGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraff
 		for (int j = 0; j < num_giraffes; ++j) {
 			if (j != i) {
 				if ((*giraffes[j]).ProjectileHit(Projectiles[p])) {
-					Projectiles[p].OnHit(Projectiles[p], *this, giraffes[j]);
+					Projectiles[p].OnHit(Projectiles[p], *this, giraffes[j], frameNumber);
 					Projectiles.Remove(p);
 					SoundAttackState |= SOUND_WEAK;
 					SoundAttackDelay[XACT_WAVEBANK_ATTACKBANK_WEAK] = frameNumber + Moves->GetAttackSoundLength(XACT_WAVEBANK_ATTACKBANK_WEAK);
@@ -683,7 +685,7 @@ void RobotGiraffe::Move(Stage& stage, const int frameNumber, std::array<Giraffe*
 	for (int i = Projectiles.Size() - 1; i >= 0; --i) {
 		Projectiles[i].Position += Projectiles[i].Velocity;
 		if (stage.KillProjectile(Projectiles[i])) {
-			Projectiles[i].OnHit(Projectiles[i], *this, nullptr);
+			Projectiles[i].OnHit(Projectiles[i], *this, nullptr, frameNumber);
 			Projectiles.Remove(i);
 		};
 	}

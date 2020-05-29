@@ -860,12 +860,23 @@ void RobotGiraffe::Draw(HDC hdc, Vector2 Scale)
 		return;
 	}
 
-	if (State & STATE_WEAK && State & STATE_FORWARD && !(State & STATE_JUMPING)) {
-		DrawSelf(hdc, Scale, AnimFrame, 19);
-		if (AnimFrame >= 5 && AnimFrame <= 20) {
-			DrawMace(hdc, Scale, ((*Moves->GetSkelPoints(19, AnimFrame))[25] + (*Moves->GetSkelPoints(19, AnimFrame))[30]) * 0.5f, ((*Moves->GetSkelPoints(19, AnimFrame))[27] + (*Moves->GetSkelPoints(19, AnimFrame))[28]) * 0.5f);
+	if (State & STATE_WEAK && !(State & STATE_JUMPING)) {
+		DrawSelf(hdc, Scale, AnimFrame, AttackNum);
+		if (State & STATE_FORWARD && (AnimFrame >= 5 && AnimFrame <= 20)) {
+			DrawAxe(hdc, Scale, ((*Moves->GetSkelPoints(19, AnimFrame))[25] + (*Moves->GetSkelPoints(19, AnimFrame))[30]) * 0.5f, ((*Moves->GetSkelPoints(19, AnimFrame))[27] + (*Moves->GetSkelPoints(19, AnimFrame))[28]) * 0.5f);
+			return;
 		}
-		return;
+		else if (State & STATE_UP && (AnimFrame >= 14)) {
+			DrawMace(hdc, Scale, ((*Moves->GetSkelPoints(20, AnimFrame))[25] + (*Moves->GetSkelPoints(20, AnimFrame))[30]) * 0.5f, ((*Moves->GetSkelPoints(20, AnimFrame))[27] + (*Moves->GetSkelPoints(20, AnimFrame))[28]) * 0.5f);
+			return;
+		}
+		else if (State & STATE_DOWN && (AnimFrame >= 0)) {
+			DrawSword(hdc, Scale, ((*Moves->GetSkelPoints(21, AnimFrame))[25] + (*Moves->GetSkelPoints(21, AnimFrame))[30]) * 0.5f, ((*Moves->GetSkelPoints(21, AnimFrame))[27] + (*Moves->GetSkelPoints(21, AnimFrame))[28]) * 0.5f);
+			return;
+		}
+		else {
+			return;
+		}
 	}
 
 	if (State & (STATE_WEAK | STATE_HEAVY | STATE_THROW)) {

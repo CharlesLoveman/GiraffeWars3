@@ -870,7 +870,7 @@ void RobotGiraffe::Draw(HDC hdc, Vector2 Scale)
 			DrawMace(hdc, Scale, ((*Moves->GetSkelPoints(20, AnimFrame))[25] + (*Moves->GetSkelPoints(20, AnimFrame))[30]) * 0.5f, ((*Moves->GetSkelPoints(20, AnimFrame))[27] + (*Moves->GetSkelPoints(20, AnimFrame))[28]) * 0.5f);
 			return;
 		}
-		else if (State & STATE_DOWN && (AnimFrame >= 0)) {
+		else if (State & STATE_DOWN && (AnimFrame >= 5 && AnimFrame <= 20)) {
 			DrawSword(hdc, Scale, ((*Moves->GetSkelPoints(21, AnimFrame))[25] + (*Moves->GetSkelPoints(21, AnimFrame))[30]) * 0.5f, ((*Moves->GetSkelPoints(21, AnimFrame))[27] + (*Moves->GetSkelPoints(21, AnimFrame))[28]) * 0.5f);
 			return;
 		}

@@ -11,6 +11,7 @@ struct RobotProjFuncs {
 				parent.State &= ~(STATE_WEAK | STATE_HEAVY | STATE_RUNNING);
 				parent.State |= STATE_GRABBING;
 				parent.TechDelay = frameNumber + 30;
+				collided->Velocity = (parent.Position - collided->Position) * 0.1f;
 			}
 		}
 	}

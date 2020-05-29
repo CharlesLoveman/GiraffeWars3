@@ -23,6 +23,7 @@ private:
 	void DrawAxe(HDC hdc, Vector2 Scale, Vector2 Neck, Vector2 Head);
 	void DrawSword(HDC hdc, Vector2 Scale, Vector2 Neck, Vector2 Head);
 	void DrawMace(HDC hdc, Vector2 Scale, Vector2 Neck, Vector2 Head);
+	void DrawBlast(HDC hdc, Vector2 Scale, Vector2 Neck, Vector2 Head);
 };
 
 #endif // !_NORMGIRAFFE_H_

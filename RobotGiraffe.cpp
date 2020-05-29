@@ -813,51 +813,60 @@ void RobotGiraffe::Draw(HDC hdc, Vector2 Scale)
 		SelectObject(hdc, IntangiblePen);
 	}
 
-
-	if ((State & STATE_HEAVY) && (State & STATE_JUMPING)) {
-		if (State & STATE_UP) {
-			if (AnimFrame >= 10 && AnimFrame <= 30) {
-				POINT points[NUM_POINTS];
-				for (int i = 0; i < NUM_POINTS; ++i) {
-					points[i] = Giraffe::VecToPoint(Position + Facing * (*Moves->GetSkelPoints(CurrentAnim, CurrentFrame))[i], Scale);
+	if (State & STATE_HEAVY) {
+		if (State & STATE_JUMPING) {
+			if (State & STATE_UP) {
+				if (AnimFrame >= 10 && AnimFrame <= 30) {
+					POINT points[NUM_POINTS];
+					for (int i = 0; i < NUM_POINTS; ++i) {
+						points[i] = Giraffe::VecToPoint(Position + Facing * (*Moves->GetSkelPoints(CurrentAnim, CurrentFrame))[i], Scale);
+					}
+					Polyline(hdc, points, 27);
+					Polyline(hdc, &points[36], 2);
 				}
-				Polyline(hdc, points, 27);
-				Polyline(hdc, &points[36], 2);
+				else {
+					DrawSelf(hdc, Scale, AnimFrame, AttackNum);
+				}
+			}
+			else if (State & STATE_DOWN) {
+				DrawSelf(hdc, Scale, AnimFrame, AttackNum);
+				SelectObject(hdc, ShineBrush);
+				POINT points[12];
+				float r = 2.5f * cosf(AnimFrame / 15.0f * 3.1415f);
+				float r1 = 0.5f * r;
+				float r2 = 0.866025f * r;
+				points[0] = Giraffe::VecToPoint(Position + Vector2(r, 0), Scale);
+				points[1] = Giraffe::VecToPoint(Position + Vector2(r1, r2), Scale);
+				points[2] = Giraffe::VecToPoint(Position + Vector2(-r1, r2), Scale);
+				points[3] = Giraffe::VecToPoint(Position + Vector2(-r, 0), Scale);
+				points[4] = Giraffe::VecToPoint(Position + Vector2(-r1, -r2), Scale);
+				points[5] = Giraffe::VecToPoint(Position + Vector2(r1, -r2), Scale);
+
+				r *= 0.6f;
+				r1 *= 0.6f;
+				r2 *= 0.6f;
+				points[6] = Giraffe::VecToPoint(Position + Vector2(r, 0), Scale);
+				points[7] = Giraffe::VecToPoint(Position + Vector2(r1, r2), Scale);
+				points[8] = Giraffe::VecToPoint(Position + Vector2(-r1, r2), Scale);
+				points[9] = Giraffe::VecToPoint(Position + Vector2(-r, 0), Scale);
+				points[10] = Giraffe::VecToPoint(Position + Vector2(-r1, -r2), Scale);
+				points[11] = Giraffe::VecToPoint(Position + Vector2(r1, -r2), Scale);
+
+				Polygon(hdc, points, 12);
 			}
 			else {
 				DrawSelf(hdc, Scale, AnimFrame, AttackNum);
 			}
-		}
-		else if (State & STATE_DOWN) {
-			DrawSelf(hdc, Scale, AnimFrame, AttackNum);
-			SelectObject(hdc, ShineBrush);
-			POINT points[12];
-			float r = 2.5f * cosf(AnimFrame / 15.0f * 3.1415f);
-			float r1 = 0.5f * r;
-			float r2 = 0.866025f * r;
-			points[0] = Giraffe::VecToPoint(Position + Vector2(r, 0), Scale);
-			points[1] = Giraffe::VecToPoint(Position + Vector2(r1, r2), Scale);
-			points[2] = Giraffe::VecToPoint(Position + Vector2(-r1, r2), Scale);
-			points[3] = Giraffe::VecToPoint(Position + Vector2(-r, 0), Scale);
-			points[4] = Giraffe::VecToPoint(Position + Vector2(-r1, -r2), Scale);
-			points[5] = Giraffe::VecToPoint(Position + Vector2(r1, -r2), Scale);
-
-			r *= 0.6f;
-			r1 *= 0.6f;
-			r2 *= 0.6f;
-			points[6] = Giraffe::VecToPoint(Position + Vector2(r, 0), Scale);
-			points[7] = Giraffe::VecToPoint(Position + Vector2(r1, r2), Scale);
-			points[8] = Giraffe::VecToPoint(Position + Vector2(-r1, r2), Scale);
-			points[9] = Giraffe::VecToPoint(Position + Vector2(-r, 0), Scale);
-			points[10] = Giraffe::VecToPoint(Position + Vector2(-r1, -r2), Scale);
-			points[11] = Giraffe::VecToPoint(Position + Vector2(r1, -r2), Scale);
-
-			Polygon(hdc, points, 12);
+			return;
 		}
 		else {
 			DrawSelf(hdc, Scale, AnimFrame, AttackNum);
+			if ((State & STATE_FORWARD) && (AnimFrame >= 10 && AnimFrame <= 13)) {
+				DrawBlast(hdc, Scale, ((*Moves->GetSkelPoints(22, AnimFrame))[25] + (*Moves->GetSkelPoints(22, AnimFrame))[30]) * 0.5f, ((*Moves->GetSkelPoints(22, AnimFrame))[27] + (*Moves->GetSkelPoints(22, AnimFrame))[28]) * 0.5f);
+				return;
+			}
+			return;
 		}
-		return;
 	}
 
 	if (State & STATE_WEAK && !(State & STATE_JUMPING)) {
@@ -1027,6 +1036,30 @@ void RobotGiraffe::DrawMace(HDC hdc, Vector2 Scale, Vector2 Neck, Vector2 Head)
 	points[8] = Giraffe::VecToPoint(Position + Facing * (Pos + dir * 0.6f), Scale);
 	points[9] = Giraffe::VecToPoint(Position + Facing * (Pos + perp * -0.3f + dir * 0.3f), Scale);
 	points[10] = Giraffe::VecToPoint(Position + Facing * Pos, Scale);
+
+	Polyline(hdc, points, 11);
+}
+
+void RobotGiraffe::DrawBlast(HDC hdc, Vector2 Scale, Vector2 Neck, Vector2 Head)
+{
+	Vector2 dir = Head - Neck;
+	dir.Normalize();
+	Vector2 perp = { -dir.y, dir.x };
+	Vector2 Pos = Head + dir;
+
+	POINT points[11];
+
+	points[0] = Giraffe::VecToPoint(Position + Facing * (Head + perp * 0.2f), Scale);
+	points[1] = Giraffe::VecToPoint(Position + Facing * (Head + dir * 1.0f + perp * 1.5f), Scale);
+	points[2] = Giraffe::VecToPoint(Position + Facing * (Head + dir * 0.5f + perp * 0.35f), Scale);
+	points[3] = Giraffe::VecToPoint(Position + Facing * (Head + dir * 1.2f + perp * 1.4f), Scale);
+	points[4] = Giraffe::VecToPoint(Position + Facing * (Head + dir * 0.65f + perp * 0.25f), Scale);
+	points[5] = Giraffe::VecToPoint(Position + Facing * (Head + dir * 2.0f), Scale);
+	points[6] = Giraffe::VecToPoint(Position + Facing * (Head + dir * 0.65f + perp * -0.25f), Scale);
+	points[7] = Giraffe::VecToPoint(Position + Facing * (Head + dir * 1.2f + perp * -1.4f), Scale);
+	points[8] = Giraffe::VecToPoint(Position + Facing * (Head + dir * 0.5f + perp * -0.35f), Scale);
+	points[9] = Giraffe::VecToPoint(Position + Facing * (Head + dir * 1.0f + perp * -1.5f), Scale);
+	points[10] = Giraffe::VecToPoint(Position + Facing * (Head + perp * -0.2f), Scale);
 
 	Polyline(hdc, points, 11);
 }

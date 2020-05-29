@@ -860,6 +860,14 @@ void RobotGiraffe::Draw(HDC hdc, Vector2 Scale)
 		return;
 	}
 
+	if (State & STATE_WEAK && State & STATE_FORWARD && !(State & STATE_JUMPING)) {
+		DrawSelf(hdc, Scale, AnimFrame, 19);
+		if (AnimFrame >= 5 && AnimFrame <= 20) {
+			DrawAxe(hdc, Scale, ((*Moves->GetSkelPoints(19, AnimFrame))[25] + (*Moves->GetSkelPoints(19, AnimFrame))[30]) * 0.5f, ((*Moves->GetSkelPoints(19, AnimFrame))[27] + (*Moves->GetSkelPoints(19, AnimFrame))[28]) * 0.5f, AnimFrame);
+		}
+		return;
+	}
+
 	if (State & (STATE_WEAK | STATE_HEAVY | STATE_THROW)) {
 		CurrentAnim = AttackNum;
 		CurrentFrame = AnimFrame;
@@ -948,5 +956,26 @@ void RobotGiraffe::DrawSelf(HDC hdc, Vector2 Scale, int CurrentFrame, int Curren
 void RobotGiraffe::DrawHitbox(HDC hdc, Vector2 Scale, Vector2 Pos, float Rad)
 {
 	Ellipse(hdc, (int)(Scale.x * (Position.x + Facing.x * Pos.x - Rad)), (int)(Scale.y * (Position.y + Facing.y * Pos.y - Rad)), (int)(Scale.x * (Position.x + Facing.x * Pos.x + Rad)), (int)(Scale.y * (Position.y + Facing.y * Pos.y + Rad)));
+}
+
+void RobotGiraffe::DrawAxe(HDC hdc, Vector2 Scale, Vector2 Neck, Vector2 Head, int CurrentFrame)
+{
+	//Vector2 head = Position + ((*Moves->GetSkelPoints(19, CurrentFrame))[27] + (*Moves->GetSkelPoints(19, CurrentFrame))[28]) * 0.5f;
+	Vector2 dir = Head - Neck;
+	dir.Normalize();
+	Vector2 perp = { -dir.y, dir.x };
+	Vector2 Pos = Head + dir;
+
+	POINT points[8];
+	points[0] = Giraffe::VecToPoint(Position + Facing * Head, Scale);
+	points[1] = Giraffe::VecToPoint(Position + Facing * Pos, Scale);
+	points[2] = Giraffe::VecToPoint(Position + Facing * (Pos + 0.3f * perp + -0.3f * dir), Scale);
+	points[3] = Giraffe::VecToPoint(Position + Facing * (Pos + 0.3f * perp + 0.4f * dir), Scale);
+	points[4] = Giraffe::VecToPoint(Position + Facing * (Pos + 0.1f * dir), Scale);
+	points[5] = Giraffe::VecToPoint(Position + Facing * (Pos + -0.3f * perp + 0.4f * dir), Scale);
+	points[6] = Giraffe::VecToPoint(Position + Facing * (Pos + -0.3f * perp + -0.3f * dir), Scale);
+	points[7] = Giraffe::VecToPoint(Position + Facing * Pos, Scale);
+
+	Polyline(hdc, points, 8);
 }
 

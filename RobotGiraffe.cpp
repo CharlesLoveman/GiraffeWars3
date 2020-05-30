@@ -869,6 +869,10 @@ void RobotGiraffe::Draw(HDC hdc, Vector2 Scale)
 				DrawBlast(hdc, Scale, ((*Moves->GetSkelPoints(23, AnimFrame))[25] + (*Moves->GetSkelPoints(23, AnimFrame))[30]) * 0.5f, ((*Moves->GetSkelPoints(23, AnimFrame))[27] + (*Moves->GetSkelPoints(23, AnimFrame))[28]) * 0.5f);
 				return;
 			}
+			else if (State & STATE_DOWN && (AnimFrame >= 19 && AnimFrame <= 22)) {
+				DrawBlast(hdc, Scale, ((*Moves->GetSkelPoints(24, AnimFrame))[25] + (*Moves->GetSkelPoints(24, AnimFrame))[30]) * 0.5f, ((*Moves->GetSkelPoints(24, AnimFrame))[27] + (*Moves->GetSkelPoints(24, AnimFrame))[28]) * 0.5f);
+				return;
+			}
 			return;
 		}
 	}

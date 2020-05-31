@@ -8,7 +8,7 @@ constexpr int NUM_MOVES_ROBOT = 24;
 
 class RobotGiraffe : public Giraffe {
 public:
-	RobotGiraffe(Vector2 _Position, MoveSet* _Moves, HPEN _GiraffePen);
+	RobotGiraffe(Vector2 _Position, MoveSet* _Moves, COLORREF _Colour);
 	~RobotGiraffe();
 
 	void Update(std::array<Giraffe*, 4> giraffes, const int num_giraffes, const int i, const int inputs, const int frameNumber, Stage& stage);
@@ -24,6 +24,7 @@ private:
 	void DrawSword(HDC hdc, Vector2 Scale, Vector2 Neck, Vector2 Head);
 	void DrawMace(HDC hdc, Vector2 Scale, Vector2 Neck, Vector2 Head);
 	void DrawBlast(HDC hdc, Vector2 Scale, Vector2 Neck, Vector2 Head);
+	void DrawBeamSword(HDC hdc, Vector2 Scale, Vector2 Neck, Vector2 Head);
 };
 
 #endif // !_NORMGIRAFFE_H_

@@ -166,7 +166,7 @@ protected:
 	//Collision
 	Collider Fullbody;
 	Collider StageCollider;
-	HitWID IncomingHits[GGPO_MAX_PLAYERS - 1];
+	HitWID IncomingHits[8];
 	ArrayQueue<int> PrevHitQueue;
 	int LastAttackID;
 	int numIncoming;

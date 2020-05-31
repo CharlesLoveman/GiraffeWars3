@@ -3,15 +3,17 @@
 
 bool Giraffe::AddHit(HitCollider hit, int ID, Vector2 facing2, Vector2 position2)
 {
-	if (Intersect(position2, hit, facing2, Position, Fullbody, Facing)) {
-		for (int k = 0; k < 6; ++k) {
-			if (Intersect(position2, hit, facing2, Position, (*Hurtboxes)[k], Facing) && !PrevHitQueue.Contains(ID)) {
-				IncomingHits[numIncoming].hit = hit;
-				IncomingHits[numIncoming].hit.Force *= facing2;
-				//IncomingHits[numIncoming].hit.Damage *= multiplier;
-				IncomingHits[numIncoming].ID = ID;
-				++numIncoming;
-				return true;
+	if (numIncoming < 8) {
+		if (Intersect(position2, hit, facing2, Position, Fullbody, Facing)) {
+			for (int k = 0; k < 6; ++k) {
+				if (Intersect(position2, hit, facing2, Position, (*Hurtboxes)[k], Facing) && !PrevHitQueue.Contains(ID)) {
+					IncomingHits[numIncoming].hit = hit;
+					IncomingHits[numIncoming].hit.Force *= facing2;
+					//IncomingHits[numIncoming].hit.Damage *= multiplier;
+					IncomingHits[numIncoming].ID = ID;
+					++numIncoming;
+					return true;
+				}
 			}
 		}
 	}
@@ -20,13 +22,15 @@ bool Giraffe::AddHit(HitCollider hit, int ID, Vector2 facing2, Vector2 position2
 
 bool Giraffe::ProjectileHit(Projectile p)
 {
-	if (Vector2::DistanceSquared(Position, p.Position) < (p.Radius * p.Radius + Fullbody.Radius * Fullbody.Radius)) {
-		for (int k = 0; k < 6; ++k) {
-			if (Vector2::DistanceSquared((Position + Facing * (*Hurtboxes)[k].Position), p.Position) < (p.Radius * p.Radius + (*Hurtboxes)[k].Radius * (*Hurtboxes)[k].Radius)) {
-				IncomingHits[numIncoming].hit = p;
-				IncomingHits[numIncoming].ID = p.ID;
-				++numIncoming;
-				return true;
+	if (numIncoming < 8) {
+		if (Vector2::DistanceSquared(Position, p.Position) < (p.Radius * p.Radius + Fullbody.Radius * Fullbody.Radius)) {
+			for (int k = 0; k < 6; ++k) {
+				if (Vector2::DistanceSquared((Position + Facing * (*Hurtboxes)[k].Position), p.Position) < (p.Radius * p.Radius + (*Hurtboxes)[k].Radius * (*Hurtboxes)[k].Radius)) {
+					IncomingHits[numIncoming].hit = p;
+					IncomingHits[numIncoming].ID = p.ID;
+					++numIncoming;
+					return true;
+				}
 			}
 		}
 	}

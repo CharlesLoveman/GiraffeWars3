@@ -41,12 +41,12 @@ void GameState::Init(HWND hwnd, int num_players, const std::array<MoveSet*, 4> M
 
 	int counter = 0;
 
-	robotGiraffes.push_back(RobotGiraffe(Vector2(stageleft + stagewidth * 1.0f / (2.0f * _num_giraffes), 20), MoveSets[1], CreatePen(PS_SOLID, 1, _giraffeColours[0])));
+	robotGiraffes.push_back(RobotGiraffe(Vector2(stageleft + stagewidth * 1.0f / (2.0f * _num_giraffes), 20), MoveSets[1], _giraffeColours[0]));
 	giraffes[counter] = &robotGiraffes[0];
 	counter++;
 
 	for (int i = 0; i < _num_giraffes - robotGiraffes.size(); ++i) {
-		normGiraffes.push_back(NormGiraffe(Vector2(stageleft + stagewidth * (2.0f * counter + 1.0f) / (2.0f * _num_giraffes), 20), MoveSets[0], CreatePen(PS_SOLID, 1, _giraffeColours[counter])));
+		normGiraffes.push_back(NormGiraffe(Vector2(stageleft + stagewidth * (2.0f * counter + 1.0f) / (2.0f * _num_giraffes), 20), MoveSets[0], _giraffeColours[counter]));
 		giraffes[counter] = &normGiraffes[i];
 		counter++;
 	}

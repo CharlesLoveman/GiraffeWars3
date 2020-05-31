@@ -1,7 +1,7 @@
 #include "NormGiraffe.h"
 #include "NormProjFuncs.h"
 
-NormGiraffe::NormGiraffe(Vector2 _Position, MoveSet* _Moves, HPEN _GiraffePen)
+NormGiraffe::NormGiraffe(Vector2 _Position, MoveSet* _Moves, COLORREF _Colour)
 {
 	//Movement
 	Position = _Position;
@@ -52,7 +52,7 @@ NormGiraffe::NormGiraffe(Vector2 _Position, MoveSet* _Moves, HPEN _GiraffePen)
 
 	//Animation
 	AnimFrame = 0;
-	GiraffePen = _GiraffePen;
+	GiraffePen = CreatePen(PS_SOLID, 1, _Colour);
 	IntangiblePen = CreatePen(PS_SOLID, 1, RGB(255,255,255));
 	ShieldBrush = CreateHatchBrush(HS_BDIAGONAL, RGB(0, 255, 127));
 	SpitBrush = CreateSolidBrush(RGB(90, 210, 180));
@@ -797,7 +797,6 @@ void NormGiraffe::Move(Stage& stage, const int frameNumber, std::array<Giraffe*,
 
 void NormGiraffe::Draw(HDC hdc, Vector2 Scale)
 {
-	SelectObject(hdc, GiraffePen);
 	for (int i = 0; i < Projectiles.Size(); ++i) {
 		Projectiles[i].Draw(Projectiles[i], *this, hdc, Scale);
 	}
@@ -807,8 +806,10 @@ void NormGiraffe::Draw(HDC hdc, Vector2 Scale)
 
 
 	if (State & STATE_INTANGIBLE) {
-
 		SelectObject(hdc, IntangiblePen);
+	}
+	else {
+		SelectObject(hdc, GiraffePen);
 	}
 
 

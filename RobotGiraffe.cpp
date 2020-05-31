@@ -506,9 +506,12 @@ void RobotGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraff
 	//	}
 	//}
 	//Fire Missile
-	if ((State & STATE_HEAVY) && !(State & (STATE_WEAK | STATE_UP | STATE_FORWARD | STATE_BACK | STATE_DOWN)) && AnimFrame == 13) {
-		for (int j = 0; j < 4; ++j) {
-			Projectiles.Append(Projectile(Position + Vector2(0.2f, -1.2f), { Facing.x * 0.5f, 0.0f }, 0.3f, { Facing.x, 0.0f }, 0.1f, 0.1f, 1.0f, true, LastAttackID++, frameNumber + 100, RobotProjFuncs::MissileOnHit, RobotProjFuncs::MissileUpdate, RobotProjFuncs::MissileDraw, GiraffePen, CreateSolidBrush(RGB(100 * (j % 2), 100 * (j % 3), 50 * j))));
+	if ((State & STATE_WEAK) && (State & STATE_JUMPING) &&!(State & (STATE_UP | STATE_FORWARD | STATE_BACK | STATE_DOWN)) && AnimFrame >= 7 && AnimFrame <= 15 && AnimFrame % 2 == 0) {
+		if (AnimFrame % 4 == 0) {
+			Projectiles.Append(Projectile(Position + Vector2(2.0f, -2.2f), { Facing.x * 0.5f, 0.0f }, 0.3f, { Facing.x, 0.0f }, 0.1f, 0.1f, 1.0f, true, LastAttackID++, frameNumber + 50, RobotProjFuncs::MissileOnHit, RobotProjFuncs::MissileUpdate, RobotProjFuncs::MissileDraw, GiraffePen, SpitBrush));
+		}
+		else {
+			Projectiles.Append(Projectile(Position + Vector2(-2.0f, -2.2f), { Facing.x * 0.5f, 0.0f }, 0.3f, { Facing.x, 0.0f }, 0.1f, 0.1f, 1.0f, true, LastAttackID++, frameNumber + 50, RobotProjFuncs::MissileOnHit, RobotProjFuncs::MissileUpdate, RobotProjFuncs::MissileDraw, GiraffePen, SpitBrush));
 		}
 	}
 	////Reverse direction in bair
@@ -864,15 +867,15 @@ void RobotGiraffe::Draw(HDC hdc, Vector2 Scale)
 		else {
 			DrawSelf(hdc, Scale, AnimFrame, AttackNum);
 			if ((State & STATE_FORWARD) && (AnimFrame >= 10 && AnimFrame <= 13)) {
-				DrawBlast(hdc, Scale, ((*Moves->GetSkelPoints(22, AnimFrame))[25] + (*Moves->GetSkelPoints(22, AnimFrame))[30]) * 0.5f, ((*Moves->GetSkelPoints(22, AnimFrame))[27] + (*Moves->GetSkelPoints(22, AnimFrame))[28]) * 0.5f);
+				DrawBlast(hdc, Scale, ((*Moves->GetSkelPoints(AttackNum, AnimFrame))[25] + (*Moves->GetSkelPoints(AttackNum, AnimFrame))[30]) * 0.5f, ((*Moves->GetSkelPoints(AttackNum, AnimFrame))[27] + (*Moves->GetSkelPoints(AttackNum, AnimFrame))[28]) * 0.5f);
 				return;
 			}
 			else if ((State & STATE_UP) && ((AnimFrame >= 12 && AnimFrame <= 14) || (AnimFrame >= 18 && AnimFrame <= 20) || (AnimFrame >= 24 && AnimFrame <= 26))) {
-				DrawBlast(hdc, Scale, ((*Moves->GetSkelPoints(23, AnimFrame))[25] + (*Moves->GetSkelPoints(23, AnimFrame))[30]) * 0.5f, ((*Moves->GetSkelPoints(23, AnimFrame))[27] + (*Moves->GetSkelPoints(23, AnimFrame))[28]) * 0.5f);
+				DrawBlast(hdc, Scale, ((*Moves->GetSkelPoints(AttackNum, AnimFrame))[25] + (*Moves->GetSkelPoints(AttackNum, AnimFrame))[30]) * 0.5f, ((*Moves->GetSkelPoints(AttackNum, AnimFrame))[27] + (*Moves->GetSkelPoints(AttackNum, AnimFrame))[28]) * 0.5f);
 				return;
 			}
 			else if (State & STATE_DOWN && (AnimFrame >= 19 && AnimFrame <= 22)) {
-				DrawBlast(hdc, Scale, ((*Moves->GetSkelPoints(24, AnimFrame))[25] + (*Moves->GetSkelPoints(24, AnimFrame))[30]) * 0.5f, ((*Moves->GetSkelPoints(24, AnimFrame))[27] + (*Moves->GetSkelPoints(24, AnimFrame))[28]) * 0.5f);
+				DrawBlast(hdc, Scale, ((*Moves->GetSkelPoints(AttackNum, AnimFrame))[25] + (*Moves->GetSkelPoints(AttackNum, AnimFrame))[30]) * 0.5f, ((*Moves->GetSkelPoints(AttackNum, AnimFrame))[27] + (*Moves->GetSkelPoints(AttackNum, AnimFrame))[28]) * 0.5f);
 				return;
 			}
 			return;
@@ -893,6 +896,9 @@ void RobotGiraffe::Draw(HDC hdc, Vector2 Scale)
 				}
 			}
 			else {
+				if (AnimFrame >= 7 && AnimFrame <= 25) {
+					DrawML(hdc, Scale, (((*Moves->GetSkelPoints(CurrentAnim, CurrentFrame))[25] + (*Moves->GetSkelPoints(CurrentAnim, CurrentFrame))[30]) * 0.5f - (*Moves->GetSkelPoints(CurrentAnim, CurrentFrame))[33]), (*Moves->GetSkelPoints(CurrentAnim, CurrentFrame))[33]);
+				}
 				return;
 			}
 		}
@@ -987,6 +993,7 @@ void RobotGiraffe::Draw(HDC hdc, Vector2 Scale)
 		}
 	}
 	DrawSelf(hdc, Scale, CurrentFrame, CurrentAnim);
+	//DrawML(hdc, Scale, (((*Moves->GetSkelPoints(CurrentAnim, CurrentFrame))[25] + (*Moves->GetSkelPoints(CurrentAnim, CurrentFrame))[30]) * 0.5f - (*Moves->GetSkelPoints(CurrentAnim, CurrentFrame))[33]), (*Moves->GetSkelPoints(CurrentAnim, CurrentFrame))[33]);
 }
 
 void RobotGiraffe::DrawSelf(HDC hdc, Vector2 Scale, int CurrentFrame, int CurrentAnim)
@@ -1143,4 +1150,38 @@ void RobotGiraffe::DrawBeamSword(HDC hdc, Vector2 Scale, Vector2 Neck, Vector2 H
 	points[28] = Giraffe::VecToPoint(Position + Facing * (Head + dir * 2.1f), Scale);
 
 	Polyline(hdc, points, 29);
+}
+
+void RobotGiraffe::DrawML(HDC hdc, Vector2 Scale, Vector2 dir, Vector2 Body)
+{
+	SelectObject(hdc, CreateSolidBrush(0));
+	dir.Normalize();
+	Vector2 perp = { -dir.y, dir.x };
+	Vector2 up = { 0, -1 };
+	Vector2 right = { 1, 0 };
+
+	POINT points[6];
+
+	points[0] = Giraffe::VecToPoint(Position + Facing * (Body + 0.5f * dir + 0.2f * perp), Scale);
+	points[1] = Giraffe::VecToPoint(Position + Facing * (Body + dir + perp), Scale);
+	points[2] = Giraffe::VecToPoint(Position + Facing * (Body + dir + perp + 1.3f * up), Scale);
+	points[3] = Giraffe::VecToPoint(Position + Facing * (Body + dir + perp + 1.3f * (up + right)), Scale);
+	points[4] = Giraffe::VecToPoint(Position + Facing * (Body + dir + perp + 1.3f * right), Scale);
+	points[5] = Giraffe::VecToPoint(Position + Facing * (Body + dir + perp), Scale);
+	Polyline(hdc, points, 6);
+
+	points[0] = Giraffe::VecToPoint(Position + Facing * (Body + 0.5f * dir + -0.2f * perp), Scale);
+	points[1] = Giraffe::VecToPoint(Position + Facing * (Body + dir - perp), Scale);
+	points[2] = Giraffe::VecToPoint(Position + Facing * (Body + dir - perp + 1.3f * up), Scale);
+	points[3] = Giraffe::VecToPoint(Position + Facing * (Body + dir - perp + 1.3f * (up - right)), Scale);
+	points[4] = Giraffe::VecToPoint(Position + Facing * (Body + dir - perp - 1.3f * right), Scale);
+	points[5] = Giraffe::VecToPoint(Position + Facing * (Body + dir - perp), Scale);
+	Polyline(hdc, points, 6);
+
+	for (int i = 0; i < 2; ++i) {
+		for(int j = 0; j < 2; ++j) {
+			DrawHitbox(hdc, Scale, Body + dir + perp + (0.17f + 0.5f * i) * 1.3f * up + (0.26f + 0.5f * j) * 1.3f * right, 0.2f);
+			DrawHitbox(hdc, Scale, Body + dir - perp + (0.25f + 0.5f * i) * 1.3f * up - (0.24f + 0.5f * j) * 1.3f * right, 0.2f);
+		}
+	}
 }

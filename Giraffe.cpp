@@ -3,7 +3,7 @@
 
 bool Giraffe::AddHit(HitCollider hit, int ID, Vector2 facing2, Vector2 position2)
 {
-	if (numIncoming < 8) {
+	if (numIncoming < 8 && !PrevHitQueue.Contains(ID)) {
 		if (Intersect(position2, hit, facing2, Position, Fullbody, Facing)) {
 			for (int k = 0; k < 6; ++k) {
 				if (Intersect(position2, hit, facing2, Position, (*Hurtboxes)[k], Facing) && !PrevHitQueue.Contains(ID)) {
@@ -22,7 +22,7 @@ bool Giraffe::AddHit(HitCollider hit, int ID, Vector2 facing2, Vector2 position2
 
 bool Giraffe::ProjectileHit(Projectile p)
 {
-	if (numIncoming < 8) {
+	if (numIncoming < 8 && !PrevHitQueue.Contains(p.ID)) {
 		if (Vector2::DistanceSquared(Position, p.Position) < (p.Radius * p.Radius + Fullbody.Radius * Fullbody.Radius)) {
 			for (int k = 0; k < 6; ++k) {
 				if (Vector2::DistanceSquared((Position + Facing * (*Hurtboxes)[k].Position), p.Position) < (p.Radius * p.Radius + (*Hurtboxes)[k].Radius * (*Hurtboxes)[k].Radius)) {

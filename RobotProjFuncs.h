@@ -47,11 +47,17 @@ struct RobotProjFuncs {
 
 	static bool MissileUpdate(Projectile& self, Giraffe& parent, int frameNumber) {
 		Vector2 newVel;
-		float theta = 0.1f * (2 * (((frameNumber + (int)trunc(self.Position.y * 10)) % (((int)(self.Position.x) ^ self.ID) + 1)) % 3) - 1);
+		float theta = 0.2f * ((((frameNumber + (int)abs(self.Position.y * 10)) % (((int)abs(self.Position.x) ^ self.ID) + 1)) % 3) - 1);
 		newVel.x = self.Velocity.Dot({ cosf(theta), -sinf(theta) });
 		newVel.y = self.Velocity.Dot({ sinf(theta), cosf(theta) });
 		self.Velocity = newVel;
-		return frameNumber >= self.LifeSpan;
+		if (frameNumber >= self.LifeSpan) {
+			parent.Projectiles.Append(Projectile(self.Position, Vector2::Zero, 0, Vector2::Zero, 0, 0, 0, 0, self.ID, frameNumber + 20, M_ExplosionOnHit, M_ExplosionUpdate, M_ExplosionDraw, self.Pen, self.Brush));
+			return true;
+		}
+		else {
+			return false;
+		}
 	}
 
 	static void MissileDraw(Projectile& self, Giraffe& parent, HDC hdc, Vector2 Scale) {

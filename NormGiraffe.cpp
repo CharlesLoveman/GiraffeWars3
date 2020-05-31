@@ -713,6 +713,7 @@ void NormGiraffe::Move(Stage& stage, const int frameNumber, std::array<Giraffe*,
 				if (State & STATE_HITSTUN && !(State & STATE_TECHATTEMPT)) {
 					Velocity = { 0,0 };
 					State |= STATE_KNOCKDOWNLAG;
+					State &= ~STATE_HITSTUN;
 					AnimFrame = 0;
 					TechDelay = frameNumber + 30;
 					SoundMoveState |= SOUND_KNOCKDOWN;
@@ -746,7 +747,7 @@ void NormGiraffe::Move(Stage& stage, const int frameNumber, std::array<Giraffe*,
 					AnimFrame = 0;
 				}
 				SoundAttackState &= ~(SOUND_DOWNB | SOUND_UPB);
-				State &= ~(STATE_UP | STATE_BACK | STATE_DOWN | STATE_FORWARD | STATE_WEAK | STATE_HEAVY | STATE_JUMPING | STATE_FASTFALL | STATE_HITSTUN | STATE_TECHLAG | STATE_THROW | STATE_GRABBED | STATE_GRABBING);
+				State &= ~(STATE_UP | STATE_BACK | STATE_DOWN | STATE_FORWARD | STATE_WEAK | STATE_HEAVY | STATE_JUMPING | STATE_FASTFALL | STATE_TECHLAG | STATE_THROW | STATE_GRABBED | STATE_GRABBING);
 			}
 		}
 		else if (!(State & (STATE_JUMPING | STATE_GRABBED))) {

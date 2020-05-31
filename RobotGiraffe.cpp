@@ -720,6 +720,7 @@ void RobotGiraffe::Move(Stage& stage, const int frameNumber, std::array<Giraffe*
 				if (State & STATE_HITSTUN && !(State & STATE_TECHATTEMPT)) {
 					Velocity = { 0,0 };
 					State |= STATE_KNOCKDOWNLAG;
+					State &= ~STATE_HITSTUN;
 					AnimFrame = 0;
 					TechDelay = frameNumber + 30;
 					SoundMoveState |= SOUND_KNOCKDOWN;

@@ -96,7 +96,6 @@ enum GiraffeSoundAttackStates {
 	SOUND_MEDIUM = (1 << 23),
 	SOUND_HEAVY = (1 << 24),
 };
-//Stupid comment
 
 class Giraffe {
 public:
@@ -169,7 +168,6 @@ protected:
 
 	//Grabs
 	bool incomingGrab;
-	//int GrabPointer;
 
 	//Animation
 	int AnimFrame;

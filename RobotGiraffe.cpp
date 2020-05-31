@@ -753,7 +753,7 @@ void RobotGiraffe::Move(Stage& stage, const int frameNumber, std::array<Giraffe*
 					AnimFrame = 0;
 				}
 				SoundAttackState &= ~(SOUND_DOWNB | SOUND_UPB);
-				State &= ~(STATE_UP | STATE_BACK | STATE_DOWN | STATE_FORWARD | STATE_WEAK | STATE_HEAVY | STATE_JUMPING | STATE_FASTFALL | STATE_HITSTUN | STATE_TECHLAG | STATE_THROW | STATE_GRABBED | STATE_GRABBING);
+				State &= ~(STATE_UP | STATE_BACK | STATE_DOWN | STATE_FORWARD | STATE_WEAK | STATE_HEAVY | STATE_JUMPING | STATE_FASTFALL | STATE_TECHLAG | STATE_THROW | STATE_GRABBED | STATE_GRABBING);
 			}
 		}
 		else if (!(State & (STATE_JUMPING | STATE_GRABBED))) {
@@ -888,6 +888,9 @@ void RobotGiraffe::Draw(HDC hdc, Vector2 Scale)
 					DrawBeamSword(hdc, Scale, ((*Moves->GetSkelPoints(AttackNum, AnimFrame))[25] + (*Moves->GetSkelPoints(AttackNum, AnimFrame))[30]) * 0.5f, ((*Moves->GetSkelPoints(AttackNum, AnimFrame))[27] + (*Moves->GetSkelPoints(AttackNum, AnimFrame))[28]) * 0.5f);
 					return;
 				}
+			}
+			else if (State & STATE_DOWN) {
+				return;
 			}
 			else {
 				if (AnimFrame >= 7 && AnimFrame <= 25) {

@@ -508,10 +508,10 @@ void RobotGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraff
 	//Fire Missile
 	if ((State & STATE_WEAK) && (State & STATE_JUMPING) &&!(State & (STATE_UP | STATE_FORWARD | STATE_BACK | STATE_DOWN)) && AnimFrame >= 7 && AnimFrame <= 15 && AnimFrame % 2 == 0) {
 		if (AnimFrame % 4 == 0) {
-			Projectiles.Append(Projectile(Position + Vector2(2.0f, -2.2f), { Facing.x * 0.5f, 0.0f }, 0.3f, { Facing.x, 0.0f }, 0.1f, 0.1f, 1.0f, true, LastAttackID++, frameNumber + 50, RobotProjFuncs::MissileOnHit, RobotProjFuncs::MissileUpdate, RobotProjFuncs::MissileDraw, GiraffePen, SpitBrush));
+			Projectiles.Append(Projectile(Position + Vector2(2.0f, -2.2f), { Facing.x * 0.5f, 0.0f }, 0.3f, { Facing.x, 0.0f }, 0.5f, 0.4f, 0.3f, false, LastAttackID++, frameNumber + 50, RobotProjFuncs::MissileOnHit, RobotProjFuncs::MissileUpdate, RobotProjFuncs::MissileDraw, GiraffePen, SpitBrush));
 		}
 		else {
-			Projectiles.Append(Projectile(Position + Vector2(-2.0f, -2.2f), { Facing.x * 0.5f, 0.0f }, 0.3f, { Facing.x, 0.0f }, 0.1f, 0.1f, 1.0f, true, LastAttackID++, frameNumber + 50, RobotProjFuncs::MissileOnHit, RobotProjFuncs::MissileUpdate, RobotProjFuncs::MissileDraw, GiraffePen, SpitBrush));
+			Projectiles.Append(Projectile(Position + Vector2(-2.0f, -2.2f), { Facing.x * 0.5f, 0.0f }, 0.3f, { Facing.x, 0.0f }, 0.5f, 0.4f, 0.3f, false, LastAttackID++, frameNumber + 50, RobotProjFuncs::MissileOnHit, RobotProjFuncs::MissileUpdate, RobotProjFuncs::MissileDraw, GiraffePen, SpitBrush));
 		}
 	}
 	////Reverse direction in bair
@@ -889,12 +889,15 @@ void RobotGiraffe::Draw(HDC hdc, Vector2 Scale)
 					return;
 				}
 			}
+			else if (State & STATE_UP) {
+				DrawDrill(hdc, Scale, ((*Moves->GetSkelPoints(AttackNum, AnimFrame))[25] + (*Moves->GetSkelPoints(AttackNum, AnimFrame))[30]) * 0.5f, ((*Moves->GetSkelPoints(AttackNum, AnimFrame))[27] + (*Moves->GetSkelPoints(AttackNum, AnimFrame))[28]) * 0.5f);
+			}
 			else if (State & STATE_DOWN) {
 				return;
 			}
 			else {
 				if (AnimFrame >= 7 && AnimFrame <= 25) {
-					DrawML(hdc, Scale, (((*Moves->GetSkelPoints(CurrentAnim, CurrentFrame))[25] + (*Moves->GetSkelPoints(CurrentAnim, CurrentFrame))[30]) * 0.5f - (*Moves->GetSkelPoints(CurrentAnim, CurrentFrame))[33]), (*Moves->GetSkelPoints(CurrentAnim, CurrentFrame))[33]);
+					DrawML(hdc, Scale, (((*Moves->GetSkelPoints(AttackNum, AnimFrame))[25] + (*Moves->GetSkelPoints(AttackNum, AnimFrame))[30]) * 0.5f - (*Moves->GetSkelPoints(AttackNum, AnimFrame))[33]), (*Moves->GetSkelPoints(AttackNum, AnimFrame))[33]);
 				}
 				return;
 			}
@@ -990,7 +993,6 @@ void RobotGiraffe::Draw(HDC hdc, Vector2 Scale)
 		}
 	}
 	DrawSelf(hdc, Scale, CurrentFrame, CurrentAnim);
-	//DrawML(hdc, Scale, (((*Moves->GetSkelPoints(CurrentAnim, CurrentFrame))[25] + (*Moves->GetSkelPoints(CurrentAnim, CurrentFrame))[30]) * 0.5f - (*Moves->GetSkelPoints(CurrentAnim, CurrentFrame))[33]), (*Moves->GetSkelPoints(CurrentAnim, CurrentFrame))[33]);
 }
 
 void RobotGiraffe::DrawSelf(HDC hdc, Vector2 Scale, int CurrentFrame, int CurrentAnim)
@@ -1181,4 +1183,51 @@ void RobotGiraffe::DrawML(HDC hdc, Vector2 Scale, Vector2 dir, Vector2 Body)
 			DrawHitbox(hdc, Scale, Body + dir - perp + (0.25f + 0.5f * i) * 1.3f * up - (0.24f + 0.5f * j) * 1.3f * right, 0.2f);
 		}
 	}
+}
+
+void RobotGiraffe::DrawDrill(HDC hdc, Vector2 Scale, Vector2 Neck, Vector2 Head)
+{
+	Vector2 dir = Head - Neck;
+	dir.Normalize();
+	Vector2 perp = { -dir.y, dir.x };
+
+	POINT points[16];
+	points[0] = VecToPoint(Position + Facing * (Head + 0.7f * dir + 0.8f * perp), Scale);
+	points[1] = VecToPoint(Position + Facing * (Head + 0.5f * dir + 0.7f * perp), Scale);
+	points[2] = VecToPoint(Position + Facing * (Head + 0.3f * dir + 0.6f * perp), Scale);
+	points[3] = VecToPoint(Position + Facing * (Head + 0.1f * dir), Scale);
+	points[4] = VecToPoint(Position + Facing * (Head + 0.3f * dir + -0.6f * perp), Scale);
+	points[5] = VecToPoint(Position + Facing * (Head + 0.5f * dir + -0.7f * perp), Scale);
+	points[6] = VecToPoint(Position + Facing * (Head + 0.9f * dir + -0.8f * perp), Scale);
+	PolyBezier(hdc, points, 7);
+
+	points[0] = VecToPoint(Position + Facing * (Head + 0.7f * dir + 0.6f * perp), Scale);
+	points[1] = VecToPoint(Position + Facing * (Head + 0.6f * dir + 0.5f * perp), Scale);
+	points[2] = VecToPoint(Position + Facing * (Head + 0.5f * dir + 0.4f * perp), Scale);
+	points[3] = VecToPoint(Position + Facing * (Head + 0.3f * dir), Scale);
+	points[4] = VecToPoint(Position + Facing * (Head + 0.5f * dir + -0.4f * perp), Scale);
+	points[5] = VecToPoint(Position + Facing * (Head + 0.7f * dir + -0.5f * perp), Scale);
+	points[6] = VecToPoint(Position + Facing * (Head + 0.9f * dir + -0.6f * perp), Scale);
+	PolyBezier(hdc, points, 7);
+	
+	points[1] = VecToPoint(Position + Facing * (Head + 0.7f * dir + 0.8f * perp), Scale);
+	Polyline(hdc, points, 2);
+
+	points[0] = VecToPoint(Position + Facing * (Head + 0.7f * dir - 0.8f * perp), Scale);
+	points[1] = VecToPoint(Position + Facing * (Head + 1.1f * dir - 0.8f * perp), Scale);
+	points[2] = VecToPoint(Position + Facing * (Head + 1.1f * dir + 0.8f * perp), Scale);
+	points[3] = VecToPoint(Position + Facing * (Head + 2.6f * dir), Scale);
+	points[4] = VecToPoint(Position + Facing * (Head + 1.1f * dir - 0.8f * perp), Scale);
+	points[5] = VecToPoint(Position + Facing * (Head + 1.1f * dir + 0.6f * perp), Scale);
+	points[6] = VecToPoint(Position + Facing * (Head + 1.475f * dir - 0.6f * perp), Scale);
+	points[7] = VecToPoint(Position + Facing * (Head + 1.85f * dir - 0.4f * perp), Scale);
+	points[8] = VecToPoint(Position + Facing * (Head + 1.475f * dir + 0.6f * perp), Scale);
+	points[9] = VecToPoint(Position + Facing * (Head + 1.85f * dir + 0.4f * perp), Scale);
+	points[10] = VecToPoint(Position + Facing * (Head + 2.225f * dir - 0.2f * perp), Scale);
+	points[11] = VecToPoint(Position + Facing * (Head + 1.1f * dir - 0.8f * perp), Scale);
+	points[12] = VecToPoint(Position + Facing * (Head + 1.1f * dir + 0.8f * perp), Scale);
+	points[13] = VecToPoint(Position + Facing * (Head + 0.8f * dir + 0.8f * perp), Scale);
+	points[14] = VecToPoint(Position + Facing * (Head + 0.8f * dir - 0.6f * perp), Scale);
+
+	Polyline(hdc, points, 15);
 }

@@ -26,6 +26,7 @@ private:
 	void DrawBlast(HDC hdc, Vector2 Scale, Vector2 Neck, Vector2 Head);
 	void DrawBeamSword(HDC hdc, Vector2 Scale, Vector2 Neck, Vector2 Head);
 	void DrawML(HDC hdc, Vector2 Scale, Vector2 dir, Vector2 Body);
+	void DrawDrill(HDC hdc, Vector2 Scale, Vector2 Neck, Vector2 Head);
 };
 
 #endif // !_NORMGIRAFFE_H_

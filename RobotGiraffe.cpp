@@ -455,18 +455,6 @@ void RobotGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraff
 	//Grab
 	if (State & STATE_WEAK && State & STATE_HEAVY && AnimFrame == 11) {
 		Projectiles.Append(Projectile(Position + Vector2(Facing.x * 0.5f, 0), { Facing.x * 0.6f, 0 }, 0.5f, { 0,0 }, 0, 0, 0, true, LastAttackID, frameNumber + 15, RobotProjFuncs::GrabberOnHit, RobotProjFuncs::GrabberUpdate, RobotProjFuncs::GrabberDraw, GiraffePen, ShieldBrush));
-		//Collider grabCol = { {Position.x + 1.885000f * Facing.x, Position.y - 0.650000f}, 0.855862f };
-		//for (int j = 0; j < num_giraffes; ++j) {
-		//	if (j != i) {
-		//		if (giraffes[j]->GrabHit(grabCol, Facing, frameNumber)) {
-		//			State &= ~(STATE_WEAK | STATE_HEAVY | STATE_RUNNING);
-		//			State |= STATE_GRABBING;
-		//			TechDelay = frameNumber + 30;
-		//			//GrabPointer = j;
-		//			break;
-		//		}
-		//	}
-		//}
 	}
 	//B-Reverse
 	if ((State & STATE_HEAVY) && (State & STATE_JUMPING) && AnimFrame == 1 && (((inputs & INPUT_LEFT) && Facing.x == 1) || ((inputs & INPUT_RIGHT) && Facing.x == -1))) {
@@ -507,7 +495,7 @@ void RobotGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraff
 	//}
 	//Throw lance
 	if ((State & STATE_WEAK) && (State & STATE_JUMPING) && (State & STATE_BACK) && AnimFrame == 10) {
-		Projectiles.Append(Projectile(Position + Vector2(2.0f, -2.2f), { Facing.x * -0.8f, 0.0f }, 0.3f, { -Facing.x, 0.0f }, 1.6f, 0.3f, 0.3f, false, LastAttackID++, frameNumber + 50, RobotProjFuncs::M_ExplosionOnHit, RobotProjFuncs::GrabberUpdate, RobotProjFuncs::LanceDraw, GiraffePen, CreateSolidBrush(0)));
+		Projectiles.Append(Projectile(Position + Vector2(0, -1.7f), { Facing.x * -0.8f, 0.0f }, 0.3f, { -Facing.x, 0.0f }, 1.6f, 0.3f, 0.3f, false, LastAttackID++, frameNumber + 50, RobotProjFuncs::M_ExplosionOnHit, RobotProjFuncs::GrabberUpdate, RobotProjFuncs::LanceDraw, GiraffePen, CreateSolidBrush(0)));
 	}
 	//Fire Missile
 	else if ((State & STATE_WEAK) && (State & STATE_JUMPING) &&!(State & (STATE_UP | STATE_FORWARD | STATE_BACK | STATE_DOWN)) && AnimFrame >= 7 && AnimFrame <= 15 && AnimFrame % 2 == 0) {
@@ -643,162 +631,7 @@ void RobotGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraff
 
 }
 
-void RobotGiraffe::Move(Stage& stage, const int frameNumber, std::array<Giraffe*, 4> giraffes)
-{
-	//Recieve incoming hits
-	if (!(State & STATE_INTANGIBLE)) {
-		if (incomingGrab) {
-			State &= ~(STATE_UP | STATE_BACK | STATE_DOWN | STATE_FORWARD | STATE_WEAK | STATE_HEAVY | STATE_SHIELDING | STATE_DROPSHIELD | STATE_SHIELDSTUN | STATE_JUMPSQUAT | STATE_JUMPLAND | STATE_HITSTUN | STATE_FASTFALL | STATE_DOUBLEJUMPWAIT | STATE_WAVEDASH | STATE_RUNNING | STATE_SHORTHOP | STATE_CROUCH | STATE_TECHATTEMPT | STATE_TECHLAG | STATE_TECHING | STATE_KNOCKDOWN | STATE_KNOCKDOWNLAG | STATE_ROLLING | STATE_GETUPATTACK | STATE_GRABBING | STATE_THROW);
-			State |= STATE_GRABBED;
-			SoundMoveState &= ~(SOUND_SHIELD | SOUND_RUN);
-			incomingGrab = false;
-		}
-		if (State & STATE_SHIELDING) {
-			for (int j = 0; j < numIncoming; ++j) {
-				State |= STATE_SHIELDSTUN;
-				AttackDelay = (int)max(AttackDelay, frameNumber + IncomingHits[j].Damage * 50);
-			}
-		}
-		else {
-			for (int j = 0; j < numIncoming; ++j) {
-				Knockback += IncomingHits[j].Damage;
-				float KnockbackApplied;
-				if (IncomingHits[j].Fixed) {
-					KnockbackApplied = IncomingHits[j].Knockback;
-				}
-				else {
-					KnockbackApplied = ((((Knockback / 10 + (Knockback * IncomingHits[j].Damage / 20)) * (200 / (Mass + 100)) * 1.4f + 0.18f) * IncomingHits[j].Scale) + IncomingHits[j].Knockback);
-				}
-				Velocity += KnockbackApplied * IncomingHits[j].Force;
-				if (State & STATE_LEDGEHOG) {
-					stage.Ledges[LedgeID].Hogged = false;
-					State &= ~STATE_LEDGEHOG;
-				}
-				State &= ~(STATE_UP | STATE_BACK | STATE_DOWN | STATE_FORWARD | STATE_WEAK | STATE_HEAVY | STATE_JUMPSQUAT | STATE_JUMPLAND | STATE_SHORTHOP | STATE_KNOCKDOWN | STATE_KNOCKDOWNLAG | STATE_GETUPATTACK | STATE_GRABBING | STATE_GRABBED | STATE_THROW);
-				State |= STATE_HITSTUN;
-				SoundMoveState |= SOUND_HITSTUN;
-				SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_HITSTUN] = 100000000;
-				AttackDelay = (int)max(AttackDelay, frameNumber + min(KnockbackApplied * 40, 100));
-			}
-		}
-	}
-	numIncoming = 0;
 
-	//Test projectile intersection with stage
-	for (int i = Projectiles.Size() - 1; i >= 0; --i) {
-		Projectiles[i].Position += Projectiles[i].Velocity;
-		if (stage.KillProjectile(Projectiles[i])) {
-			Projectiles[i].OnHit(Projectiles[i], *this, nullptr, frameNumber);
-			Projectiles.Remove(i);
-		};
-	}
-
-	Position += Velocity;
-	//Correct intersection with the stage
-	bool landed = false;
-	bool hogging = false;
-	bool bounced = false;
-	Vector2 offset;
-	if (!(State & STATE_LEDGEHOG)) {
-		if (stage.Intersects(Position, StageCollider, State & (STATE_CROUCH | STATE_FASTFALL), State & STATE_JUMPING, Velocity.y > -0.00001, State & STATE_HITSTUN, landed, bounced, Facing, offset, Velocity, hogging, LedgeID)) {
-			Position += offset;
-			if (hogging) {
-				State &= ~(STATE_UP | STATE_BACK | STATE_DOWN | STATE_FORWARD | STATE_WEAK | STATE_HEAVY | STATE_JUMPING | STATE_FASTFALL | STATE_GETUPATTACK | STATE_GRABBING | STATE_GRABBED | STATE_THROW);
-				State |= STATE_LEDGEHOG;
-				SoundMoveState |= SOUND_HITSTUN;
-				SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_HITSTUN] = 1000000000;
-			}
-			else if (bounced) {
-				if (State & STATE_TECHATTEMPT) {
-					Velocity = { 0,0 };
-					State &= ~(STATE_TECHATTEMPT | STATE_HITSTUN);
-					State |= STATE_TECHING | STATE_INTANGIBLE;
-					TechDelay = frameNumber + 5;
-					SoundMoveState |= SOUND_TECH;
-					SoundMoveState &= ~SOUND_HITSTUN;
-				}
-			}
-			else if (landed && (State & STATE_JUMPING)) {
-				SoundMoveState |= SOUND_JUMPLAND;
-				SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_JUMPLAND] = frameNumber + Moves->GetMoveSoundLength(XACT_WAVEBANK_MOVEBANK_JUMPLAND);
-				if (State & STATE_HITSTUN && !(State & STATE_TECHATTEMPT)) {
-					Velocity = { 0,0 };
-					State |= STATE_KNOCKDOWNLAG;
-					State &= ~STATE_HITSTUN;
-					AnimFrame = 0;
-					TechDelay = frameNumber + 30;
-					SoundMoveState |= SOUND_KNOCKDOWN;
-					SoundMoveState &= ~SOUND_HITSTUN;
-					SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_KNOCKDOWN] = frameNumber + Moves->GetMoveSoundLength(XACT_WAVEBANK_MOVEBANK_KNOCKDOWN);
-				}
-				else if (State & STATE_GRABBING) {
-					State &= ~STATE_GRABBING;
-					giraffes[CommandGrabPointer]->State &= ~STATE_GRABBED;
-				}
-				else {
-					if (State & (STATE_WEAK | STATE_HEAVY)) {
-						State |= STATE_HITSTUN;
-						AttackDelay = frameNumber + Moves->GetLandingLag(max(0, (AttackNum - 25)));
-						SoundMoveState |= SOUND_HITSTUN;
-						SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_HITSTUN] = AttackDelay;
-					}
-					else if ((State & STATE_TECHATTEMPT) && (State & STATE_HITSTUN)) {
-						State &= ~STATE_TECHATTEMPT;
-						State |= STATE_TECHING | STATE_INTANGIBLE;
-						TechDelay = frameNumber + 20;
-						SoundMoveState &= ~SOUND_HITSTUN;
-						SoundMoveState |= SOUND_TECH;
-						SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_TECH] = frameNumber + Moves->GetMoveSoundLength(XACT_WAVEBANK_MOVEBANK_TECH);
-					}
-
-					State |= STATE_JUMPLAND;
-					HasAirDash = true;
-					HasDoubleJump = false;
-					JumpDelay = frameNumber + MaxJumpDelay / 2;
-					AnimFrame = 0;
-				}
-				SoundAttackState &= ~(SOUND_DOWNB | SOUND_UPB);
-				State &= ~(STATE_UP | STATE_BACK | STATE_DOWN | STATE_FORWARD | STATE_WEAK | STATE_HEAVY | STATE_JUMPING | STATE_FASTFALL | STATE_TECHLAG | STATE_THROW | STATE_GRABBED | STATE_GRABBING);
-			}
-		}
-		else if (!(State & (STATE_JUMPING | STATE_GRABBED))) {
-			State &= ~(STATE_UP | STATE_BACK | STATE_DOWN | STATE_FORWARD | STATE_WEAK | STATE_HEAVY | STATE_SHIELDING | STATE_DROPSHIELD | STATE_SHIELDSTUN | STATE_JUMPSQUAT | STATE_SHORTHOP | STATE_JUMPLAND | STATE_WAVEDASH | STATE_CROUCH | STATE_GRABBING | STATE_THROW | STATE_KNOCKDOWN);
-			State |= STATE_JUMPING | STATE_DOUBLEJUMPWAIT;
-			JumpDelay = frameNumber + MaxJumpDelay * 2;
-		}
-	}
-
-
-	//Make giraffes loop around like pac-man
-	//Remove this later
-	if (Position.y > 60) {
-		Position.y = 0;
-		Knockback = 0;
-		SoundMoveState |= SOUND_DEATH;
-		SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_DEATH] = frameNumber + Moves->GetMoveSoundLength(XACT_WAVEBANK_MOVEBANK_DEATH);
-	}
-	else if (Position.y < 0) {
-		Position.y = 60;
-		Knockback = 0;
-		SoundMoveState |= SOUND_DEATH;
-		SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_DEATH] = frameNumber + Moves->GetMoveSoundLength(XACT_WAVEBANK_MOVEBANK_DEATH);
-	}
-	if (Position.x > 60) {
-		Position.x = 0;
-		Knockback = 0;
-		SoundMoveState |= SOUND_DEATH;
-		SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_DEATH] = frameNumber + Moves->GetMoveSoundLength(XACT_WAVEBANK_MOVEBANK_DEATH);
-	}
-	else if (Position.x < 0) {
-		Position.x = 60;
-		Knockback = 0;
-		SoundMoveState |= SOUND_DEATH;
-		SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_DEATH] = frameNumber + Moves->GetMoveSoundLength(XACT_WAVEBANK_MOVEBANK_DEATH);
-	}
-
-
-	//This is the last stateful part of the update loop
-}
 
 void RobotGiraffe::Draw(HDC hdc, Vector2 Scale)
 {
@@ -884,6 +717,9 @@ void RobotGiraffe::Draw(HDC hdc, Vector2 Scale)
 	if (State & STATE_WEAK) {
 		DrawSelf(hdc, Scale, AnimFrame, AttackNum);
 		if (State & STATE_JUMPING) {
+			if (State & (STATE_DOWN | STATE_BACK)) {
+				return;
+			}
 			if (State & STATE_FORWARD) {
 				if (AnimFrame <= 4 || AnimFrame >= 24) {
 					DrawSword(hdc, Scale, ((*Moves->GetSkelPoints(AttackNum, AnimFrame))[25] + (*Moves->GetSkelPoints(AttackNum, AnimFrame))[30]) * 0.5f, ((*Moves->GetSkelPoints(AttackNum, AnimFrame))[27] + (*Moves->GetSkelPoints(AttackNum, AnimFrame))[28]) * 0.5f);
@@ -896,9 +732,6 @@ void RobotGiraffe::Draw(HDC hdc, Vector2 Scale)
 			}
 			else if (State & STATE_UP) {
 				DrawDrill(hdc, Scale, ((*Moves->GetSkelPoints(AttackNum, AnimFrame))[25] + (*Moves->GetSkelPoints(AttackNum, AnimFrame))[30]) * 0.5f, ((*Moves->GetSkelPoints(AttackNum, AnimFrame))[27] + (*Moves->GetSkelPoints(AttackNum, AnimFrame))[28]) * 0.5f);
-			}
-			else if (State & STATE_DOWN) {
-				return;
 			}
 			else {
 				if (AnimFrame >= 7 && AnimFrame <= 25) {

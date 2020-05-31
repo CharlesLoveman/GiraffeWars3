@@ -20,7 +20,6 @@ public:
 private:
 	HBRUSH SpitBrush;
 	HBRUSH ShineBrush;
-	int CommandGrabPointer;
 	void DrawSelf(HDC hdc, Vector2 Scale, int CurrentFrame, int CurrentAnim);
 	void DrawHitbox(HDC hdc, Vector2 Scale, Vector2 Pos, float Rad);
 };

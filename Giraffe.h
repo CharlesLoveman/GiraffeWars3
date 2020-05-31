@@ -96,12 +96,7 @@ enum GiraffeSoundAttackStates {
 	SOUND_MEDIUM = (1 << 23),
 	SOUND_HEAVY = (1 << 24),
 };
-
-
-struct HitWID {
-	HitCollider hit;
-	int ID;
-};
+//Stupid comment
 
 class Giraffe {
 public:
@@ -166,7 +161,7 @@ protected:
 	//Collision
 	Collider Fullbody;
 	Collider StageCollider;
-	HitWID IncomingHits[8];
+	HitCollider IncomingHits[8];
 	ArrayQueue<int> PrevHitQueue;
 	int LastAttackID;
 	int numIncoming;

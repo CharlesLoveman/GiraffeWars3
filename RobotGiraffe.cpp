@@ -1051,20 +1051,39 @@ void RobotGiraffe::DrawDrill(HDC hdc, Vector2 Scale, Vector2 Neck, Vector2 Head)
 	points[1] = VecToPoint(Position + Facing * (Head + 0.7f * dir + 0.8f * perp), Scale);
 	Polyline(hdc, points, 2);
 
+	//Handle
 	points[0] = VecToPoint(Position + Facing * (Head + 0.7f * dir - 0.8f * perp), Scale);
+	//Up to base
 	points[1] = VecToPoint(Position + Facing * (Head + 1.1f * dir - 0.8f * perp), Scale);
+	//Across
 	points[2] = VecToPoint(Position + Facing * (Head + 1.1f * dir + 0.8f * perp), Scale);
+	//To top
 	points[3] = VecToPoint(Position + Facing * (Head + 2.6f * dir), Scale);
+	//To base
 	points[4] = VecToPoint(Position + Facing * (Head + 1.1f * dir - 0.8f * perp), Scale);
+
+	//Up1
 	points[5] = VecToPoint(Position + Facing * (Head + 1.1f * dir + 0.6f * perp), Scale);
+	//Across1
 	points[6] = VecToPoint(Position + Facing * (Head + 1.475f * dir - 0.6f * perp), Scale);
+
+	//Up2
 	points[7] = VecToPoint(Position + Facing * (Head + 1.85f * dir - 0.4f * perp), Scale);
+	//Across2
 	points[8] = VecToPoint(Position + Facing * (Head + 1.475f * dir + 0.6f * perp), Scale);
+
+	//Up3
 	points[9] = VecToPoint(Position + Facing * (Head + 1.85f * dir + 0.4f * perp), Scale);
+	//Across3
 	points[10] = VecToPoint(Position + Facing * (Head + 2.225f * dir - 0.2f * perp), Scale);
+
+	//Down to base
 	points[11] = VecToPoint(Position + Facing * (Head + 1.1f * dir - 0.8f * perp), Scale);
+	//Across to other side
 	points[12] = VecToPoint(Position + Facing * (Head + 1.1f * dir + 0.8f * perp), Scale);
+	//Down to handle
 	points[13] = VecToPoint(Position + Facing * (Head + 0.8f * dir + 0.8f * perp), Scale);
+	//Close handle
 	points[14] = VecToPoint(Position + Facing * (Head + 0.8f * dir - 0.6f * perp), Scale);
 
 	Polyline(hdc, points, 15);

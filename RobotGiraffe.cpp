@@ -651,36 +651,30 @@ void RobotGiraffe::Move(Stage& stage, const int frameNumber, std::array<Giraffe*
 		}
 		if (State & STATE_SHIELDING) {
 			for (int j = 0; j < numIncoming; ++j) {
-				if (!PrevHitQueue.Contains(IncomingHits[j].ID)) {
-					State |= STATE_SHIELDSTUN;
-					AttackDelay = (int)max(AttackDelay, frameNumber + IncomingHits[j].hit.Damage * 50);
-					PrevHitQueue.Push(IncomingHits[j].ID);
-				}
+				State |= STATE_SHIELDSTUN;
+				AttackDelay = (int)max(AttackDelay, frameNumber + IncomingHits[j].Damage * 50);
 			}
 		}
 		else {
 			for (int j = 0; j < numIncoming; ++j) {
-				if (!PrevHitQueue.Contains(IncomingHits[j].ID)) {
-					Knockback += IncomingHits[j].hit.Damage;
-					float KnockbackApplied;
-					if (IncomingHits[j].hit.Fixed) {
-						KnockbackApplied = IncomingHits[j].hit.Knockback;
-					}
-					else {
-						KnockbackApplied = ((((Knockback / 10 + (Knockback * IncomingHits[j].hit.Damage / 20)) * (200 / (Mass + 100)) * 1.4f + 0.18f) * IncomingHits[j].hit.Scale) + IncomingHits[j].hit.Knockback);
-					}
-					Velocity += KnockbackApplied * IncomingHits[j].hit.Force;
-					if (State & STATE_LEDGEHOG) {
-						stage.Ledges[LedgeID].Hogged = false;
-						State &= ~STATE_LEDGEHOG;
-					}
-					State &= ~(STATE_UP | STATE_BACK | STATE_DOWN | STATE_FORWARD | STATE_WEAK | STATE_HEAVY | STATE_JUMPSQUAT | STATE_JUMPLAND | STATE_SHORTHOP | STATE_KNOCKDOWN | STATE_KNOCKDOWNLAG | STATE_GETUPATTACK | STATE_GRABBING | STATE_GRABBED | STATE_THROW);
-					State |= STATE_HITSTUN;
-					SoundMoveState |= SOUND_HITSTUN;
-					SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_HITSTUN] = 100000000;
-					AttackDelay = (int)max(AttackDelay, frameNumber + min(KnockbackApplied * 40, 100));
-					PrevHitQueue.Push(IncomingHits[j].ID);
+				Knockback += IncomingHits[j].Damage;
+				float KnockbackApplied;
+				if (IncomingHits[j].Fixed) {
+					KnockbackApplied = IncomingHits[j].Knockback;
 				}
+				else {
+					KnockbackApplied = ((((Knockback / 10 + (Knockback * IncomingHits[j].Damage / 20)) * (200 / (Mass + 100)) * 1.4f + 0.18f) * IncomingHits[j].Scale) + IncomingHits[j].Knockback);
+				}
+				Velocity += KnockbackApplied * IncomingHits[j].Force;
+				if (State & STATE_LEDGEHOG) {
+					stage.Ledges[LedgeID].Hogged = false;
+					State &= ~STATE_LEDGEHOG;
+				}
+				State &= ~(STATE_UP | STATE_BACK | STATE_DOWN | STATE_FORWARD | STATE_WEAK | STATE_HEAVY | STATE_JUMPSQUAT | STATE_JUMPLAND | STATE_SHORTHOP | STATE_KNOCKDOWN | STATE_KNOCKDOWNLAG | STATE_GETUPATTACK | STATE_GRABBING | STATE_GRABBED | STATE_THROW);
+				State |= STATE_HITSTUN;
+				SoundMoveState |= SOUND_HITSTUN;
+				SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_HITSTUN] = 100000000;
+				AttackDelay = (int)max(AttackDelay, frameNumber + min(KnockbackApplied * 40, 100));
 			}
 		}
 	}

@@ -97,12 +97,6 @@ enum GiraffeSoundAttackStates {
 	SOUND_HEAVY = (1 << 24),
 };
 
-
-struct HitWID {
-	HitCollider hit;
-	int ID;
-};
-
 class Giraffe {
 public:
 	virtual ~Giraffe() { };
@@ -166,7 +160,7 @@ protected:
 	//Collision
 	Collider Fullbody;
 	Collider StageCollider;
-	HitWID IncomingHits[8];
+	HitCollider IncomingHits[8];
 	ArrayQueue<int> PrevHitQueue;
 	int LastAttackID;
 	int numIncoming;

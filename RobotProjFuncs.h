@@ -6,6 +6,14 @@
 
 struct RobotProjFuncs {
 
+	static void StandardOnHit(Projectile& self, Giraffe& parent, Giraffe* collided, int frameNumber) {
+		//Do nothing?
+	}
+
+	static bool StandardUpdate(Projectile& self, Giraffe& parent, int frameNumber) {
+		return frameNumber >= self.LifeSpan;
+	}
+
 	static void GrabberOnHit(Projectile& self, Giraffe& parent, Giraffe* collided, int frameNumber) {
 		if (collided != nullptr) {
 			if (collided->GrabHit(self, parent.Facing, frameNumber)) {
@@ -15,10 +23,6 @@ struct RobotProjFuncs {
 				collided->Velocity = (parent.Position - collided->Position) * 0.1f;
 			}
 		}
-	}
-
-	static bool GrabberUpdate(Projectile& self, Giraffe& parent, int frameNumber) {
-		return frameNumber >= self.LifeSpan;
 	}
 
 	static void GrabberDraw(Projectile& self, Giraffe& parent, HDC hdc, Vector2 Scale) {
@@ -42,7 +46,7 @@ struct RobotProjFuncs {
 
 	static void MissileOnHit(Projectile& self, Giraffe& parent, Giraffe* collided, int frameNumber) {
 		//Add explosion projectile to parent
-		parent.Projectiles.Append(Projectile(self.Position, Vector2::Zero, 0, Vector2::Zero, 0, 0, 0, 0, self.ID, frameNumber + 20, M_ExplosionOnHit, M_ExplosionUpdate, M_ExplosionDraw, self.Pen, self.Brush));
+		parent.Projectiles.Append(Projectile(self.Position, Vector2::Zero, 0, Vector2::Zero, 0, 0, 0, 0, self.ID, frameNumber + 20, StandardOnHit, StandardUpdate, M_ExplosionDraw, self.Pen, self.Brush));
 	}
 
 	static bool MissileUpdate(Projectile& self, Giraffe& parent, int frameNumber) {
@@ -52,7 +56,7 @@ struct RobotProjFuncs {
 		newVel.y = self.Velocity.Dot({ sinf(theta), cosf(theta) });
 		self.Velocity = newVel;
 		if (frameNumber >= self.LifeSpan) {
-			parent.Projectiles.Append(Projectile(self.Position, Vector2::Zero, 0, Vector2::Zero, 0, 0, 0, 0, self.ID, frameNumber + 20, M_ExplosionOnHit, M_ExplosionUpdate, M_ExplosionDraw, self.Pen, self.Brush));
+			parent.Projectiles.Append(Projectile(self.Position, Vector2::Zero, 0, Vector2::Zero, 0, 0, 0, 0, self.ID, frameNumber + 20, StandardOnHit, StandardUpdate, M_ExplosionDraw, self.Pen, self.Brush));
 			return true;
 		}
 		else {
@@ -86,14 +90,6 @@ struct RobotProjFuncs {
 		points[2] = Giraffe::VecToPoint(self.Position + dir * 0.75f + perp * -0.3f, Scale);
 
 		PolyBezier(hdc, points, 4);
-	}
-
-	static void M_ExplosionOnHit(Projectile& self, Giraffe& parent, Giraffe* collided, int frameNumber) {
-		//Do nothing?
-	}
-
-	static bool M_ExplosionUpdate(Projectile& self, Giraffe& parent, int frameNumber) {
-		return frameNumber >= self.LifeSpan;
 	}
 
 	static void M_ExplosionDraw(Projectile& self, Giraffe& parent, HDC hdc, Vector2 Scale) {
@@ -155,6 +151,30 @@ struct RobotProjFuncs {
 		points[5] = Giraffe::VecToPoint(self.Position + 1.2f * dir - 0.2f * perp, Scale);
 		points[6] = Giraffe::VecToPoint(self.Position + dir, Scale);
 		Polyline(hdc, points, 7);
+	}
+
+	static void SmallLaserDraw(Projectile& self, Giraffe& parent, HDC hdc, Vector2 Scale) {
+		SelectObject(hdc, self.Pen);
+		POINT points[2];
+		points[0] = Giraffe::VecToPoint(self.Position - self.Velocity * 0.5f, Scale);
+		points[1] = Giraffe::VecToPoint(self.Position + self.Velocity * 0.5f, Scale);
+		Polyline(hdc, points, 2);
+	}
+
+	static void BigLaserDraw(Projectile& self, Giraffe& parent, HDC hdc, Vector2 Scale) {
+		SelectObject(hdc, self.Pen);
+
+		Vector2 dir = self.Velocity;
+		dir.Normalize();
+		Vector2 perp = { -dir.y, dir.x };
+
+		POINT points[2];
+		points[0] = Giraffe::VecToPoint(self.Position - dir * 3.0f + perp * 0.5f, Scale);
+		points[1] = Giraffe::VecToPoint(self.Position + dir * 3.0f + perp * 0.5f, Scale);
+		Polyline(hdc, points, 2);
+		points[0] = Giraffe::VecToPoint(self.Position - dir * 3.0f - perp * 0.5f, Scale);
+		points[1] = Giraffe::VecToPoint(self.Position + dir * 3.0f - perp * 0.5f, Scale);
+		Polyline(hdc, points, 2);
 	}
 };
 

@@ -47,7 +47,6 @@ NormGiraffe::NormGiraffe(Vector2 _Position, MoveSet* _Moves, COLORREF _Colour)
 	Stocks = 3;
 	Knockback = 0;
 	Mass = 100;
-	hInst = GetModuleHandle(NULL);
 	CommandGrabPointer = 0;
 
 	//Animation

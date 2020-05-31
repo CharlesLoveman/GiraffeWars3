@@ -145,7 +145,6 @@ protected:
 	float Mass;
 	int LedgeID;
 	ArrayList<Projectile> Projectiles;
-	HINSTANCE hInst;
 
 
 	//State Management

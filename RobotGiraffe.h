@@ -17,6 +17,8 @@ public:
 private:
 	HBRUSH SpitBrush;
 	HBRUSH ShineBrush;
+	int Charge;
+	bool BigLaser;
 	void DrawSelf(HDC hdc, Vector2 Scale, int CurrentFrame, int CurrentAnim);
 	void DrawHitbox(HDC hdc, Vector2 Scale, Vector2 Pos, float Rad);
 	void DrawAxe(HDC hdc, Vector2 Scale, Vector2 Neck, Vector2 Head);

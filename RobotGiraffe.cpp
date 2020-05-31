@@ -505,13 +505,17 @@ void RobotGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraff
 	//		++LastAttackID;
 	//	}
 	//}
+	//Throw lance
+	if ((State & STATE_WEAK) && (State & STATE_JUMPING) && (State & STATE_BACK) && AnimFrame == 10) {
+		Projectiles.Append(Projectile(Position + Vector2(2.0f, -2.2f), { Facing.x * -0.8f, 0.0f }, 0.3f, { -Facing.x, 0.0f }, 1.6f, 0.3f, 0.3f, false, LastAttackID++, frameNumber + 50, RobotProjFuncs::M_ExplosionOnHit, RobotProjFuncs::GrabberUpdate, RobotProjFuncs::LanceDraw, GiraffePen, CreateSolidBrush(0)));
+	}
 	//Fire Missile
-	if ((State & STATE_WEAK) && (State & STATE_JUMPING) &&!(State & (STATE_UP | STATE_FORWARD | STATE_BACK | STATE_DOWN)) && AnimFrame >= 7 && AnimFrame <= 15 && AnimFrame % 2 == 0) {
+	else if ((State & STATE_WEAK) && (State & STATE_JUMPING) &&!(State & (STATE_UP | STATE_FORWARD | STATE_BACK | STATE_DOWN)) && AnimFrame >= 7 && AnimFrame <= 15 && AnimFrame % 2 == 0) {
 		if (AnimFrame % 4 == 0) {
-			Projectiles.Append(Projectile(Position + Vector2(2.0f, -2.2f), { Facing.x * 0.5f, 0.0f }, 0.3f, { Facing.x, 0.0f }, 0.5f, 0.4f, 0.3f, false, LastAttackID++, frameNumber + 50, RobotProjFuncs::MissileOnHit, RobotProjFuncs::MissileUpdate, RobotProjFuncs::MissileDraw, GiraffePen, SpitBrush));
+			Projectiles.Append(Projectile(Position + Vector2(2.0f, -2.2f), { Facing.x * 0.5f, 0.0f }, 0.3f, { Facing.x, 0.0f }, 0.3f, 0.2f, 0.3f, false, LastAttackID++, frameNumber + 50, RobotProjFuncs::MissileOnHit, RobotProjFuncs::MissileUpdate, RobotProjFuncs::MissileDraw, GiraffePen, SpitBrush));
 		}
 		else {
-			Projectiles.Append(Projectile(Position + Vector2(-2.0f, -2.2f), { Facing.x * 0.5f, 0.0f }, 0.3f, { Facing.x, 0.0f }, 0.5f, 0.4f, 0.3f, false, LastAttackID++, frameNumber + 50, RobotProjFuncs::MissileOnHit, RobotProjFuncs::MissileUpdate, RobotProjFuncs::MissileDraw, GiraffePen, SpitBrush));
+			Projectiles.Append(Projectile(Position + Vector2(-2.0f, -2.2f), { Facing.x * 0.5f, 0.0f }, 0.3f, { Facing.x, 0.0f }, 0.3f, 0.2f, 0.3f, false, LastAttackID++, frameNumber + 50, RobotProjFuncs::MissileOnHit, RobotProjFuncs::MissileUpdate, RobotProjFuncs::MissileDraw, GiraffePen, SpitBrush));
 		}
 	}
 	////Reverse direction in bair

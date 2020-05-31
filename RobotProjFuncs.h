@@ -121,6 +121,41 @@ struct RobotProjFuncs {
 
 		Polyline(hdc, points, 17);
 	}
+
+	static void LanceDraw(Projectile& self, Giraffe& parent, HDC hdc, Vector2 Scale) {
+		SelectObject(hdc, self.Pen);
+		SelectObject(hdc, self.Brush);
+		Vector2 dir = self.Velocity;
+		dir.Normalize();
+		Vector2 perp = { -dir.y, dir.x };
+
+		POINT points[7];
+		points[0] = Giraffe::VecToPoint(self.Position, Scale);
+		points[1] = Giraffe::VecToPoint(self.Position - 3 * dir, Scale);
+		Polyline(hdc, points, 2);
+
+		Ellipse(hdc, Scale.x * (self.Position.x + dir.x * 0.2f - 0.2f), Scale.y * (self.Position.y + dir.y * 0.2f - 0.2f), Scale.x * (self.Position.x + dir.x * 0.2f + 0.2f), Scale.y * (self.Position.y + dir.y * 0.2f + 0.2f));
+		Ellipse(hdc, Scale.x * (self.Position.x + dir.x * 0.6f - 0.2f), Scale.y * (self.Position.y + dir.y * 0.6f - 0.2f), Scale.x * (self.Position.x + dir.x * 0.6f + 0.2f), Scale.y * (self.Position.y + dir.y * 0.6f + 0.2f));
+		Ellipse(hdc, Scale.x * (self.Position.x + dir.x - 0.2f), Scale.y * (self.Position.y + dir.y - 0.2f), Scale.x * (self.Position.x + dir.x + 0.2f), Scale.y * (self.Position.y + dir.y + 0.2f));
+
+		points[0] = Giraffe::VecToPoint(self.Position + dir, Scale);
+		points[1] = Giraffe::VecToPoint(self.Position + 1.2f * dir + 0.1f * perp, Scale);
+		points[2] = Giraffe::VecToPoint(self.Position + 1.4f * dir + 0.3f * perp, Scale);
+		points[3] = Giraffe::VecToPoint(self.Position + 2.1f * dir + 0.3f * perp, Scale);
+		points[4] = Giraffe::VecToPoint(self.Position + 1.9f * dir + 0.2f * perp, Scale);
+		points[5] = Giraffe::VecToPoint(self.Position + 1.2f * dir + 0.2f * perp, Scale);
+		points[6] = Giraffe::VecToPoint(self.Position + dir, Scale);
+		Polyline(hdc, points, 7);
+
+		points[0] = Giraffe::VecToPoint(self.Position + dir, Scale);
+		points[1] = Giraffe::VecToPoint(self.Position + 1.2f * dir - 0.1f * perp, Scale);
+		points[2] = Giraffe::VecToPoint(self.Position + 1.4f * dir - 0.3f * perp, Scale);
+		points[3] = Giraffe::VecToPoint(self.Position + 2.1f * dir - 0.3f * perp, Scale);
+		points[4] = Giraffe::VecToPoint(self.Position + 1.9f * dir - 0.2f * perp, Scale);
+		points[5] = Giraffe::VecToPoint(self.Position + 1.2f * dir - 0.2f * perp, Scale);
+		points[6] = Giraffe::VecToPoint(self.Position + dir, Scale);
+		Polyline(hdc, points, 7);
+	}
 };
 
 #endif // !_ROBOTPROJFUNCS_H_

@@ -185,7 +185,6 @@ struct RobotProjFuncs {
 
 	static void BombOnHit(Projectile& self, Giraffe& parent, Giraffe* collided, int frameNumber) {
 		parent.Projectiles.Append(Projectile(self.Position, Vector2::Zero, 0, Vector2::Zero, 0, 0, 0, 0, self.ID, frameNumber + 20, StandardOnHit, StandardUpdate, B_ExplosionDraw, self.Pen, self.Brush));
-		//Need to add a bomb explosion projectile
 	}
 
 	static bool BombUpdate(Projectile& self, Giraffe& parent, int frameNumber) {
@@ -273,6 +272,48 @@ struct RobotProjFuncs {
 			}
 		}
 		points[numPoints * division] = Giraffe::VecToPoint(controlPoints[numPoints], Scale);
+	}
+
+	static void SwordOnHit(Projectile& self, Giraffe& parent, Giraffe* collided, int frameNumber) {
+		if (!(collided == nullptr) && !(self.Fixed)) {
+			parent.Projectiles.Append(Projectile(self.Position, -self.Velocity, 1.5f, -self.Force, 0.5f, 0.5f, 0.5f, true, self.ID, frameNumber + 50, SwordOnHit, SwordUpdate, SwordDraw, self.Pen, self.Brush));
+		}
+	}
+
+	static bool SwordUpdate(Projectile& self, Giraffe& parent, int frameNumber) {
+		if (frameNumber >= self.LifeSpan && !(self.Fixed)) {
+			parent.Projectiles.Append(Projectile(self.Position, -self.Velocity, 1.5f, -self.Force, 0.5f, 0.5f, 0.5f, true, self.ID, frameNumber + 50, SwordOnHit, SwordUpdate, SwordDraw, self.Pen, self.Brush));
+			return true;
+		}
+		return false;
+	}
+
+	static void SwordDraw(Projectile& self, Giraffe& parent, HDC hdc, Vector2 Scale, int frameNumber) {
+		SelectObject(hdc, self.Pen);
+		float theta = frameNumber / 15.0f * 3.14159f;
+		Vector2 dir = { sinf(theta), -cosf(theta) };
+		Vector2 perp = { -dir.y, dir.x };
+		dir.Normalize();
+
+		POINT points[61];
+		points[0] = Giraffe::VecToPoint(self.Position, Scale);
+		points[1] = Giraffe::VecToPoint(self.Position - 1.5f * dir, Scale);
+		points[2] = Giraffe::VecToPoint(self.Position - 1.2f * dir, Scale);
+		points[3] = Giraffe::VecToPoint(self.Position - 1.2f * dir + perp * 0.2f, Scale);
+		points[4] = Giraffe::VecToPoint(self.Position - 1.2f * dir - perp * 0.2f, Scale);
+		Polyline(hdc, points, 5);
+
+		Vector2 controlPoints[7];
+		controlPoints[0] = self.Position - 1.2f * dir + perp * 0.2f;
+		controlPoints[1] = self.Position - 0.7f * dir + perp * 0.3f;
+		controlPoints[2] = self.Position + 0.5f * dir + perp * 0.2f;
+		controlPoints[3] = self.Position + dir;
+		controlPoints[4] = self.Position + 0.5f * dir + perp * -0.2f;
+		controlPoints[5] = self.Position - 0.7f * dir + perp * -0.3f;
+		controlPoints[6] = self.Position - 1.2f * dir + perp * -0.2f;
+
+		Crackle(points, controlPoints, 6, 10, 0.2f, Scale);
+		Polyline(hdc, points, 61);
 	}
 };
 

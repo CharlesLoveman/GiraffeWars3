@@ -517,29 +517,37 @@ void RobotGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraff
 			Projectiles.Append(Projectile(Position + Vector2(-2.0f, -2.2f), { Facing.x * 0.5f, 0.0f }, 0.3f, { Facing.x, 0.0f }, 0.3f, 0.2f, 0.3f, false, LastAttackID++, frameNumber + 50, RobotProjFuncs::MissileOnHit, RobotProjFuncs::MissileUpdate, RobotProjFuncs::MissileDraw, GiraffePen, nullptr));
 		}
 	}
-	//UpB
-	if ((State & STATE_HEAVY) && (State & STATE_JUMPING) && (State & STATE_UP) && AnimFrame >= 13 && AnimFrame <= 23) {
-		if (AnimFrame == 14) {
-			Velocity.y = 0;
+
+	if (State & STATE_HEAVY) {
+		//UpB
+		if ((State & STATE_JUMPING) && (State & STATE_UP) && AnimFrame >= 13 && AnimFrame <= 23) {
+			if (AnimFrame == 14) {
+				Velocity.y = 0;
+			}
+			Velocity += Vector2(0.02f * Facing.x, -0.2f);
 		}
-		Velocity += Vector2(0.02f * Facing.x, -0.2f);
-	}
-	//Drop Bomb
-	else if ((State & STATE_HEAVY) && (State & STATE_JUMPING) && (State & STATE_DOWN) && AnimFrame == 20) {
-		Projectiles.Append(Projectile(Position, { 0, 0 }, 0.5f, { Facing.x, -1.0f }, 1.5f, 0.7f, 0.3f, false, LastAttackID++, frameNumber + 50, RobotProjFuncs::BombOnHit, RobotProjFuncs::BombUpdate, RobotProjFuncs::BombDraw, GiraffePen, nullptr));
-	}
-	//Laser
-	else if ((State & STATE_HEAVY) && !(State & (STATE_WEAK | STATE_UP | STATE_FORWARD | STATE_BACK | STATE_DOWN))) {
-		if (!BigLaser && AnimFrame == 7) {
-			Projectiles.Append(Projectile(Position + Vector2(0.5, -0.5f), { Facing.x, 0.0f }, 0.3f, { Facing.x, 0.0f }, 0.1f, 0.1f, 0.0f, true, LastAttackID, frameNumber + 50, RobotProjFuncs::StandardOnHit, RobotProjFuncs::StandardUpdate, RobotProjFuncs::SmallLaserDraw, GiraffePen, nullptr));
+		//Drop Bomb
+		else if ((State & STATE_JUMPING) && (State & STATE_DOWN) && AnimFrame == 20) {
+			Projectiles.Append(Projectile(Position, { 0, 0 }, 0.5f, { Facing.x, -1.0f }, 1.5f, 0.7f, 0.3f, false, LastAttackID++, frameNumber + 50, RobotProjFuncs::BombOnHit, RobotProjFuncs::BombUpdate, RobotProjFuncs::BombDraw, GiraffePen, nullptr));
 		}
-		else if (BigLaser && AnimFrame >= 7) {
-			Projectiles.Append(Projectile(Position + Vector2(0.5f, -1.0f), { 5 * Facing.x, -3.0f }, 1.0f, { Facing.x, -1.0f }, 2.0f, 1.0f, 1.0f, false, LastAttackID++, frameNumber + 50, RobotProjFuncs::StandardOnHit, RobotProjFuncs::StandardUpdate, RobotProjFuncs::BigLaserDraw, GiraffePen, nullptr));
-			if (State & STATE_JUMPING) {
-				Velocity = { 0, -Gravity - 0.00001f };
+		//Throw sword
+		else if ((State & STATE_JUMPING) && (State & STATE_FORWARD) && AnimFrame == 10) {
+			Projectiles.Append(Projectile(Position, { 0.5f * Facing.x, 0 }, 1.5f, {Facing.x, 0.5f}, 0.5f, 0.5f, 0.5f, false, LastAttackID, frameNumber + 50, RobotProjFuncs::SwordOnHit, RobotProjFuncs::SwordUpdate, RobotProjFuncs::SwordDraw, GiraffePen, nullptr));
+		}
+		//Laser
+		else if (!(State & (STATE_WEAK | STATE_UP | STATE_FORWARD | STATE_BACK | STATE_DOWN))) {
+			if (!BigLaser && AnimFrame == 7) {
+				Projectiles.Append(Projectile(Position + Vector2(0.5, -0.5f), { Facing.x, 0.0f }, 0.3f, { Facing.x, 0.0f }, 0.1f, 0.1f, 0.0f, true, LastAttackID, frameNumber + 50, RobotProjFuncs::StandardOnHit, RobotProjFuncs::StandardUpdate, RobotProjFuncs::SmallLaserDraw, GiraffePen, nullptr));
+			}
+			else if (BigLaser && AnimFrame >= 7) {
+				Projectiles.Append(Projectile(Position + Vector2(0.5f, -1.0f), { 5 * Facing.x, -3.0f }, 1.0f, { Facing.x, -1.0f }, 2.0f, 1.0f, 1.0f, false, LastAttackID++, frameNumber + 50, RobotProjFuncs::StandardOnHit, RobotProjFuncs::StandardUpdate, RobotProjFuncs::BigLaserDraw, GiraffePen, nullptr));
+				if (State & STATE_JUMPING) {
+					Velocity = { 0, -Gravity - 0.00001f };
+				}
 			}
 		}
 	}
+	
 
 	////Reverse direction in bair
 	//else if ((State & STATE_JUMPING) && (State & STATE_WEAK) && (State & STATE_BACK) && AnimFrame == 7) {

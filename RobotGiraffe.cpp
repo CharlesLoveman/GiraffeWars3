@@ -6,9 +6,9 @@ RobotGiraffe::RobotGiraffe(Vector2 _Position, MoveSet* _Moves, COLORREF _Colour)
 	//Movement
 	Position = _Position;
 	Velocity = Vector2(0, 0);
-	MaxGroundSpeed = 0.3f;
+	MaxGroundSpeed = 0.25f;
 	MaxAirSpeed = Vector2(0.2f, 0.7f);
-	RunAccel = 0.1f;
+	RunAccel = 0.03f;
 	AirAccel = 0.03f;
 	Gravity = 0.025f;
 	Facing = { 1.0f, 1.0f };

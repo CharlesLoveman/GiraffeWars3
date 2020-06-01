@@ -256,13 +256,27 @@ struct RobotProjFuncs {
 		controlPoints[7] = self.Position + Vector2(0.2f, -3.0f);
 		controlPoints[8] = self.Position + Vector2(0, 0);
 
-		POINT points[80];
+		/*POINT points[80];
 		for (int i = 0; i < 8; ++i) {
 			for (int t = 0; t < 10; ++t) {
 				points[i * 10 + t] = Giraffe::VecToPoint((t / 10.0f) * controlPoints[i + 1] + (1.0f - t / 10.0f) * controlPoints[i] + 0.3f * Vector2(((float)rand() / RAND_MAX) + 0.5f, ((float)rand() / RAND_MAX) + 0.5f), Scale);
 			}
-		}
+		}*/
+		POINT* points = Crackle(controlPoints, 8, 10, 0.3f, Scale);
 		Polyline(hdc, points, 80);
+		delete[] points;
+	}
+
+	static POINT* Crackle(Vector2* controlPoints, const int numPoints, const int division, float factor, Vector2 Scale) {
+		POINT* points = new POINT[numPoints * division];
+
+		for (int i = 0; i < numPoints; ++i) {
+			for (int t = 0; t < division; ++t) {
+				points[i * 10 + t] = Giraffe::VecToPoint((t / (float)division) * controlPoints[i + 1] + (1.0f - t / (float)division) * controlPoints[i] + factor * Vector2(((float)rand() / RAND_MAX) + 0.5f, ((float)rand() / RAND_MAX) + 0.5f), Scale);
+			}
+		}
+
+		return points;
 	}
 };
 

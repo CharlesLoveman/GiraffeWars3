@@ -914,21 +914,23 @@ void RobotGiraffe::DrawBlast(HDC hdc, Vector2 Scale, Vector2 Neck, Vector2 Head)
 	Vector2 perp = { -dir.y, dir.x };
 	Vector2 Pos = Head + dir;
 
-	POINT points[11];
+	Vector2 controlPoints[11];
 
-	points[0] = Giraffe::VecToPoint(Position + Facing * (Head + perp * 0.2f), Scale);
-	points[1] = Giraffe::VecToPoint(Position + Facing * (Head + dir * 1.0f + perp * 1.5f), Scale);
-	points[2] = Giraffe::VecToPoint(Position + Facing * (Head + dir * 0.5f + perp * 0.35f), Scale);
-	points[3] = Giraffe::VecToPoint(Position + Facing * (Head + dir * 1.5f + perp * 0.75f), Scale);
-	points[4] = Giraffe::VecToPoint(Position + Facing * (Head + dir * 0.65f + perp * 0.25f), Scale);
-	points[5] = Giraffe::VecToPoint(Position + Facing * (Head + dir * 2.0f), Scale);
-	points[6] = Giraffe::VecToPoint(Position + Facing * (Head + dir * 0.65f + perp * -0.25f), Scale);
-	points[7] = Giraffe::VecToPoint(Position + Facing * (Head + dir * 1.5f + perp * -0.75f), Scale);
-	points[8] = Giraffe::VecToPoint(Position + Facing * (Head + dir * 0.5f + perp * -0.35f), Scale);
-	points[9] = Giraffe::VecToPoint(Position + Facing * (Head + dir * 1.0f + perp * -1.5f), Scale);
-	points[10] = Giraffe::VecToPoint(Position + Facing * (Head + perp * -0.2f), Scale);
+	controlPoints[0] = Position + Facing * (Head + perp * 0.2f);
+	controlPoints[1] = Position + Facing * (Head + dir * 1.0f + perp * 1.5f);
+	controlPoints[2] = Position + Facing * (Head + dir * 0.5f + perp * 0.35f);
+	controlPoints[3] = Position + Facing * (Head + dir * 1.5f + perp * 0.75f);
+	controlPoints[4] = Position + Facing * (Head + dir * 0.65f + perp * 0.25f);
+	controlPoints[5] = Position + Facing * (Head + dir * 2.0f);
+	controlPoints[6] = Position + Facing * (Head + dir * 0.65f + perp * -0.25f);
+	controlPoints[7] = Position + Facing * (Head + dir * 1.5f + perp * -0.75f);
+	controlPoints[8] = Position + Facing * (Head + dir * 0.5f + perp * -0.35f);
+	controlPoints[9] = Position + Facing * (Head + dir * 1.0f + perp * -1.5f);
+	controlPoints[10] = Position + Facing * (Head + perp * -0.2f);
 
-	Polyline(hdc, points, 11);
+	POINT* points = RobotProjFuncs::Crackle(controlPoints, 10, 10, 0.1f, Scale);
+	Polyline(hdc, points, 100);
+	delete[] points;
 }
 
 void RobotGiraffe::DrawBeamSword(HDC hdc, Vector2 Scale, Vector2 Neck, Vector2 Head)

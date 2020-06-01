@@ -631,10 +631,10 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 
 }
 
-void NormGiraffe::Draw(HDC hdc, Vector2 Scale)
+void NormGiraffe::Draw(HDC hdc, Vector2 Scale, int frameNumber)
 {
 	for (int i = 0; i < Projectiles.Size(); ++i) {
-		Projectiles[i].Draw(Projectiles[i], *this, hdc, Scale);
+		Projectiles[i].Draw(Projectiles[i], *this, hdc, Scale, frameNumber);
 	}
 
 	int CurrentAnim = 0;

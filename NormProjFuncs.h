@@ -12,7 +12,7 @@ struct NormProjFuncs {
 		self.Velocity.y += parent.Gravity;
 		return (frameNumber >= self.LifeSpan);
 	}
-	static void SpitDraw(Projectile& self, Giraffe& parent, HDC hdc, Vector2 Scale)
+	static void SpitDraw(Projectile& self, Giraffe& parent, HDC hdc, Vector2 Scale, int frameNumber)
 	{
 		SelectObject(hdc, self.Pen);
 		SelectObject(hdc, self.Brush);
@@ -36,7 +36,7 @@ struct NormProjFuncs {
 		self.Velocity.y += parent.Gravity;
 		return (frameNumber >= self.LifeSpan) || !(parent.State & STATE_JUMPING);
 	}
-	static void NeckGrabDraw(Projectile& self, Giraffe& parent, HDC hdc, Vector2 Scale)
+	static void NeckGrabDraw(Projectile& self, Giraffe& parent, HDC hdc, Vector2 Scale, int frameNumber)
 	{
 		SelectObject(hdc, self.Pen);
 		POINT points[7];

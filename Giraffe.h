@@ -101,7 +101,7 @@ class Giraffe {
 public:
 	virtual ~Giraffe() { };
 	virtual void Update(std::array<Giraffe*, 4> giraffes, const int num_giraffes, const int i, const int inputs, const int frameNumber, Stage& stage) = 0;
-	virtual void Draw(HDC hdc, Vector2 Scale) = 0;
+	virtual void Draw(HDC hdc, Vector2 Scale, int frameNumber) = 0;
 	void Move(Stage& stage, const int frameNumber, std::array<Giraffe*, 4> giraffes);
 	bool AddHit(HitCollider hit, int ID, Vector2 facing, Vector2 position);
 	bool ProjectileHit(Projectile p);

@@ -520,8 +520,12 @@ void RobotGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraff
 		}
 		Velocity += Vector2(0.02f * Facing.x, -0.2f);
 	}
+	//Drop Bomb
+	else if ((State & STATE_HEAVY) && (State & STATE_JUMPING) && (State & STATE_DOWN) && AnimFrame == 10) {
+		Projectiles.Append(Projectile(Position, { 0, 0 }, 0.5f, { Facing.x, -1.0f }, 1.5f, 0.7f, 0.3f, false, LastAttackID++, frameNumber + 50, RobotProjFuncs::BombOnHit, RobotProjFuncs::BombUpdate, RobotProjFuncs::BombDraw, GiraffePen, nullptr));
+	}
 	//Laser
-	if ((State & STATE_HEAVY) && !(State & (STATE_WEAK | STATE_UP | STATE_FORWARD | STATE_BACK | STATE_DOWN))) {
+	else if ((State & STATE_HEAVY) && !(State & (STATE_WEAK | STATE_UP | STATE_FORWARD | STATE_BACK | STATE_DOWN))) {
 		if (!BigLaser && AnimFrame == 7) {
 			Projectiles.Append(Projectile(Position + Vector2(0.5, -0.5f), { Facing.x, 0.0f }, 0.3f, { Facing.x, 0.0f }, 0.1f, 0.1f, 0.0f, true, LastAttackID, frameNumber + 50, RobotProjFuncs::StandardOnHit, RobotProjFuncs::StandardUpdate, RobotProjFuncs::SmallLaserDraw, GiraffePen, nullptr));
 		}
@@ -660,10 +664,10 @@ void RobotGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraff
 
 
 
-void RobotGiraffe::Draw(HDC hdc, Vector2 Scale)
+void RobotGiraffe::Draw(HDC hdc, Vector2 Scale, int frameNumber)
 {
 	for (int i = 0; i < Projectiles.Size(); ++i) {
-		Projectiles[i].Draw(Projectiles[i], *this, hdc, Scale);
+		Projectiles[i].Draw(Projectiles[i], *this, hdc, Scale, frameNumber);
 	}
 
 	int CurrentAnim = 0;

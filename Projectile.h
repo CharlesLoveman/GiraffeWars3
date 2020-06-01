@@ -8,7 +8,7 @@ class Projectile;
 
 typedef void (*ProjectileOnHit)(Projectile&, Giraffe&, Giraffe*, int);
 typedef bool (*ProjectileUpdate)(Projectile&, Giraffe&, int);
-typedef void (*ProjectileDraw)(Projectile&, Giraffe&, HDC, Vector2);
+typedef void (*ProjectileDraw)(Projectile&, Giraffe&, HDC, Vector2, int);
 
 class Projectile : public HitCollider {
 public:

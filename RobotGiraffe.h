@@ -12,8 +12,7 @@ public:
 	~RobotGiraffe();
 
 	void Update(std::array<Giraffe*, 4> giraffes, const int num_giraffes, const int i, const int inputs, const int frameNumber, Stage& stage);
-	void Move(Stage& stage, const int frameNumber, std::array<Giraffe*, 4> giraffes);
-	void Draw(HDC hdc, Vector2 Scale);
+	void Draw(HDC hdc, Vector2 Scale, int frameNumber);
 private:
 	HBRUSH SpitBrush;
 	HBRUSH ShineBrush;

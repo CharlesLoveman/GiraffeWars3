@@ -25,7 +25,7 @@ struct RobotProjFuncs {
 		}
 	}
 
-	static void GrabberDraw(Projectile& self, Giraffe& parent, HDC hdc, Vector2 Scale) {
+	static void GrabberDraw(Projectile& self, Giraffe& parent, HDC hdc, Vector2 Scale, int frameNumber) {
 
 		std::vector<Vector2>* skel = parent.Moves->GetSkelPoints(12, 11);
 		Vector2 toGrabber = (self.Position - (parent.Position + parent.Facing * ((*skel)[27] + (*skel)[28]) * 0.5f));
@@ -64,7 +64,7 @@ struct RobotProjFuncs {
 		}
 	}
 
-	static void MissileDraw(Projectile& self, Giraffe& parent, HDC hdc, Vector2 Scale) {
+	static void MissileDraw(Projectile& self, Giraffe& parent, HDC hdc, Vector2 Scale, int frameNumber) {
 		SelectObject(hdc, self.Pen);
 		Vector2 dir = self.Velocity;
 		dir.Normalize();
@@ -92,7 +92,7 @@ struct RobotProjFuncs {
 		PolyBezier(hdc, points, 4);
 	}
 
-	static void M_ExplosionDraw(Projectile& self, Giraffe& parent, HDC hdc, Vector2 Scale) {
+	static void M_ExplosionDraw(Projectile& self, Giraffe& parent, HDC hdc, Vector2 Scale, int frameNumber) {
 		SelectObject(hdc, self.Pen);
 		POINT points[17];
 		Vector2 up = { 0, 1.0f };
@@ -118,7 +118,7 @@ struct RobotProjFuncs {
 		Polyline(hdc, points, 17);
 	}
 
-	static void LanceDraw(Projectile& self, Giraffe& parent, HDC hdc, Vector2 Scale) {
+	static void LanceDraw(Projectile& self, Giraffe& parent, HDC hdc, Vector2 Scale, int frameNumber) {
 		SelectObject(hdc, self.Pen);
 		SelectObject(hdc, self.Brush);
 		Vector2 dir = self.Velocity;
@@ -153,7 +153,7 @@ struct RobotProjFuncs {
 		Polyline(hdc, points, 7);
 	}
 
-	static void SmallLaserDraw(Projectile& self, Giraffe& parent, HDC hdc, Vector2 Scale) {
+	static void SmallLaserDraw(Projectile& self, Giraffe& parent, HDC hdc, Vector2 Scale, int frameNumber) {
 		SelectObject(hdc, self.Pen);
 		POINT points[2];
 		points[0] = Giraffe::VecToPoint(self.Position - self.Velocity * 0.5f, Scale);
@@ -161,7 +161,7 @@ struct RobotProjFuncs {
 		Polyline(hdc, points, 2);
 	}
 
-	static void BigLaserDraw(Projectile& self, Giraffe& parent, HDC hdc, Vector2 Scale) {
+	static void BigLaserDraw(Projectile& self, Giraffe& parent, HDC hdc, Vector2 Scale, int frameNumber) {
 		SelectObject(hdc, self.Pen);
 
 		Vector2 dir = self.Velocity;
@@ -175,6 +175,93 @@ struct RobotProjFuncs {
 		points[0] = Giraffe::VecToPoint(self.Position - dir * 3.0f - perp * 0.5f, Scale);
 		points[1] = Giraffe::VecToPoint(self.Position + dir * 3.0f - perp * 0.5f, Scale);
 		Polyline(hdc, points, 2);
+	}
+
+	static void BombOnHit(Projectile& self, Giraffe& parent, Giraffe* collided, int frameNumber) {
+		parent.Projectiles.Append(Projectile(self.Position, Vector2::Zero, 0, Vector2::Zero, 0, 0, 0, 0, self.ID, frameNumber + 20, StandardOnHit, StandardUpdate, B_ExplosionDraw, self.Pen, self.Brush));
+		//Need to add a bomb explosion projectile
+	}
+
+	static bool BombUpdate(Projectile& self, Giraffe& parent, int frameNumber) {
+		self.Velocity.y += parent.Gravity;
+		return frameNumber >= self.LifeSpan;
+	}
+
+	static void BombDraw(Projectile& self, Giraffe& parent, HDC hdc, Vector2 Scale, int frameNumber) {
+		SelectObject(hdc, self.Pen);
+		POINT points[7];
+		float theta = frameNumber / 15.0f * 3.14159f;
+		Vector2 up = { sinf(theta), -cosf(theta) };
+		Vector2 right = { -up.y, up.x };
+
+		//Outer box
+		points[0] = Giraffe::VecToPoint(self.Position - 0.9f * right - 0.5f * up, Scale);
+		points[1] = Giraffe::VecToPoint(self.Position - 0.9f * right + 0.5f * up, Scale);
+		points[2] = Giraffe::VecToPoint(self.Position + 0.9f * right + 0.5f * up, Scale);
+		points[3] = Giraffe::VecToPoint(self.Position + 0.9f * right - 0.5f * up, Scale);
+		points[4] = Giraffe::VecToPoint(self.Position - 0.9f * right - 0.5f * up, Scale);
+		Polyline(hdc, points, 5);
+
+		//Inner box
+		points[0] = Giraffe::VecToPoint(self.Position - 0.7f * right + 0.5f * up, Scale);
+		points[1] = Giraffe::VecToPoint(self.Position - 0.7f * right - 0.5f * up, Scale);
+		points[2] = Giraffe::VecToPoint(self.Position + 0.7f * right - 0.5f * up, Scale);
+		points[3] = Giraffe::VecToPoint(self.Position + 0.7f * right + 0.5f * up, Scale);
+		Polyline(hdc, points, 4);
+
+		//N
+		points[0] = Giraffe::VecToPoint(self.Position - 0.4f * right - 0.35f * up, Scale);
+		points[1] = Giraffe::VecToPoint(self.Position - 0.4f * right + 0.35f * up, Scale);
+		points[2] = Giraffe::VecToPoint(self.Position - 0.35f * up, Scale);
+		points[3] = Giraffe::VecToPoint(self.Position + 0.35f * up, Scale);
+		Polyline(hdc, points, 4);
+
+		//2 Loop
+		points[0] = Giraffe::VecToPoint(self.Position + 0.2f * right + 0.35f * up, Scale);
+		points[1] = Giraffe::VecToPoint(self.Position + 0.5f * right + 0.35f * up, Scale);
+		points[2] = Giraffe::VecToPoint(self.Position + 0.5f * right + 0.25f * up, Scale);
+		points[3] = Giraffe::VecToPoint(self.Position + 0.2f * right + 0.1f * up, Scale);
+		PolyBezier(hdc, points, 4);
+
+		//2 Base
+		points[4] = Giraffe::VecToPoint(self.Position + 0.5f * right + 0.1f * up, Scale);
+		Polyline(hdc, &points[3], 2);
+
+		//B Side
+		points[0] = Giraffe::VecToPoint(self.Position + 0.2f * right, Scale);
+		points[1] = Giraffe::VecToPoint(self.Position + 0.2f * right - 0.35f * up, Scale);
+		Polyline(hdc, points, 2);
+
+		//B Loops
+		points[1] = Giraffe::VecToPoint(self.Position + 0.5f * right - 0.1f * up, Scale);
+		points[2] = Giraffe::VecToPoint(self.Position + 0.5f * right - 0.15f * up, Scale);
+		points[3] = Giraffe::VecToPoint(self.Position + 0.2f * right - 0.2f * up, Scale);
+		points[4] = Giraffe::VecToPoint(self.Position + 0.5f * right - 0.25f * up, Scale);
+		points[5] = Giraffe::VecToPoint(self.Position + 0.5f * right - 0.3f * up, Scale);
+		points[6] = Giraffe::VecToPoint(self.Position + 0.2f * right - 0.35f * up, Scale);
+		PolyBezier(hdc, points, 7);
+	}
+
+	static void B_ExplosionDraw(Projectile& self, Giraffe& parent, HDC hdc, Vector2 Scale, int frameNumber) {
+		SelectObject(hdc, self.Pen);
+		Vector2 controlPoints[9];
+		controlPoints[0] = self.Position + Vector2(0, 0);
+		controlPoints[1] = self.Position + Vector2(-0.2f, -3.0f);
+		controlPoints[2] = self.Position + Vector2(-1.0f, -3.1f);
+		controlPoints[3] = self.Position + Vector2(-0.2f, -3.2f);
+		controlPoints[4] = self.Position + Vector2(0, -3.5f);
+		controlPoints[5] = self.Position + Vector2(0.2f, -3.2f);
+		controlPoints[6] = self.Position + Vector2(1.0f, -3.1f);
+		controlPoints[7] = self.Position + Vector2(0.2f, -3.0f);
+		controlPoints[8] = self.Position + Vector2(0, 0);
+
+		POINT points[80];
+		for (int i = 0; i < 8; ++i) {
+			for (int t = 0; t < 10; ++t) {
+				points[i * 10 + t] = Giraffe::VecToPoint((t / 10.0f) * controlPoints[i + 1] + (1.0f - t / 10.0f) * controlPoints[i] + 0.3f * Vector2(((float)rand() / RAND_MAX) + 0.5f, ((float)rand() / RAND_MAX) + 0.5f), Scale);
+			}
+		}
+		Polyline(hdc, points, 80);
 	}
 };
 

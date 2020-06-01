@@ -39,13 +39,18 @@ void GameState::Init(HWND hwnd, int num_players, const std::array<MoveSet*, 4> M
 	_giraffeColours[2] = RGB(0, 0, 255);
 	_giraffeColours[3] = RGB(255, 255, 0);
 
-	for (int i = 0; i < _num_giraffes; ++i) {
-		normGiraffes.push_back(NormGiraffe(Vector2(stageleft + stagewidth * (2.0f * i + 1.0f) / (2.0f * _num_giraffes), 20), MoveSets[0], CreatePen(PS_SOLID, 1, _giraffeColours[i])));
+	int counter = 0;
+
+	robotGiraffes.push_back(RobotGiraffe(Vector2(stageleft + stagewidth * 1.0f / (2.0f * _num_giraffes), 20), MoveSets[1], _giraffeColours[0]));
+	giraffes[counter] = &robotGiraffes[0];
+	counter++;
+
+	for (int i = 0; i < _num_giraffes - robotGiraffes.size(); ++i) {
+		normGiraffes.push_back(NormGiraffe(Vector2(stageleft + stagewidth * (2.0f * counter + 1.0f) / (2.0f * _num_giraffes), 20), MoveSets[0], _giraffeColours[counter]));
+		giraffes[counter] = &normGiraffes[i];
+		counter++;
 	}
 
-	for (int i = 0; i < normGiraffes.size(); ++i) {
-		giraffes[i] = &normGiraffes[i];
-	}
 
 	stage.Box = { stageleft, stagetop, stageleft + stagewidth, stagetop + stageheight };
 	stage.Platforms = { {(float)(stageleft + stagewidth / 2.0f - stagewidth / 10.0f), (float)(stagetop - 2 * stageheight - 0.1f), (float)(stageleft + stagewidth / 2.0f + stagewidth / 10.0f), (float)(stagetop - 2 * stageheight + 0.1f)}, {(float)(stageleft + stagewidth / 4.0f - stagewidth / 10.0f), (float)(stagetop - stageheight - 0.1f), (float)(stageleft + stagewidth / 4.0f + stagewidth / 10.0f), (float)(stagetop - stageheight + 0.1f)}, {(float)(stageleft + 3 * stagewidth / 4.0f - stagewidth / 10.0f), (float)(stagetop - stageheight - 0.1f), (float)(stageleft + 3 * stagewidth / 4.0f + stagewidth / 10.0f), (float)(stagetop - stageheight + 0.1f)} };

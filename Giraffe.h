@@ -97,18 +97,12 @@ enum GiraffeSoundAttackStates {
 	SOUND_HEAVY = (1 << 24),
 };
 
-
-struct HitWID {
-	HitCollider hit;
-	int ID;
-};
-
 class Giraffe {
 public:
 	virtual ~Giraffe() { };
 	virtual void Update(std::array<Giraffe*, 4> giraffes, const int num_giraffes, const int i, const int inputs, const int frameNumber, Stage& stage) = 0;
-	virtual void Draw(HDC hdc, Vector2 Scale) = 0;
-	virtual void Move(Stage& stage, const int frameNumber, std::array<Giraffe*, 4> giraffes) = 0;
+	virtual void Draw(HDC hdc, Vector2 Scale, int frameNumber) = 0;
+	void Move(Stage& stage, const int frameNumber, std::array<Giraffe*, 4> giraffes);
 	bool AddHit(HitCollider hit, int ID, Vector2 facing, Vector2 position);
 	bool ProjectileHit(Projectile p);
 	bool GrabHit(Collider col, Vector2 _Facing, int frameNumber);
@@ -126,6 +120,7 @@ public:
 	float Knockback;
 
 	friend struct NormProjFuncs;
+	friend struct RobotProjFuncs;
 
 protected:
 	//Movement
@@ -150,7 +145,6 @@ protected:
 	float Mass;
 	int LedgeID;
 	ArrayList<Projectile> Projectiles;
-	HINSTANCE hInst;
 
 
 	//State Management
@@ -165,7 +159,7 @@ protected:
 	//Collision
 	Collider Fullbody;
 	Collider StageCollider;
-	HitWID IncomingHits[GGPO_MAX_PLAYERS - 1];
+	HitCollider IncomingHits[8];
 	ArrayQueue<int> PrevHitQueue;
 	int LastAttackID;
 	int numIncoming;
@@ -173,7 +167,7 @@ protected:
 
 	//Grabs
 	bool incomingGrab;
-	//int GrabPointer;
+	int CommandGrabPointer;
 
 	//Animation
 	int AnimFrame;

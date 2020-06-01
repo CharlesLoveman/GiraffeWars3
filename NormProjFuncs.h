@@ -3,7 +3,7 @@
 #include "Giraffe.h"
 
 struct NormProjFuncs {
-	static void SpitOnHit(Projectile& self, Giraffe& parent, Giraffe* collided)
+	static void SpitOnHit(Projectile& self, Giraffe& parent, Giraffe* collided, int frameNumber)
 	{
 		//Do nothing
 	}
@@ -12,13 +12,13 @@ struct NormProjFuncs {
 		self.Velocity.y += parent.Gravity;
 		return (frameNumber >= self.LifeSpan);
 	}
-	static void SpitDraw(Projectile& self, Giraffe& parent, HDC hdc, Vector2 Scale)
+	static void SpitDraw(Projectile& self, Giraffe& parent, HDC hdc, Vector2 Scale, int frameNumber)
 	{
 		SelectObject(hdc, self.Pen);
 		SelectObject(hdc, self.Brush);
 		Ellipse(hdc, Scale.x * (self.Position.x - self.Radius), Scale.y * (self.Position.y - self.Radius), Scale.x * (self.Position.x + self.Radius), Scale.y * (self.Position.y + self.Radius));
 	}
-	static void NeckGrabOnHit(Projectile& self, Giraffe& parent, Giraffe* collided)
+	static void NeckGrabOnHit(Projectile& self, Giraffe& parent, Giraffe* collided, int frameNumber)
 	{
 		Vector2 diff = Vector2(0.2f, 0.3f) *(self.Position - parent.Position);
 		float len = diff.Length();
@@ -36,7 +36,7 @@ struct NormProjFuncs {
 		self.Velocity.y += parent.Gravity;
 		return (frameNumber >= self.LifeSpan) || !(parent.State & STATE_JUMPING);
 	}
-	static void NeckGrabDraw(Projectile& self, Giraffe& parent, HDC hdc, Vector2 Scale)
+	static void NeckGrabDraw(Projectile& self, Giraffe& parent, HDC hdc, Vector2 Scale, int frameNumber)
 	{
 		SelectObject(hdc, self.Pen);
 		POINT points[7];

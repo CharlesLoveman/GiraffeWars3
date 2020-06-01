@@ -201,7 +201,7 @@ std::array<HurtCollider, 6>* NormMoveSet::GetHurtboxes(int MoveId, int FrameNum)
 	return &Hurtboxes[MoveId][FrameNum];
 }
 
-std::array<Vector2, NUM_POINTS>* NormMoveSet::GetSkelPoints(int MoveId, int FrameNum)
+std::vector<Vector2>* NormMoveSet::GetSkelPoints(int MoveId, int FrameNum)
 {
 	return &SkelPoints[MoveId][FrameNum];
 }

@@ -513,7 +513,14 @@ void RobotGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraff
 			Projectiles.Append(Projectile(Position + Vector2(-2.0f, -2.2f), { Facing.x * 0.5f, 0.0f }, 0.3f, { Facing.x, 0.0f }, 0.3f, 0.2f, 0.3f, false, LastAttackID++, frameNumber + 50, RobotProjFuncs::MissileOnHit, RobotProjFuncs::MissileUpdate, RobotProjFuncs::MissileDraw, GiraffePen, nullptr));
 		}
 	}
-	//Small Laser
+	//UpB
+	if ((State & STATE_HEAVY) && (State & STATE_JUMPING) && (State & STATE_UP) && AnimFrame >= 13 && AnimFrame <= 23) {
+		if (AnimFrame == 13) {
+			Velocity.y = 0;
+		}
+		Velocity += Vector2(0.02f * Facing.x, -0.2f);
+	}
+	//Laser
 	if ((State & STATE_HEAVY) && !(State & (STATE_WEAK | STATE_UP | STATE_FORWARD | STATE_BACK | STATE_DOWN))) {
 		if (!BigLaser && AnimFrame == 7) {
 			Projectiles.Append(Projectile(Position + Vector2(0.5, -0.5f), { Facing.x, 0.0f }, 0.3f, { Facing.x, 0.0f }, 0.1f, 0.1f, 0.0f, true, LastAttackID, frameNumber + 50, RobotProjFuncs::StandardOnHit, RobotProjFuncs::StandardUpdate, RobotProjFuncs::SmallLaserDraw, GiraffePen, nullptr));
@@ -673,16 +680,9 @@ void RobotGiraffe::Draw(HDC hdc, Vector2 Scale)
 	if (State & STATE_HEAVY) {
 		if (State & STATE_JUMPING) {
 			if (State & STATE_UP) {
-				if (AnimFrame >= 10 && AnimFrame <= 30) {
-					POINT points[NUM_POINTS];
-					for (int i = 0; i < NUM_POINTS; ++i) {
-						points[i] = Giraffe::VecToPoint(Position + Facing * (*Moves->GetSkelPoints(CurrentAnim, CurrentFrame))[i], Scale);
-					}
-					Polyline(hdc, points, 27);
-					Polyline(hdc, &points[36], 2);
-				}
-				else {
-					DrawSelf(hdc, Scale, AnimFrame, AttackNum);
+				DrawSelf(hdc, Scale, AnimFrame, AttackNum);
+				if (AnimFrame >= 13 && AnimFrame <= 23) {
+					DrawBlast(hdc, Scale, Vector2(0,1), Vector2(0,1.5f));
 				}
 			}
 			else if (State & STATE_DOWN) {

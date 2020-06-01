@@ -157,6 +157,7 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 				AttackNum = 13;
 				AttackDelay = frameNumber + Moves->GetMoveLength(AttackNum);
 				AnimFrame = 0;
+				LastAttackID++;
 				SoundAttackState |= SOUND_FTHROW;
 				SoundAttackDelay[XACT_WAVEBANK_ATTACKBANK_FTHROW] = frameNumber + Moves->GetAttackSoundLength(XACT_WAVEBANK_ATTACKBANK_FTHROW);
 			}
@@ -166,6 +167,7 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 				AttackNum = 14;
 				AttackDelay = frameNumber + Moves->GetMoveLength(AttackNum);
 				AnimFrame = 0;
+				LastAttackID++;
 				SoundAttackState |= SOUND_UPTHROW;
 				SoundAttackDelay[XACT_WAVEBANK_ATTACKBANK_UPTHROW] = frameNumber + Moves->GetAttackSoundLength(XACT_WAVEBANK_ATTACKBANK_UPTHROW);
 			}
@@ -175,6 +177,7 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 				AttackNum = 15;
 				AttackDelay = frameNumber + Moves->GetMoveLength(AttackNum);
 				AnimFrame = 0;
+				LastAttackID++;
 				SoundAttackState |= SOUND_DOWNTHROW;
 				SoundAttackDelay[XACT_WAVEBANK_ATTACKBANK_DOWNTHROW] = frameNumber + Moves->GetAttackSoundLength(XACT_WAVEBANK_ATTACKBANK_DOWNTHROW);
 			}
@@ -184,6 +187,7 @@ void NormGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 				AttackNum = 16;
 				AttackDelay = frameNumber + Moves->GetMoveLength(AttackNum);
 				AnimFrame = 0;
+				LastAttackID++;
 				SoundAttackState |= SOUND_BACKTHROW;
 				SoundAttackDelay[XACT_WAVEBANK_ATTACKBANK_BACKTHROW] = frameNumber + Moves->GetAttackSoundLength(XACT_WAVEBANK_ATTACKBANK_BACKTHROW);
 			}

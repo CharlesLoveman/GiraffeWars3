@@ -27,6 +27,7 @@ struct RobotProjFuncs {
 
 	static void GrabberDraw(Projectile& self, Giraffe& parent, HDC hdc, Vector2 Scale, int frameNumber) {
 
+		SelectObject(hdc, self.Pen);
 		std::vector<Vector2>* skel = parent.Moves->GetSkelPoints(12, 11);
 		Vector2 toGrabber = (self.Position - (parent.Position + parent.Facing * ((*skel)[27] + (*skel)[28]) * 0.5f));
 		toGrabber.Normalize();

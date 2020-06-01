@@ -50,6 +50,8 @@ RobotGiraffe::RobotGiraffe(Vector2 _Position, MoveSet* _Moves, COLORREF _Colour)
 	CommandGrabPointer = 0;
 	Charge = 0;
 	BigLaser = false;
+	HasSword = true;
+	SwordDelay = 0;
 
 	//Animation
 	AnimFrame = 0;
@@ -129,6 +131,10 @@ void RobotGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraff
 	}
 	else if (State & (STATE_GRABBING | STATE_GRABBED) && frameNumber >= TechDelay) {
 		State &= ~(STATE_GRABBED | STATE_GRABBING);
+	}
+
+	if (!HasSword && frameNumber >= SwordDelay) {
+		HasSword = true;
 	}
 
 	for (int i = 0; i < XACT_WAVEBANK_MOVEBANK_ENTRY_COUNT; ++i) {
@@ -491,19 +497,6 @@ void RobotGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraff
 	}
 
 
-
-	//if ((State & STATE_HEAVY) && (State & STATE_UP)) {
-	//	//Fire neck
-	//	if (State & STATE_JUMPING) {
-	//		if (AnimFrame == 10) {
-	//			Projectiles.Append(Projectile(Position + Vector2(0.2f, -1.2f), { Facing.x * 0.65f, -0.65f }, 0.3f, { 0.0f, 0.0f }, 0.1f, 0.1f, 1.0f, true, LastAttackID, AttackDelay - 10, RobotProjFuncs::NeckGrabOnHit, RobotProjFuncs::NeckGrabUpdate, RobotProjFuncs::NeckGrabDraw, GiraffePen, SpitBrush));
-	//		}
-	//	}
-	//	//Main hit of upsmash
-	//	else if (AnimFrame == 17) {
-	//		++LastAttackID;
-	//	}
-	//}
 	//Throw lance
 	if ((State & STATE_WEAK) && (State & STATE_JUMPING) && (State & STATE_BACK) && AnimFrame == 10) {
 		Projectiles.Append(Projectile(Position + Vector2(0, -1.7f), { Facing.x * -0.8f, 0.0f }, 0.3f, { -Facing.x, 0.0f }, 1.6f, 0.3f, 0.3f, false, LastAttackID, frameNumber + 50, RobotProjFuncs::StandardOnHit, RobotProjFuncs::StandardUpdate, RobotProjFuncs::LanceDraw, GiraffePen, CreateSolidBrush(0)));
@@ -531,8 +524,10 @@ void RobotGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraff
 			Projectiles.Append(Projectile(Position, { 0, 0 }, 0.5f, { Facing.x, -1.0f }, 1.5f, 0.7f, 0.3f, false, LastAttackID++, frameNumber + 50, RobotProjFuncs::BombOnHit, RobotProjFuncs::BombUpdate, RobotProjFuncs::BombDraw, GiraffePen, nullptr));
 		}
 		//Throw sword
-		else if ((State & STATE_JUMPING) && (State & STATE_FORWARD) && AnimFrame == 10) {
+		else if ((State & STATE_JUMPING) && (State & STATE_FORWARD) && AnimFrame == 10 && HasSword) {
 			Projectiles.Append(Projectile(Position, { 0.5f * Facing.x, 0 }, 1.5f, {Facing.x, 0.5f}, 0.5f, 0.5f, 0.5f, false, LastAttackID, frameNumber + 50, RobotProjFuncs::SwordOnHit, RobotProjFuncs::SwordUpdate, RobotProjFuncs::SwordDraw, GiraffePen, nullptr));
+			HasSword = false;
+			SwordDelay = frameNumber + 100;
 		}
 		//Laser
 		else if (!(State & (STATE_WEAK | STATE_UP | STATE_FORWARD | STATE_BACK | STATE_DOWN))) {
@@ -547,17 +542,6 @@ void RobotGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraff
 			}
 		}
 	}
-	
-
-	////Reverse direction in bair
-	//else if ((State & STATE_JUMPING) && (State & STATE_WEAK) && (State & STATE_BACK) && AnimFrame == 7) {
-	//	Facing.x *= -1;
-	//}
-	////Spin like a maniac in get-up attack
-	//else if ((State & STATE_GETUPATTACK) && (7 <= AnimFrame) && (AnimFrame <= 10)) {
-	//	Facing.x *= -1;
-	//}
-
 
 	//Update State
 	if (State & (STATE_WEAK | STATE_HEAVY | STATE_THROW)) {
@@ -695,11 +679,15 @@ void RobotGiraffe::Draw(HDC hdc, Vector2 Scale, int frameNumber)
 
 	if (State & STATE_HEAVY) {
 		DrawSelf(hdc, Scale, AnimFrame, AttackNum);
-		if ((State & STATE_JUMPING) && (State & STATE_UP)) {
-			if (AnimFrame >= 13 && AnimFrame <= 23) {
+		if ((State & STATE_JUMPING)) {
+			if ((State & STATE_UP) && AnimFrame >= 13 && AnimFrame <= 23) {
 				DrawBlast(hdc, Scale, Vector2(0, 1), Vector2(0, 1.5f));
+				return;
 			}
-			return;
+			else if ((State & STATE_FORWARD) && AnimFrame <= 9 && HasSword) {
+				DrawBeamSword(hdc, Scale, ((*Moves->GetSkelPoints(AttackNum, AnimFrame))[25] + (*Moves->GetSkelPoints(AttackNum, AnimFrame))[30]) * 0.5f, ((*Moves->GetSkelPoints(AttackNum, AnimFrame))[27] + (*Moves->GetSkelPoints(AttackNum, AnimFrame))[28]) * 0.5f);
+				return;
+			}
 		}
 		else {
 			if ((State & STATE_FORWARD) && (AnimFrame >= 10 && AnimFrame <= 13)) {
@@ -714,8 +702,8 @@ void RobotGiraffe::Draw(HDC hdc, Vector2 Scale, int frameNumber)
 				DrawBlast(hdc, Scale, ((*Moves->GetSkelPoints(AttackNum, AnimFrame))[25] + (*Moves->GetSkelPoints(AttackNum, AnimFrame))[30]) * 0.5f, ((*Moves->GetSkelPoints(AttackNum, AnimFrame))[27] + (*Moves->GetSkelPoints(AttackNum, AnimFrame))[28]) * 0.5f);
 				return;
 			}
-			return;
 		}
+		return;
 	}
 
 	if (State & STATE_WEAK) {

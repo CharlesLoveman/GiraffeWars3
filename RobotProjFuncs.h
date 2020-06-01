@@ -281,8 +281,10 @@ struct RobotProjFuncs {
 	}
 
 	static bool SwordUpdate(Projectile& self, Giraffe& parent, int frameNumber) {
-		if (frameNumber >= self.LifeSpan && !(self.Fixed)) {
-			parent.Projectiles.Append(Projectile(self.Position, -self.Velocity, 1.5f, -self.Force, 0.5f, 0.5f, 0.5f, true, self.ID, frameNumber + 50, SwordOnHit, SwordUpdate, SwordDraw, self.Pen, self.Brush));
+		if (frameNumber >= self.LifeSpan) {
+			if (!self.Fixed) {
+				parent.Projectiles.Append(Projectile(self.Position, -self.Velocity, 1.5f, -self.Force, 0.5f, 0.5f, 0.5f, true, self.ID, frameNumber + 50, SwordOnHit, SwordUpdate, SwordDraw, self.Pen, self.Brush));
+			}
 			return true;
 		}
 		return false;

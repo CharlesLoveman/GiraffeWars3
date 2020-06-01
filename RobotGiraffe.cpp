@@ -713,7 +713,7 @@ void RobotGiraffe::Draw(HDC hdc, Vector2 Scale, int frameNumber)
 				return;
 			}
 			if (State & STATE_FORWARD) {
-				if (AnimFrame <= 4 || AnimFrame >= 24) {
+				if (AnimFrame <= 4 || AnimFrame >= 24 || !HasSword) {
 					DrawSword(hdc, Scale, ((*Moves->GetSkelPoints(AttackNum, AnimFrame))[25] + (*Moves->GetSkelPoints(AttackNum, AnimFrame))[30]) * 0.5f, ((*Moves->GetSkelPoints(AttackNum, AnimFrame))[27] + (*Moves->GetSkelPoints(AttackNum, AnimFrame))[28]) * 0.5f);
 					return;
 				}

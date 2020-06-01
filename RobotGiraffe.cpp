@@ -50,6 +50,8 @@ RobotGiraffe::RobotGiraffe(Vector2 _Position, MoveSet* _Moves, COLORREF _Colour)
 	CommandGrabPointer = 0;
 	Charge = 0;
 	BigLaser = false;
+	HasSword = true;
+	SwordDelay = 0;
 
 	//Animation
 	AnimFrame = 0;
@@ -129,6 +131,10 @@ void RobotGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraff
 	}
 	else if (State & (STATE_GRABBING | STATE_GRABBED) && frameNumber >= TechDelay) {
 		State &= ~(STATE_GRABBED | STATE_GRABBING);
+	}
+
+	if (!HasSword && frameNumber >= SwordDelay) {
+		HasSword = true;
 	}
 
 	for (int i = 0; i < XACT_WAVEBANK_MOVEBANK_ENTRY_COUNT; ++i) {
@@ -491,19 +497,6 @@ void RobotGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraff
 	}
 
 
-
-	//if ((State & STATE_HEAVY) && (State & STATE_UP)) {
-	//	//Fire neck
-	//	if (State & STATE_JUMPING) {
-	//		if (AnimFrame == 10) {
-	//			Projectiles.Append(Projectile(Position + Vector2(0.2f, -1.2f), { Facing.x * 0.65f, -0.65f }, 0.3f, { 0.0f, 0.0f }, 0.1f, 0.1f, 1.0f, true, LastAttackID, AttackDelay - 10, RobotProjFuncs::NeckGrabOnHit, RobotProjFuncs::NeckGrabUpdate, RobotProjFuncs::NeckGrabDraw, GiraffePen, SpitBrush));
-	//		}
-	//	}
-	//	//Main hit of upsmash
-	//	else if (AnimFrame == 17) {
-	//		++LastAttackID;
-	//	}
-	//}
 	//Throw lance
 	if ((State & STATE_WEAK) && (State & STATE_JUMPING) && (State & STATE_BACK) && AnimFrame == 10) {
 		Projectiles.Append(Projectile(Position + Vector2(0, -1.7f), { Facing.x * -0.8f, 0.0f }, 0.3f, { -Facing.x, 0.0f }, 1.6f, 0.3f, 0.3f, false, LastAttackID, frameNumber + 50, RobotProjFuncs::StandardOnHit, RobotProjFuncs::StandardUpdate, RobotProjFuncs::LanceDraw, GiraffePen, CreateSolidBrush(0)));
@@ -517,39 +510,38 @@ void RobotGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraff
 			Projectiles.Append(Projectile(Position + Vector2(-2.0f, -2.2f), { Facing.x * 0.5f, 0.0f }, 0.3f, { Facing.x, 0.0f }, 0.3f, 0.2f, 0.3f, false, LastAttackID++, frameNumber + 50, RobotProjFuncs::MissileOnHit, RobotProjFuncs::MissileUpdate, RobotProjFuncs::MissileDraw, GiraffePen, nullptr));
 		}
 	}
-	//UpB
-	if ((State & STATE_HEAVY) && (State & STATE_JUMPING) && (State & STATE_UP) && AnimFrame >= 13 && AnimFrame <= 23) {
-		if (AnimFrame == 14) {
-			Velocity.y = 0;
+
+	if (State & STATE_HEAVY) {
+		//UpB
+		if ((State & STATE_JUMPING) && (State & STATE_UP) && AnimFrame >= 13 && AnimFrame <= 23) {
+			if (AnimFrame == 14) {
+				Velocity.y = 0;
+			}
+			Velocity += Vector2(0.02f * Facing.x, -0.2f);
 		}
-		Velocity += Vector2(0.02f * Facing.x, -0.2f);
-	}
-	//Drop Bomb
-	else if ((State & STATE_HEAVY) && (State & STATE_JUMPING) && (State & STATE_DOWN) && AnimFrame == 20) {
-		Projectiles.Append(Projectile(Position, { 0, 0 }, 0.5f, { Facing.x, -1.0f }, 1.5f, 0.7f, 0.3f, false, LastAttackID++, frameNumber + 50, RobotProjFuncs::BombOnHit, RobotProjFuncs::BombUpdate, RobotProjFuncs::BombDraw, GiraffePen, nullptr));
-	}
-	//Laser
-	else if ((State & STATE_HEAVY) && !(State & (STATE_WEAK | STATE_UP | STATE_FORWARD | STATE_BACK | STATE_DOWN))) {
-		if (!BigLaser && AnimFrame == 7) {
-			Projectiles.Append(Projectile(Position + Vector2(0.5, -0.5f), { Facing.x, 0.0f }, 0.3f, { Facing.x, 0.0f }, 0.1f, 0.1f, 0.0f, true, LastAttackID, frameNumber + 50, RobotProjFuncs::StandardOnHit, RobotProjFuncs::StandardUpdate, RobotProjFuncs::SmallLaserDraw, GiraffePen, nullptr));
+		//Drop Bomb
+		else if ((State & STATE_JUMPING) && (State & STATE_DOWN) && AnimFrame == 20) {
+			Projectiles.Append(Projectile(Position, { 0, 0 }, 0.5f, { Facing.x, -1.0f }, 1.5f, 0.7f, 0.3f, false, LastAttackID++, frameNumber + 50, RobotProjFuncs::BombOnHit, RobotProjFuncs::BombUpdate, RobotProjFuncs::BombDraw, GiraffePen, nullptr));
 		}
-		else if (BigLaser && AnimFrame >= 7) {
-			Projectiles.Append(Projectile(Position + Vector2(0.5f, -1.0f), { 5 * Facing.x, -3.0f }, 1.0f, { Facing.x, -1.0f }, 2.0f, 1.0f, 1.0f, false, LastAttackID++, frameNumber + 50, RobotProjFuncs::StandardOnHit, RobotProjFuncs::StandardUpdate, RobotProjFuncs::BigLaserDraw, GiraffePen, nullptr));
-			if (State & STATE_JUMPING) {
-				Velocity = { 0, -Gravity - 0.00001f };
+		//Throw sword
+		else if ((State & STATE_JUMPING) && (State & STATE_FORWARD) && AnimFrame == 10 && HasSword) {
+			Projectiles.Append(Projectile(Position, { 0.5f * Facing.x, 0 }, 1.5f, {Facing.x, 0.5f}, 0.5f, 0.5f, 0.5f, false, LastAttackID, frameNumber + 50, RobotProjFuncs::SwordOnHit, RobotProjFuncs::SwordUpdate, RobotProjFuncs::SwordDraw, GiraffePen, nullptr));
+			HasSword = false;
+			SwordDelay = frameNumber + 100;
+		}
+		//Laser
+		else if (!(State & (STATE_WEAK | STATE_UP | STATE_FORWARD | STATE_BACK | STATE_DOWN))) {
+			if (!BigLaser && AnimFrame == 7) {
+				Projectiles.Append(Projectile(Position + Vector2(0.5, -0.5f), { Facing.x, 0.0f }, 0.3f, { Facing.x, 0.0f }, 0.1f, 0.1f, 0.0f, true, LastAttackID, frameNumber + 50, RobotProjFuncs::StandardOnHit, RobotProjFuncs::StandardUpdate, RobotProjFuncs::SmallLaserDraw, GiraffePen, nullptr));
+			}
+			else if (BigLaser && AnimFrame >= 7) {
+				Projectiles.Append(Projectile(Position + Vector2(0.5f, -1.0f), { 5 * Facing.x, -3.0f }, 1.0f, { Facing.x, -1.0f }, 2.0f, 1.0f, 1.0f, false, LastAttackID++, frameNumber + 50, RobotProjFuncs::StandardOnHit, RobotProjFuncs::StandardUpdate, RobotProjFuncs::BigLaserDraw, GiraffePen, nullptr));
+				if (State & STATE_JUMPING) {
+					Velocity = { 0, -Gravity - 0.00001f };
+				}
 			}
 		}
 	}
-
-	////Reverse direction in bair
-	//else if ((State & STATE_JUMPING) && (State & STATE_WEAK) && (State & STATE_BACK) && AnimFrame == 7) {
-	//	Facing.x *= -1;
-	//}
-	////Spin like a maniac in get-up attack
-	//else if ((State & STATE_GETUPATTACK) && (7 <= AnimFrame) && (AnimFrame <= 10)) {
-	//	Facing.x *= -1;
-	//}
-
 
 	//Update State
 	if (State & (STATE_WEAK | STATE_HEAVY | STATE_THROW)) {
@@ -687,11 +679,15 @@ void RobotGiraffe::Draw(HDC hdc, Vector2 Scale, int frameNumber)
 
 	if (State & STATE_HEAVY) {
 		DrawSelf(hdc, Scale, AnimFrame, AttackNum);
-		if ((State & STATE_JUMPING) && (State & STATE_UP)) {
-			if (AnimFrame >= 13 && AnimFrame <= 23) {
+		if ((State & STATE_JUMPING)) {
+			if ((State & STATE_UP) && AnimFrame >= 13 && AnimFrame <= 23) {
 				DrawBlast(hdc, Scale, Vector2(0, 1), Vector2(0, 1.5f));
+				return;
 			}
-			return;
+			else if ((State & STATE_FORWARD) && AnimFrame <= 9 && HasSword) {
+				DrawBeamSword(hdc, Scale, ((*Moves->GetSkelPoints(AttackNum, AnimFrame))[25] + (*Moves->GetSkelPoints(AttackNum, AnimFrame))[30]) * 0.5f, ((*Moves->GetSkelPoints(AttackNum, AnimFrame))[27] + (*Moves->GetSkelPoints(AttackNum, AnimFrame))[28]) * 0.5f);
+				return;
+			}
 		}
 		else {
 			if ((State & STATE_FORWARD) && (AnimFrame >= 10 && AnimFrame <= 13)) {
@@ -706,8 +702,8 @@ void RobotGiraffe::Draw(HDC hdc, Vector2 Scale, int frameNumber)
 				DrawBlast(hdc, Scale, ((*Moves->GetSkelPoints(AttackNum, AnimFrame))[25] + (*Moves->GetSkelPoints(AttackNum, AnimFrame))[30]) * 0.5f, ((*Moves->GetSkelPoints(AttackNum, AnimFrame))[27] + (*Moves->GetSkelPoints(AttackNum, AnimFrame))[28]) * 0.5f);
 				return;
 			}
-			return;
 		}
+		return;
 	}
 
 	if (State & STATE_WEAK) {
@@ -928,63 +924,32 @@ void RobotGiraffe::DrawBlast(HDC hdc, Vector2 Scale, Vector2 Neck, Vector2 Head)
 	controlPoints[9] = Position + Facing * (Head + dir * 1.0f + perp * -1.5f);
 	controlPoints[10] = Position + Facing * (Head + perp * -0.2f);
 
-	POINT* points = RobotProjFuncs::Crackle(controlPoints, 10, 10, 0.1f, Scale);
-	Polyline(hdc, points, 100);
-	delete[] points;
+	POINT points[101];
+	RobotProjFuncs::Crackle(points,controlPoints, 10, 10, 0.1f, Scale);
+	Polyline(hdc, points, 101);
 }
 
 void RobotGiraffe::DrawBeamSword(HDC hdc, Vector2 Scale, Vector2 Neck, Vector2 Head)
 {
+	DrawSword(hdc, Scale, Neck, Head);
+	
 	Vector2 dir = Head - Neck;
 	dir.Normalize();
 	Vector2 perp = { -dir.y, dir.x };
 	Vector2 Pos = Head + dir * 0.3f;
 
-	POINT points[29];
-	points[0] = Giraffe::VecToPoint(Position + Facing * Head, Scale);
-	points[1] = Giraffe::VecToPoint(Position + Facing * Pos, Scale);
-	points[2] = Giraffe::VecToPoint(Position + Facing * (Pos + perp * 0.2f), Scale);
-	points[3] = Giraffe::VecToPoint(Position + Facing * (Pos - perp * 0.2f), Scale);
-	points[4] = Giraffe::VecToPoint(Position + Facing * Pos, Scale);
-	points[5] = Giraffe::VecToPoint(Position + Facing * (Pos + dir * 0.6f), Scale);
+	Vector2 controlPoints[7];
+	controlPoints[0] = Position + Facing * (Pos + perp * 0.2f);
+	controlPoints[1] = Position + Facing * (Pos + dir * 0.5f + perp * 0.3f);
+	controlPoints[2] = Position + Facing * (Pos + dir * 2.0f + perp * 0.2f);
+	controlPoints[3] = Position + Facing * (Pos + dir * 2.5f);
+	controlPoints[4] = Position + Facing * (Pos + dir * 2.0f + perp * -0.2f);
+	controlPoints[5] = Position + Facing * (Pos + dir * 0.5f + perp * -0.3f);
+	controlPoints[6] = Position + Facing * (Pos + perp * -0.2f);
 
-	points[6] = Giraffe::VecToPoint(Position + Facing * (Pos + dir * 0.6f + perp * 0.6f), Scale);
-	points[7] = Giraffe::VecToPoint(Position + Facing * (Pos + dir * 0.48f + perp * 0.48f), Scale);
-
-	points[8] = Giraffe::VecToPoint(Position + Facing * (Pos + dir * 1.02f + perp * 0.52f), Scale);
-	points[9] = Giraffe::VecToPoint(Position + Facing * (Pos + dir * 0.9f + perp * 0.4f), Scale);
-
-	points[10] = Giraffe::VecToPoint(Position + Facing * (Pos + dir * 1.44f + perp * 0.4f), Scale);
-	points[11] = Giraffe::VecToPoint(Position + Facing * (Pos + dir * 1.32f + perp * 0.32f), Scale);
-
-	points[12] = Giraffe::VecToPoint(Position + Facing * (Pos + dir * 1.86f + perp * 0.36f), Scale);
-	points[13] = Giraffe::VecToPoint(Position + Facing * (Pos + dir * 1.74f + perp * 0.24f), Scale);
-
-	points[14] = Giraffe::VecToPoint(Position + Facing * (Pos + dir * 2.22f + perp * 0.28f), Scale);
-	points[15] = Giraffe::VecToPoint(Position + Facing * (Pos + dir * 2.1f + perp * 0.16f), Scale);
-	
-	points[16] = Giraffe::VecToPoint(Position + Facing * (Pos + dir * 2.4f), Scale);
-
-	points[17] = Giraffe::VecToPoint(Position + Facing * (Pos + dir * 2.1f + perp * -0.16f), Scale);
-	points[18] = Giraffe::VecToPoint(Position + Facing * (Pos + dir * 2.22f + perp * -0.28f), Scale);
-
-	points[19] = Giraffe::VecToPoint(Position + Facing * (Pos + dir * 1.74f + perp * -0.24f), Scale);
-	points[20] = Giraffe::VecToPoint(Position + Facing * (Pos + dir * 1.86f + perp * -0.36f), Scale);
-
-	points[21] = Giraffe::VecToPoint(Position + Facing * (Pos + dir * 1.32f + perp * -0.32f), Scale);
-	points[22] = Giraffe::VecToPoint(Position + Facing * (Pos + dir * 1.44f + perp * -0.4f), Scale);
-
-	points[23] = Giraffe::VecToPoint(Position + Facing * (Pos + dir * 0.9f + perp * -0.4f), Scale);
-	points[24] = Giraffe::VecToPoint(Position + Facing * (Pos + dir * 1.02f + perp * -0.52f), Scale);
-
-	points[25] = Giraffe::VecToPoint(Position + Facing * (Pos + dir * 0.48f + perp * -0.48f), Scale);
-	points[26] = Giraffe::VecToPoint(Position + Facing * (Pos + dir * 0.6f + perp * -0.6f), Scale);
-
-
-	points[27] = Giraffe::VecToPoint(Position + Facing * (Pos + dir * 0.6f), Scale);
-	points[28] = Giraffe::VecToPoint(Position + Facing * (Head + dir * 2.1f), Scale);
-
-	Polyline(hdc, points, 29);
+	POINT points[61];
+	RobotProjFuncs::Crackle(points, controlPoints, 6, 10, 0.2f, Scale);
+	Polyline(hdc, points, 61);
 }
 
 void RobotGiraffe::DrawML(HDC hdc, Vector2 Scale, Vector2 dir, Vector2 Body)

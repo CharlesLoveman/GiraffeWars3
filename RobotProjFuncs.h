@@ -156,10 +156,12 @@ struct RobotProjFuncs {
 
 	static void SmallLaserDraw(Projectile& self, Giraffe& parent, HDC hdc, Vector2 Scale, int frameNumber) {
 		SelectObject(hdc, self.Pen);
-		POINT points[2];
-		points[0] = Giraffe::VecToPoint(self.Position - self.Velocity * 0.5f, Scale);
-		points[1] = Giraffe::VecToPoint(self.Position + self.Velocity * 0.5f, Scale);
-		Polyline(hdc, points, 2);
+		Vector2 controlPoints[2];
+		controlPoints[0] = self.Position - self.Velocity * 0.5f;
+		controlPoints[1] = self.Position + self.Velocity * 0.5f;
+		POINT points[11];
+		Crackle(points, controlPoints, 1, 10, 0.1f, Scale);
+		Polyline(hdc, points, 11);
 	}
 
 	static void BigLaserDraw(Projectile& self, Giraffe& parent, HDC hdc, Vector2 Scale, int frameNumber) {
@@ -169,18 +171,20 @@ struct RobotProjFuncs {
 		dir.Normalize();
 		Vector2 perp = { -dir.y, dir.x };
 
-		POINT points[2];
-		points[0] = Giraffe::VecToPoint(self.Position - dir * 3.0f + perp * 0.5f, Scale);
-		points[1] = Giraffe::VecToPoint(self.Position + dir * 3.0f + perp * 0.5f, Scale);
-		Polyline(hdc, points, 2);
-		points[0] = Giraffe::VecToPoint(self.Position - dir * 3.0f - perp * 0.5f, Scale);
-		points[1] = Giraffe::VecToPoint(self.Position + dir * 3.0f - perp * 0.5f, Scale);
-		Polyline(hdc, points, 2);
+		Vector2 controlPoints[2];
+		POINT points[11];
+		controlPoints[0] = self.Position - dir * 3.0f + perp * 0.5f;
+		controlPoints[1] = self.Position + dir * 3.0f + perp * 0.5f;
+		Crackle(points, controlPoints, 1, 10, 0.4f, Scale);
+		Polyline(hdc, points, 11);
+		controlPoints[0] = self.Position - dir * 3.0f - perp * 0.5f;
+		controlPoints[1] = self.Position + dir * 3.0f - perp * 0.5f;
+		Crackle(points, controlPoints, 1, 10, 0.4f, Scale);
+		Polyline(hdc, points, 11);
 	}
 
 	static void BombOnHit(Projectile& self, Giraffe& parent, Giraffe* collided, int frameNumber) {
 		parent.Projectiles.Append(Projectile(self.Position, Vector2::Zero, 0, Vector2::Zero, 0, 0, 0, 0, self.ID, frameNumber + 20, StandardOnHit, StandardUpdate, B_ExplosionDraw, self.Pen, self.Brush));
-		//Need to add a bomb explosion projectile
 	}
 
 	static bool BombUpdate(Projectile& self, Giraffe& parent, int frameNumber) {
@@ -256,27 +260,62 @@ struct RobotProjFuncs {
 		controlPoints[7] = self.Position + Vector2(0.2f, -3.0f);
 		controlPoints[8] = self.Position + Vector2(0, 0);
 
-		/*POINT points[80];
-		for (int i = 0; i < 8; ++i) {
-			for (int t = 0; t < 10; ++t) {
-				points[i * 10 + t] = Giraffe::VecToPoint((t / 10.0f) * controlPoints[i + 1] + (1.0f - t / 10.0f) * controlPoints[i] + 0.3f * Vector2(((float)rand() / RAND_MAX) + 0.5f, ((float)rand() / RAND_MAX) + 0.5f), Scale);
-			}
-		}*/
-		POINT* points = Crackle(controlPoints, 8, 10, 0.3f, Scale);
-		Polyline(hdc, points, 80);
-		delete[] points;
+		POINT points[81];
+		Crackle(points, controlPoints, 8, 10, 0.3f, Scale);
+		Polyline(hdc, points, 81);
 	}
 
-	static POINT* Crackle(Vector2* controlPoints, const int numPoints, const int division, float factor, Vector2 Scale) {
-		POINT* points = new POINT[numPoints * division];
-
+	static void Crackle(POINT* points, Vector2* controlPoints, const int numPoints, const int division, float factor, Vector2 Scale) {
 		for (int i = 0; i < numPoints; ++i) {
 			for (int t = 0; t < division; ++t) {
-				points[i * 10 + t] = Giraffe::VecToPoint((t / (float)division) * controlPoints[i + 1] + (1.0f - t / (float)division) * controlPoints[i] + factor * Vector2(((float)rand() / RAND_MAX) + 0.5f, ((float)rand() / RAND_MAX) + 0.5f), Scale);
+				points[i * division + t] = Giraffe::VecToPoint((t / (float)division) * controlPoints[i + 1] + (1.0f - t / (float)division) * controlPoints[i] + factor * Vector2(((float)rand() / RAND_MAX) - 0.5f, ((float)rand() / RAND_MAX) - 0.5f), Scale);
 			}
 		}
+		points[numPoints * division] = Giraffe::VecToPoint(controlPoints[numPoints], Scale);
+	}
 
-		return points;
+	static void SwordOnHit(Projectile& self, Giraffe& parent, Giraffe* collided, int frameNumber) {
+		if (!(collided == nullptr) && !(self.Fixed)) {
+			parent.Projectiles.Append(Projectile(self.Position, -self.Velocity, 1.5f, -self.Force, 0.5f, 0.5f, 0.5f, true, self.ID, frameNumber + 50, SwordOnHit, SwordUpdate, SwordDraw, self.Pen, self.Brush));
+		}
+	}
+
+	static bool SwordUpdate(Projectile& self, Giraffe& parent, int frameNumber) {
+		if (frameNumber >= self.LifeSpan) {
+			if (!self.Fixed) {
+				parent.Projectiles.Append(Projectile(self.Position, -self.Velocity, 1.5f, -self.Force, 0.5f, 0.5f, 0.5f, true, self.ID, frameNumber + 50, SwordOnHit, SwordUpdate, SwordDraw, self.Pen, self.Brush));
+			}
+			return true;
+		}
+		return false;
+	}
+
+	static void SwordDraw(Projectile& self, Giraffe& parent, HDC hdc, Vector2 Scale, int frameNumber) {
+		SelectObject(hdc, self.Pen);
+		float theta = frameNumber / 15.0f * 3.14159f;
+		Vector2 dir = { sinf(theta), -cosf(theta) };
+		Vector2 perp = { -dir.y, dir.x };
+		dir.Normalize();
+
+		POINT points[61];
+		points[0] = Giraffe::VecToPoint(self.Position, Scale);
+		points[1] = Giraffe::VecToPoint(self.Position - 1.5f * dir, Scale);
+		points[2] = Giraffe::VecToPoint(self.Position - 1.2f * dir, Scale);
+		points[3] = Giraffe::VecToPoint(self.Position - 1.2f * dir + perp * 0.2f, Scale);
+		points[4] = Giraffe::VecToPoint(self.Position - 1.2f * dir - perp * 0.2f, Scale);
+		Polyline(hdc, points, 5);
+
+		Vector2 controlPoints[7];
+		controlPoints[0] = self.Position - 1.2f * dir + perp * 0.2f;
+		controlPoints[1] = self.Position - 0.7f * dir + perp * 0.3f;
+		controlPoints[2] = self.Position + 0.5f * dir + perp * 0.2f;
+		controlPoints[3] = self.Position + dir;
+		controlPoints[4] = self.Position + 0.5f * dir + perp * -0.2f;
+		controlPoints[5] = self.Position - 0.7f * dir + perp * -0.3f;
+		controlPoints[6] = self.Position - 1.2f * dir + perp * -0.2f;
+
+		Crackle(points, controlPoints, 6, 10, 0.2f, Scale);
+		Polyline(hdc, points, 61);
 	}
 };
 

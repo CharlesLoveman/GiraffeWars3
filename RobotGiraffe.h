@@ -18,6 +18,8 @@ private:
 	HBRUSH ShineBrush;
 	int Charge;
 	bool BigLaser;
+	bool HasSword;
+	int SwordDelay;
 	void DrawSelf(HDC hdc, Vector2 Scale, int CurrentFrame, int CurrentAnim);
 	void DrawHitbox(HDC hdc, Vector2 Scale, Vector2 Pos, float Rad);
 	void DrawAxe(HDC hdc, Vector2 Scale, Vector2 Neck, Vector2 Head);

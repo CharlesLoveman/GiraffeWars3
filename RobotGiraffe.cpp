@@ -340,9 +340,9 @@ void RobotGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraff
 		{
 			//Neutral B
 			AttackNum = 30;
-			if (Charge > 1000) {
+			BigLaser = Charge > 1000;
+			if (BigLaser) {
 				Charge = 0;
-				BigLaser = true;
 			}
 		}
 		if (State & STATE_JUMPING) {
@@ -516,15 +516,12 @@ void RobotGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraff
 	//Small Laser
 	if ((State & STATE_HEAVY) && !(State & (STATE_WEAK | STATE_UP | STATE_FORWARD | STATE_BACK | STATE_DOWN))) {
 		if (!BigLaser && AnimFrame == 7) {
-			Projectiles.Append(Projectile(Position + Vector2(0, -1.5f), { Facing.x, 0.0f }, 0.2f, { Facing.x, 0.0f }, 0.1f, 0.1f, 0.0f, true, LastAttackID, frameNumber + 50, RobotProjFuncs::StandardOnHit, RobotProjFuncs::StandardUpdate, RobotProjFuncs::SmallLaserDraw, GiraffePen, nullptr));
+			Projectiles.Append(Projectile(Position + Vector2(0.5, -0.5f), { Facing.x, 0.0f }, 0.3f, { Facing.x, 0.0f }, 0.1f, 0.1f, 0.0f, true, LastAttackID, frameNumber + 50, RobotProjFuncs::StandardOnHit, RobotProjFuncs::StandardUpdate, RobotProjFuncs::SmallLaserDraw, GiraffePen, nullptr));
 		}
-		else if (BigLaser && AnimFrame >= 7 && AnimFrame % 3 == 0) {
-			Projectiles.Append(Projectile(Position + Vector2(0, -1.5f), { Facing.x, -1.0f }, 0.2f, { Facing.x, -1.0f }, 2.0f, 1.0f, 1.0f, false, LastAttackID++, frameNumber + 50, RobotProjFuncs::StandardOnHit, RobotProjFuncs::StandardUpdate, RobotProjFuncs::BigLaserDraw, GiraffePen, nullptr));
+		else if (BigLaser && AnimFrame >= 7) {
+			Projectiles.Append(Projectile(Position + Vector2(0.5f, -1.0f), { 5 * Facing.x, -3.0f }, 1.0f, { Facing.x, -1.0f }, 2.0f, 1.0f, 1.0f, false, LastAttackID++, frameNumber + 50, RobotProjFuncs::StandardOnHit, RobotProjFuncs::StandardUpdate, RobotProjFuncs::BigLaserDraw, GiraffePen, nullptr));
 			if (State & STATE_JUMPING) {
 				Velocity = { 0, -Gravity - 0.00001f };
-			}
-			if (AttackDelay == frameNumber + 1) {
-				BigLaser = false;
 			}
 		}
 	}

@@ -751,8 +751,8 @@ void CoolGiraffe::Draw(HDC hdc, Vector2 Scale, int frameNumber)
 			CurrentFrame = 30;
 		}
 		else if (State & STATE_LEDGEHOG) {
-			CurrentAnim = 6;
-			CurrentFrame = AnimFrame % 16;
+			CurrentAnim = 9;
+			CurrentFrame = 0;
 		}
 		else if (State & (STATE_WAVEDASH | STATE_CROUCH)) {
 			CurrentAnim = 7;

@@ -9,6 +9,7 @@
 #include <array>
 #include "MoveSet.h"
 #include "NormMoveSet.h"
+#include "CoolMoveSet.h"
 #include "AudioPlayer.h"
 
 #pragma comment(lib, "Ws2_32.lib")
@@ -110,12 +111,14 @@ bool __cdecl gw_load_game_state_callback(unsigned char* buffer, int len)
 	
 	int normSize = sizeof(gs.normGiraffes[0]) * gs.normGiraffes.size();
 	int robotSize = sizeof(gs.robotGiraffes[0]) * gs.robotGiraffes.size();
+	int coolSize = sizeof(gs.coolGiraffes[0]) * gs.coolGiraffes.size();
 	int ledgeSize = sizeof(gs.stage.Ledges[0]) * gs.stage.Ledges.size();
-	int gsSize = len - normSize - robotSize - ledgeSize;
+	int gsSize = len - normSize - robotSize - coolSize - ledgeSize;
 	memcpy(&gs, buffer, gsSize);
 	memcpy(gs.normGiraffes.data(), buffer + gsSize, normSize);
 	memcpy(gs.robotGiraffes.data(), buffer + gsSize + normSize, robotSize);
-	memcpy(gs.stage.Ledges.data(), buffer + gsSize + normSize + robotSize, ledgeSize);
+	memcpy(gs.coolGiraffes.data(), buffer + gsSize + normSize + robotSize, coolSize);
+	memcpy(gs.stage.Ledges.data(), buffer + gsSize + normSize + robotSize + coolSize, ledgeSize);
 
 	return true;
 }
@@ -126,9 +129,10 @@ bool __cdecl gw_save_game_state_callback(unsigned char** buffer, int* len, int* 
 {
 	int normSize = sizeof(gs.normGiraffes[0]) * gs.normGiraffes.size();
 	int robotSize = sizeof(gs.robotGiraffes[0]) * gs.robotGiraffes.size();
+	int coolSize = sizeof(gs.coolGiraffes[0]) * gs.coolGiraffes.size();
 	int ledgeSize = sizeof(gs.stage.Ledges[0]) * gs.stage.Ledges.size();
 	int gsSize = sizeof(gs);
-	*len = gsSize + normSize + robotSize + ledgeSize;
+	*len = gsSize + normSize + robotSize + coolSize + ledgeSize;
 	*buffer = (unsigned char*)malloc(*len);
 	if (!*buffer) {
 		return false;
@@ -138,7 +142,8 @@ bool __cdecl gw_save_game_state_callback(unsigned char** buffer, int* len, int* 
 	memcpy(*buffer, &gs, *len);
 	memcpy(*buffer + gsSize, gs.normGiraffes.data(), normSize);
 	memcpy(*buffer + gsSize + normSize, gs.robotGiraffes.data(), robotSize);
-	memcpy(*buffer + gsSize + normSize + robotSize, gs.stage.Ledges.data(), ledgeSize);
+	memcpy(*buffer + gsSize + normSize + robotSize, gs.coolGiraffes.data(), coolSize);
+	memcpy(*buffer + gsSize + normSize + robotSize + coolSize, gs.stage.Ledges.data(), ledgeSize);
 
 	return true;
 }
@@ -192,9 +197,7 @@ void GiraffeWar_Init(HWND hwnd, unsigned short localport, GGPOPlayer* players, i
 
 	MoveSets[0] = new NormMoveSet();
 	MoveSets[1] = new RobotMoveSet();
-	for (int i = 2; i < GGPO_MAX_PLAYERS; ++i) {
-		MoveSets[i] = new NormMoveSet();
-	}
+	MoveSets[2] = new CoolMoveSet();
 
 	//Initialize the game state
 	gs.Init(hwnd, num_players, MoveSets);
@@ -258,10 +261,9 @@ void GiraffeWar_InitSpectator(HWND hwnd, unsigned short localport, int num_playe
 	renderer = new GDIRenderer(hwnd);
 	audioPlayer = new AudioPlayer();
 
-	//std::shared_ptr<NormMoveSet> pNorm = std::make_shared<NormMoveSet>();
-	for (int i = 0; i < 4; ++i) {
-		MoveSets[i] = new NormMoveSet();
-	}
+	MoveSets[0] = new NormMoveSet();
+	MoveSets[1] = new RobotMoveSet();
+	MoveSets[2] = new CoolMoveSet();
 
 	//Initialize the game state
 	gs.Init(hwnd, num_players, MoveSets);

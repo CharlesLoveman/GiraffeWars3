@@ -3,6 +3,7 @@
 #include "Giraffe.h"
 #include "NormGiraffe.h"
 #include "RobotGiraffe.h"
+#include "CoolGiraffe.h"
 #include "Stage.h"
 #include "MoveSet.h"
 #include <memory>
@@ -29,6 +30,7 @@ struct GameState
 	std::array<Giraffe*, 4> giraffes;
 	std::vector<NormGiraffe> normGiraffes;
 	std::vector<RobotGiraffe> robotGiraffes;
+	std::vector<CoolGiraffe> coolGiraffes;
 	Stage stage;
 	//HINSTANCE hInst;
 };

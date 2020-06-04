@@ -39,17 +39,20 @@ void GameState::Init(HWND hwnd, int num_players, const std::array<MoveSet*, 4> M
 	_giraffeColours[2] = RGB(0, 0, 255);
 	_giraffeColours[3] = RGB(255, 255, 0);
 
-	int counter = 0;
+	//int counter = 0;
 
-	robotGiraffes.push_back(RobotGiraffe(Vector2(stageleft + stagewidth * 1.0f / (2.0f * _num_giraffes), 20), MoveSets[1], _giraffeColours[0]));
-	giraffes[counter] = &robotGiraffes[0];
-	counter++;
+	coolGiraffes.push_back(CoolGiraffe(Vector2(stageleft + stagewidth * 1.0f / (2.0f * _num_giraffes), 20), MoveSets[2], _giraffeColours[0]));
+	giraffes[0] = &coolGiraffes[0];
 
-	for (int i = 0; i < _num_giraffes - robotGiraffes.size(); ++i) {
+	robotGiraffes.push_back(RobotGiraffe(Vector2(stageleft + stagewidth * 3.0f / (2.0f * _num_giraffes), 20), MoveSets[1], _giraffeColours[1]));
+	giraffes[1] = &robotGiraffes[0];
+	//counter++;
+
+	/*for (int i = 0; i < _num_giraffes; ++i) {
 		normGiraffes.push_back(NormGiraffe(Vector2(stageleft + stagewidth * (2.0f * counter + 1.0f) / (2.0f * _num_giraffes), 20), MoveSets[0], _giraffeColours[counter]));
 		giraffes[counter] = &normGiraffes[i];
 		counter++;
-	}
+	}*/
 
 
 	stage.Box = { stageleft, stagetop, stageleft + stagewidth, stagetop + stageheight };

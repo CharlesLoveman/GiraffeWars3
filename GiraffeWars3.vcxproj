@@ -136,6 +136,8 @@
   <ItemGroup>
     <ClCompile Include="AudioPlayer.cpp" />
     <ClCompile Include="Collider.cpp" />
+    <ClCompile Include="CoolGiraffe.cpp" />
+    <ClCompile Include="CoolMoveSet.cpp" />
     <ClCompile Include="gamestate.cpp" />
     <ClCompile Include="gdi_renderer.cpp" />
     <ClCompile Include="Giraffe.cpp" />
@@ -155,6 +157,9 @@
     <ClInclude Include="attackbankheader.h" />
     <ClInclude Include="AudioPlayer.h" />
     <ClInclude Include="Collider.h" />
+    <ClInclude Include="CoolGiraffe.h" />
+    <ClInclude Include="CoolMoveSet.h" />
+    <ClInclude Include="CoolProjFuncs.h" />
     <ClInclude Include="gamestate.h" />
     <ClInclude Include="gdi_renderer.h" />
     <ClInclude Include="Giraffe.h" />

@@ -142,6 +142,12 @@ void Giraffe::Move(Stage& stage, const int frameNumber, std::array<Giraffe*, 4> 
 				SoundMoveState |= SOUND_JUMPLAND;
 				SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_JUMPLAND] = frameNumber + Moves->GetMoveSoundLength(XACT_WAVEBANK_MOVEBANK_JUMPLAND);
 				if (State & STATE_HITSTUN && !(State & STATE_TECHATTEMPT)) {
+					if (Velocity.x > 0) {
+						Facing.x = -1;
+					}
+					else {
+						Facing.x = 1;
+					}
 					Velocity = { 0,0 };
 					State |= STATE_KNOCKDOWNLAG;
 					State &= ~STATE_HITSTUN;

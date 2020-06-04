@@ -41,25 +41,14 @@ void GameState::Init(HWND hwnd, int num_players, const std::array<MoveSet*, 4> M
 
 	//int counter = 0;
 
-	coolGiraffes.push_back(CoolGiraffe(Vector2(stageleft + stagewidth * 1.0f / (2.0f * _num_giraffes), 20), MoveSets[2], _giraffeColours[0]));
-	giraffes[0] = &coolGiraffes[0];
-
-	robotGiraffes.push_back(RobotGiraffe(Vector2(stageleft + stagewidth * 3.0f / (2.0f * _num_giraffes), 20), MoveSets[1], _giraffeColours[1]));
-	giraffes[1] = &robotGiraffes[0];
+	giraffes[0] = new CoolGiraffe(Vector2(stageleft + stagewidth * 1.0f / (2.0f * _num_giraffes), 20), MoveSets[2], _giraffeColours[0]);
+	giraffes[1] = new RobotGiraffe(Vector2(stageleft + stagewidth * 3.0f / (2.0f * _num_giraffes), 20), MoveSets[1], _giraffeColours[1]);
 	//counter++;
-
-	/*for (int i = 0; i < _num_giraffes; ++i) {
-		normGiraffes.push_back(NormGiraffe(Vector2(stageleft + stagewidth * (2.0f * counter + 1.0f) / (2.0f * _num_giraffes), 20), MoveSets[0], _giraffeColours[counter]));
-		giraffes[counter] = &normGiraffes[i];
-		counter++;
-	}*/
 
 
 	stage.Box = { stageleft, stagetop, stageleft + stagewidth, stagetop + stageheight };
 	stage.Platforms = { {(float)(stageleft + stagewidth / 2.0f - stagewidth / 10.0f), (float)(stagetop - 2 * stageheight - 0.1f), (float)(stageleft + stagewidth / 2.0f + stagewidth / 10.0f), (float)(stagetop - 2 * stageheight + 0.1f)}, {(float)(stageleft + stagewidth / 4.0f - stagewidth / 10.0f), (float)(stagetop - stageheight - 0.1f), (float)(stageleft + stagewidth / 4.0f + stagewidth / 10.0f), (float)(stagetop - stageheight + 0.1f)}, {(float)(stageleft + 3 * stagewidth / 4.0f - stagewidth / 10.0f), (float)(stagetop - stageheight - 0.1f), (float)(stageleft + 3 * stagewidth / 4.0f + stagewidth / 10.0f), (float)(stagetop - stageheight + 0.1f)} };
 	stage.Ledges = { { { {stageleft, stagetop + 0.5f}, 0.5f}, false, true}, { {{stageleft + stagewidth, stagetop + 0.5f}, 0.5f}, false, false } };
-	//stage = { {stageleft, stagetop, stageleft + stagewidth, stagetop + stageheight}, {{(float)(stageleft + stagewidth / 2.0f - stagewidth / 10.0f), (float)(stagetop - 2 * stageheight - 0.1f), (float)(stageleft + stagewidth / 2.0f + stagewidth / 10.0f), (float)(stagetop - 2 * stageheight + 0.1f)}, {(float)(stageleft + stagewidth / 4.0f - stagewidth / 10.0f), (float)(stagetop - stageheight - 0.1f), (float)(stageleft + stagewidth / 4.0f + stagewidth / 10.0f), (float)(stagetop - stageheight + 0.1f)}, {(float)(stageleft + 3 * stagewidth / 4.0f - stagewidth / 10.0f), (float)(stagetop - stageheight - 0.1f), (float)(stageleft + 3 * stagewidth / 4.0f + stagewidth / 10.0f), (float)(stagetop - stageheight + 0.1f)}}, {{{{stageleft, stagetop + 0.5f}, 0.5f}, false, true}, {{{stageleft + stagewidth, stagetop + 0.5f}, 0.5f}, false, false}} };
-
 
 	InflateRect(&_bounds, -8, -8);
 }

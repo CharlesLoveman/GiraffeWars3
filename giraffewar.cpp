@@ -108,17 +108,16 @@ bool __cdecl gw_advance_frame_callback(int)
 //Match the current state to the one provided by GGPO
 bool __cdecl gw_load_game_state_callback(unsigned char* buffer, int len)
 {
-	
-	int normSize = sizeof(gs.normGiraffes[0]) * gs.normGiraffes.size();
-	int robotSize = sizeof(gs.robotGiraffes[0]) * gs.robotGiraffes.size();
-	int coolSize = sizeof(gs.coolGiraffes[0]) * gs.coolGiraffes.size();
+	int giraffeSize = 0;
 	int ledgeSize = sizeof(gs.stage.Ledges[0]) * gs.stage.Ledges.size();
-	int gsSize = len - normSize - robotSize - coolSize - ledgeSize;
+	int gsSize = sizeof(gs);
 	memcpy(&gs, buffer, gsSize);
-	memcpy(gs.normGiraffes.data(), buffer + gsSize, normSize);
-	memcpy(gs.robotGiraffes.data(), buffer + gsSize + normSize, robotSize);
-	memcpy(gs.coolGiraffes.data(), buffer + gsSize + normSize + robotSize, coolSize);
-	memcpy(gs.stage.Ledges.data(), buffer + gsSize + normSize + robotSize + coolSize, ledgeSize);
+
+	for (int i = 0; i < gs._num_giraffes; ++i) {
+		memcpy(gs.giraffes[i], buffer + gsSize + giraffeSize, sizeof(*gs.giraffes[i]));
+		giraffeSize += sizeof(*gs.giraffes[i]);
+	}
+	memcpy(gs.stage.Ledges.data(), buffer + gsSize + giraffeSize, ledgeSize);
 
 	return true;
 }
@@ -127,23 +126,28 @@ bool __cdecl gw_load_game_state_callback(unsigned char* buffer, int len)
 //Saves the current state to the buffer
 bool __cdecl gw_save_game_state_callback(unsigned char** buffer, int* len, int* checksum, int)
 {
-	int normSize = sizeof(gs.normGiraffes[0]) * gs.normGiraffes.size();
-	int robotSize = sizeof(gs.robotGiraffes[0]) * gs.robotGiraffes.size();
-	int coolSize = sizeof(gs.coolGiraffes[0]) * gs.coolGiraffes.size();
+	int giraffeSize = 0;
+	for (int i = 0; i < gs._num_giraffes; ++i) {
+		giraffeSize += sizeof(*gs.giraffes[i]);
+	}
+
 	int ledgeSize = sizeof(gs.stage.Ledges[0]) * gs.stage.Ledges.size();
 	int gsSize = sizeof(gs);
-	*len = gsSize + normSize + robotSize + coolSize + ledgeSize;
+	*len = gsSize + giraffeSize + ledgeSize;
 	*buffer = (unsigned char*)malloc(*len);
 	if (!*buffer) {
 		return false;
 	}
 
-	*checksum = fletcher32_checksum((short*)gs.normGiraffes.data(), sizeof(gs.normGiraffes[0]) * gs.normGiraffes.size() / 2);
+	//*checksum = fletcher32_checksum((short*)gs.normGiraffes.data(), sizeof(gs.normGiraffes[0]) * gs.normGiraffes.size() / 2);
 	memcpy(*buffer, &gs, *len);
-	memcpy(*buffer + gsSize, gs.normGiraffes.data(), normSize);
-	memcpy(*buffer + gsSize + normSize, gs.robotGiraffes.data(), robotSize);
-	memcpy(*buffer + gsSize + normSize + robotSize, gs.coolGiraffes.data(), coolSize);
-	memcpy(*buffer + gsSize + normSize + robotSize + coolSize, gs.stage.Ledges.data(), ledgeSize);
+	*checksum = fletcher32_checksum((short*)buffer, *len);
+	giraffeSize = 0;
+	for (int i = 0; i < gs._num_giraffes; ++i) {
+		memcpy(*buffer + gsSize + giraffeSize, gs.giraffes[i], sizeof(*gs.giraffes[i]));
+		giraffeSize += sizeof(*gs.giraffes[i]);
+	}
+	memcpy(*buffer + gsSize + giraffeSize, gs.stage.Ledges.data(), ledgeSize);
 
 	return true;
 }
@@ -322,7 +326,7 @@ void GiraffeWar_AdvanceFrame(int inputs[], int disconnect_flags)
 
 	//update the checksums
 	ngs.now.framenumber = gs._framenumber;
-	ngs.now.checksum = fletcher32_checksum((short*)& gs.normGiraffes, sizeof(gs.normGiraffes) / 2);
+	ngs.now.checksum = fletcher32_checksum((short*)gs.giraffes[0], sizeof(*gs.giraffes[0]) / 2);
 	if ((gs._framenumber % 90) == 0) {
 		ngs.periodic = ngs.now;
 	}

@@ -404,6 +404,9 @@ void GiraffeWar_Exit()
 	for (int i = 0; i < 4; ++i) {
 		delete MoveSets[i];
 	}
+	for (int i = 0; i < gs._num_giraffes; ++i) {
+		delete gs.giraffes[i];
+	}
 
 	if (ggpo) {
 		ggpo_close_session(ggpo);

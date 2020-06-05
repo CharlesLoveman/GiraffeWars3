@@ -16,6 +16,12 @@ public:
 	int GetMoveLength(int MoveId);
 	int GetAttackSoundLength(int AttackId);
 	int GetMoveSoundLength(int MoveId);
+	void InitMoves();
+	void InitThrows();
+	void InitTilts();
+	void InitSmashes();
+	void InitAerials();
+	void InitSpecials();
 
 private:
 	std::array<std::vector<std::vector<HitCollider>>, NUM_MOVES> Hitboxes;
@@ -24,6 +30,8 @@ private:
 	std::array<int, 10> LandingLag;
 	std::array<int, XACT_WAVEBANK_ATTACKBANK_ENTRY_COUNT> AttackSoundLengths;
 	std::array<int, XACT_WAVEBANK_MOVEBANK_ENTRY_COUNT> MoveSoundLengths;
+
+
 };
 
 #endif

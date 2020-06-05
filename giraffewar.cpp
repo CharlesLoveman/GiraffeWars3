@@ -203,6 +203,15 @@ void GiraffeWar_Init(HWND hwnd, unsigned short localport, GGPOPlayer* players, i
 	MoveSets[1] = new RobotMoveSet();
 	MoveSets[2] = new CoolMoveSet();
 
+	for (int i = 0; i < 3; ++i) {
+		MoveSets[i]->InitMoves();
+		MoveSets[i]->InitThrows();
+		MoveSets[i]->InitTilts();
+		MoveSets[i]->InitSmashes();
+		MoveSets[i]->InitAerials();
+		MoveSets[i]->InitSpecials();
+	}
+
 	//Initialize the game state
 	gs.Init(hwnd, num_players, MoveSets);
 	ngs.num_players = num_players;

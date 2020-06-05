@@ -515,8 +515,8 @@ void CoolGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 	else if ((State & STATE_JUMPING) && (State & STATE_WEAK) && (State & STATE_BACK) && AnimFrame == 7) {
 		Facing.x *= -1;
 	}
-	//Spin like a maniac in get-up attack
-	else if ((State & STATE_GETUPATTACK) && (7 <= AnimFrame) && (AnimFrame <= 10)) {
+	//Reverse direction in dtilt
+	else if (!(State & STATE_JUMPING) && (State & STATE_WEAK) && (State & STATE_DOWN) && AnimFrame == 7) {
 		Facing.x *= -1;
 	}
 

@@ -503,8 +503,8 @@ void CoolGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 			}
 		}
 		//Main hit of upsmash
-		else if (AnimFrame == 17) {
-			++LastAttackID;
+		else if (AnimFrame == 24) {
+			Facing.x *= -1;
 		}
 	}
 	//Fire spit

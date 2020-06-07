@@ -126,7 +126,7 @@ void CoolGiraffe::Update(std::array<Giraffe*, GGPO_MAX_PLAYERS> giraffes, const 
 		Facing.x *= -1;
 	}
 	//Reverse direction in dtilt
-	else if (!(State & STATE_JUMPING) && (State & STATE_WEAK) && (State & STATE_DOWN) && AnimFrame == 7) {
+	else if (!(State & STATE_JUMPING) && (State & STATE_WEAK) && (State & STATE_DOWN) && (AnimFrame == 7 || AnimFrame == 0)) {
 		Facing.x *= -1;
 	}
 

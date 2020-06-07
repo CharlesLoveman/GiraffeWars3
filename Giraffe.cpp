@@ -63,7 +63,7 @@ POINT Giraffe::VecToPoint(Vector2 vec, Vector2 scale)
 	return { (int)(vec.x * scale.x), (int)(vec.y * scale.y) };
 }
 
-void Giraffe::Move(Stage& stage, const int frameNumber, std::array<Giraffe*, 4> giraffes)
+void Giraffe::Move(Stage& stage, const int frameNumber, std::array<Giraffe*, 4> giraffes, std::vector<Line>& lines)
 {
 	//Recieve incoming hits
 	if (!(State & STATE_INTANGIBLE)) {
@@ -197,27 +197,19 @@ void Giraffe::Move(Stage& stage, const int frameNumber, std::array<Giraffe*, 4> 
 
 	//Make giraffes loop around like pac-man
 	//Remove this later
-	if (Position.y > 60) {
-		Position.y = 0;
+	if (Position.y < -5 || Position.y > 55 || Position.x < -5 || Position.x > 60) {
+		std::vector<Vector2> points = *(Moves->GetSkelPoints(0, 0));
+		for (int i = 0; i < points.size() - 1; ++i) {
+			lines.push_back(Line(Position, -Velocity + Vector2(rand() / (float)RAND_MAX - 0.5f, rand() / (float)RAND_MAX - 0.5f), Vector2::Distance(points[i], points[i+1]) / 2.0f, frameNumber + 30, GiraffePen));
+		}
+		Position = {0.5f * (stage.Box.left + stage.Box.right), 0};
+		Velocity = { 0,0 };
 		Knockback = 0;
-		SoundMoveState |= SOUND_DEATH;
-		SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_DEATH] = frameNumber + Moves->GetMoveSoundLength(XACT_WAVEBANK_MOVEBANK_DEATH);
-	}
-	else if (Position.y < 0) {
-		Position.y = 60;
-		Knockback = 0;
-		SoundMoveState |= SOUND_DEATH;
-		SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_DEATH] = frameNumber + Moves->GetMoveSoundLength(XACT_WAVEBANK_MOVEBANK_DEATH);
-	}
-	if (Position.x > 60) {
-		Position.x = 0;
-		Knockback = 0;
-		SoundMoveState |= SOUND_DEATH;
-		SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_DEATH] = frameNumber + Moves->GetMoveSoundLength(XACT_WAVEBANK_MOVEBANK_DEATH);
-	}
-	else if (Position.x < 0) {
-		Position.x = 60;
-		Knockback = 0;
+		State = STATE_INTANGIBLE;
+		TechDelay = frameNumber + 60;
+
+		--Stocks;
+
 		SoundMoveState |= SOUND_DEATH;
 		SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_DEATH] = frameNumber + Moves->GetMoveSoundLength(XACT_WAVEBANK_MOVEBANK_DEATH);
 	}
@@ -287,6 +279,9 @@ void Giraffe::TransitionStates(const int frameNumber)
 	}
 	else if (State & (STATE_GRABBING | STATE_GRABBED) && frameNumber >= TechDelay) {
 		State &= ~(STATE_GRABBED | STATE_GRABBING);
+	}
+	else if (State & STATE_INTANGIBLE && frameNumber >= TechDelay) {
+		State &= ~STATE_INTANGIBLE;
 	}
 
 	for (int i = 0; i < XACT_WAVEBANK_MOVEBANK_ENTRY_COUNT; ++i) {

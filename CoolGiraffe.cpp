@@ -47,7 +47,7 @@ CoolGiraffe::CoolGiraffe(Vector2 _Position, MoveSet* _Moves, COLORREF _Colour)
 	//Misc
 	Stocks = 3;
 	Knockback = 0;
-	Mass = 100;
+	Mass = 80;
 	CommandGrabPointer = 0;
 
 	//Animation

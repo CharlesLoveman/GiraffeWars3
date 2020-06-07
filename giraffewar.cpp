@@ -110,13 +110,21 @@ bool __cdecl gw_load_game_state_callback(unsigned char* buffer, int len)
 {
 	int giraffeSize = 0;
 	int ledgeSize = sizeof(gs.stage.Ledges[0]) * gs.stage.Ledges.size();
+	/*int lineSize = 0;
+	if (gs.lines.size() > 0) {
+		lineSize = sizeof(gs.lines[0]) * gs.lines.size();
+	}*/
 	int gsSize = sizeof(gs);
+
 	memcpy(&gs, buffer, gsSize);
 
 	for (int i = 0; i < gs._num_giraffes; ++i) {
 		memcpy(gs.giraffes[i], buffer + gsSize + giraffeSize, sizeof(*gs.giraffes[i]));
 		giraffeSize += sizeof(*gs.giraffes[i]);
 	}
+
+	//memcpy(gs.lines.data(), buffer + gsSize + giraffeSize, lineSize);
+
 	memcpy(gs.stage.Ledges.data(), buffer + gsSize + giraffeSize, ledgeSize);
 
 	return true;
@@ -133,6 +141,7 @@ bool __cdecl gw_save_game_state_callback(unsigned char** buffer, int* len, int* 
 
 	int ledgeSize = sizeof(gs.stage.Ledges[0]) * gs.stage.Ledges.size();
 	int gsSize = sizeof(gs);
+
 	*len = gsSize + giraffeSize + ledgeSize;
 	*buffer = (unsigned char*)malloc(*len);
 	if (!*buffer) {

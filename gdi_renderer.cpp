@@ -51,6 +51,10 @@ void GDIRenderer::Draw(GameState& gs, NonGameState& ngs)
 	SetBkMode(hdc, TRANSPARENT);
 	SelectObject(hdc, _font);
 
+	for (int i = 0; i < gs.lines.size(); ++i) {
+		gs.lines[i].Draw(hdc, Scale, gs._framenumber);
+	}
+
 	for (int i = 0; i < gs._num_giraffes; ++i) {
 		SetTextColor(hdc, _giraffeColours[i]);
 		//SelectObject(hdc, _giraffePens[i]);

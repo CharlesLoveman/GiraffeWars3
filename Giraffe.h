@@ -13,6 +13,7 @@
 #include "SimpleMath.h"
 #include "movebankheader.h"
 #include "attackbankheader.h"
+#include "Line.h"
 
 using namespace DirectX::SimpleMath;
 
@@ -102,7 +103,7 @@ public:
 	virtual ~Giraffe() { };
 	virtual void Update(std::array<Giraffe*, GGPO_MAX_PLAYERS> giraffes, const int num_giraffes, const int i, const int inputs, const int frameNumber, Stage& stage) = 0;
 	virtual void Draw(HDC hdc, Vector2 Scale, int frameNumber) = 0;
-	void Move(Stage& stage, const int frameNumber, std::array<Giraffe*, 4> giraffes);
+	void Move(Stage& stage, const int frameNumber, std::array<Giraffe*, 4> giraffes, std::vector<Line>& lines);
 	bool AddHit(HitCollider hit, int ID, Vector2 facing, Vector2 position);
 	bool ProjectileHit(Projectile p);
 	bool GrabHit(Collider col, Vector2 _Facing, int frameNumber);

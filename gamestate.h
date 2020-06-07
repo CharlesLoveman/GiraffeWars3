@@ -8,6 +8,7 @@
 #include "MoveSet.h"
 #include <memory>
 #include <array>
+#include "Line.h"
 
 //Structure to be serialized at each frame
 //Needs to be small
@@ -23,8 +24,9 @@ struct GameState
 	int _framenumber;
 	int _num_giraffes;
 	RECT _bounds;
-	std::array<Giraffe*, 4> giraffes;
+	std::array<Giraffe*, GGPO_MAX_PLAYERS> giraffes;
 	Stage stage;
+	std::vector<Line> lines;
 };
 #endif // !_GAMESTATE_H_
 

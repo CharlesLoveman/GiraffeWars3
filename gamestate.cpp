@@ -67,6 +67,12 @@ void GameState::Update(int inputs[], int disconnect_flags)
 	}
 
 	for (int i = 0; i < _num_giraffes; ++i) {
-		(*giraffes[i]).Move(stage, _framenumber, giraffes);
+		(*giraffes[i]).Move(stage, _framenumber, giraffes, lines);
+	}
+
+	for (int i = lines.size() - 1; i > 0; --i) {
+		if (lines[i].Update(_framenumber)) {
+			lines.erase(lines.begin() + i);
+		}
 	}
 }

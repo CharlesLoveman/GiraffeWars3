@@ -142,6 +142,7 @@
     <ClCompile Include="gamestate.cpp" />
     <ClCompile Include="gdi_renderer.cpp" />
     <ClCompile Include="Giraffe.cpp" />
+    <ClCompile Include="Line.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="giraffewar.cpp" />
     <ClCompile Include="NormGiraffe.cpp" />
@@ -164,6 +165,7 @@
     <ClInclude Include="gamestate.h" />
     <ClInclude Include="gdi_renderer.h" />
     <ClInclude Include="Giraffe.h" />
+    <ClInclude Include="Line.h" />
     <ClInclude Include="movebankheader.h" />
     <ClInclude Include="MoveSet.h" />
     <ClInclude Include="nongamestate.h" />

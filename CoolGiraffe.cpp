@@ -141,7 +141,7 @@ void CoolGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 
 
 	//Read Inputs
-	if (!(State & (STATE_WEAK | STATE_HEAVY | STATE_JUMPSQUAT | STATE_JUMPLAND | STATE_DROPSHIELD | STATE_SHIELDSTUN | STATE_HITSTUN | STATE_KNOCKDOWNLAG | STATE_ROLLING | STATE_GRABBED | STATE_THROW))) {
+	if (!(State & (STATE_JUMPSQUAT | STATE_JUMPLAND | STATE_DROPSHIELD | STATE_SHIELDSTUN | STATE_KNOCKDOWNLAG | STATE_ROLLING | STATE_GRABBED | STATE_THROW))) {
 		if (State & STATE_LEDGEHOG) {
 			if (inputs & INPUT_DOWN) {
 				State &= ~STATE_LEDGEHOG;
@@ -193,16 +193,26 @@ void CoolGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 				SoundAttackDelay[XACT_WAVEBANK_ATTACKBANK_BACKTHROW] = frameNumber + Moves->GetAttackSoundLength(XACT_WAVEBANK_ATTACKBANK_BACKTHROW);
 			}
 		}
-		else if (State & STATE_JUMPING) {
-			if (inputs & INPUT_LEFT) {
-				if (Velocity.x > -MaxAirSpeed.x) {
-					Velocity.x -= AirAccel;
-				}
+		else if (State & STATE_HITSTUN && State & STATE_JUMPING) {
+			if (inputs & INPUT_LEFT && Velocity.x > -MaxAirSpeed.x) {
+				Velocity.x -= AirAccel / 10.0f;
 			}
-			else if (inputs & INPUT_RIGHT) {
-				if (Velocity.x < MaxAirSpeed.x) {
-					Velocity.x += AirAccel;
-				}
+			else if (inputs & INPUT_RIGHT && Velocity.x < MaxAirSpeed.x) {
+				Velocity.x += AirAccel / 10.0f;
+			}
+			if (inputs & INPUT_UP && Velocity.y > -MaxAirSpeed.y) {
+				Velocity.y -= AirAccel / 10.0f;
+			}
+			else if (inputs & INPUT_DOWN && Velocity.y < MaxAirSpeed.y) {
+				Velocity.y += AirAccel / 10.0f;
+			}
+		}
+		else if (State & STATE_JUMPING) {
+			if (inputs & INPUT_LEFT && Velocity.x > -MaxAirSpeed.x) {
+				Velocity.x -= AirAccel;
+			}
+			else if (inputs & INPUT_RIGHT && Velocity.x < MaxAirSpeed.x) {
+				Velocity.x += AirAccel;
 			}
 			if (inputs & INPUT_DOWN && !(inputs & (INPUT_WEAK | INPUT_HEAVY)) && !(State & STATE_FASTFALL)) {
 				State |= STATE_FASTFALL;
@@ -210,48 +220,46 @@ void CoolGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 				SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_FASTFALL] = frameNumber + Moves->GetMoveSoundLength(XACT_WAVEBANK_MOVEBANK_FASTFALL);
 			}
 		}
-		else {
+		else if (State & (STATE_TECHING | STATE_SHIELDING | STATE_KNOCKDOWN)) {
 			if (inputs & INPUT_LEFT) {
-				if (State & (STATE_TECHING | STATE_SHIELDING | STATE_KNOCKDOWN)) {
-					State &= ~(STATE_TECHING | STATE_SHIELDING | STATE_KNOCKDOWN | STATE_CROUCH);
-					State |= STATE_ROLLING | STATE_INTANGIBLE;
-					AttackDelay = frameNumber + 20;
-					AnimFrame = 0;
-					Facing = { -1, 1 };
-					SoundMoveState |= SOUND_ROLL;
-					SoundMoveState &= ~SOUND_SHIELD;
-					SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_ROLL] = frameNumber + Moves->GetMoveSoundLength(XACT_WAVEBANK_MOVEBANK_ROLL);
-				}
-				else if (Velocity.x > -MaxGroundSpeed) {
-					Velocity.x -= RunAccel;
-					State &= ~STATE_CROUCH;
-					State |= STATE_RUNNING;
-					Facing = { -1, 1 };
-					SoundMoveState |= SOUND_RUN;
-					SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_RUN] = frameNumber + Moves->GetMoveSoundLength(XACT_WAVEBANK_MOVEBANK_RUN);
-				}
+				State &= ~(STATE_TECHING | STATE_SHIELDING | STATE_KNOCKDOWN | STATE_CROUCH);
+				State |= STATE_ROLLING | STATE_INTANGIBLE;
+				AttackDelay = frameNumber + 20;
+				AnimFrame = 0;
+				Facing = { -1, 1 };
+				SoundMoveState |= SOUND_ROLL;
+				SoundMoveState &= ~SOUND_SHIELD;
+				SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_ROLL] = frameNumber + Moves->GetMoveSoundLength(XACT_WAVEBANK_MOVEBANK_ROLL);
 			}
 			else if (inputs & INPUT_RIGHT) {
-				if (State & (STATE_TECHING | STATE_SHIELDING | STATE_KNOCKDOWN)) {
-					State &= ~(STATE_TECHING | STATE_SHIELDING | STATE_KNOCKDOWN | STATE_CROUCH);
-					State |= STATE_ROLLING | STATE_INTANGIBLE;
-					AttackDelay = frameNumber + 20;
-					AnimFrame = 0;
-					Facing = { 1, 1 };
-					SoundMoveState |= SOUND_ROLL;
-					SoundMoveState &= ~SOUND_SHIELD;
-					SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_ROLL] = frameNumber + Moves->GetMoveSoundLength(XACT_WAVEBANK_MOVEBANK_ROLL);
-				}
-				else if (Velocity.x < MaxGroundSpeed) {
-					Velocity.x += RunAccel;
-					State &= ~STATE_CROUCH;
-					State |= STATE_RUNNING;
-					Facing = { 1, 1 };
-					SoundMoveState |= SOUND_RUN;
-					SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_RUN] = frameNumber + Moves->GetMoveSoundLength(XACT_WAVEBANK_MOVEBANK_RUN);
-				}
+				State &= ~(STATE_TECHING | STATE_SHIELDING | STATE_KNOCKDOWN | STATE_CROUCH);
+				State |= STATE_ROLLING | STATE_INTANGIBLE;
+				AttackDelay = frameNumber + 20;
+				AnimFrame = 0;
+				Facing = { 1, 1 };
+				SoundMoveState |= SOUND_ROLL;
+				SoundMoveState &= ~SOUND_SHIELD;
+				SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_ROLL] = frameNumber + Moves->GetMoveSoundLength(XACT_WAVEBANK_MOVEBANK_ROLL);
 			}
-			else {
+		}
+		else if (!(State & (STATE_WEAK | STATE_HEAVY))) {
+			if (inputs & INPUT_LEFT && Velocity.x > -MaxGroundSpeed) {
+				Velocity.x -= RunAccel;
+				State &= ~STATE_CROUCH;
+				State |= STATE_RUNNING;
+				Facing = { -1, 1 };
+				SoundMoveState |= SOUND_RUN;
+				SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_RUN] = frameNumber + Moves->GetMoveSoundLength(XACT_WAVEBANK_MOVEBANK_RUN);
+			}
+			else if (inputs & INPUT_RIGHT && Velocity.x < MaxGroundSpeed) {
+				Velocity.x += RunAccel;
+				State &= ~STATE_CROUCH;
+				State |= STATE_RUNNING;
+				Facing = { 1, 1 };
+				SoundMoveState |= SOUND_RUN;
+				SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_RUN] = frameNumber + Moves->GetMoveSoundLength(XACT_WAVEBANK_MOVEBANK_RUN);
+			}
+			else if(!(inputs & (INPUT_LEFT | INPUT_RIGHT))){
 				State &= ~STATE_RUNNING;
 				SoundMoveState &= ~SOUND_RUN;
 			}
@@ -353,7 +361,6 @@ void CoolGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 		++LastAttackID;
 		AnimFrame = 0;
 	}
-
 	if (inputs & INPUT_JUMP && !(State & (STATE_WEAK | STATE_HEAVY | STATE_JUMPSQUAT | STATE_JUMPLAND | STATE_HITSTUN | STATE_SHIELDSTUN | STATE_WAVEDASH | STATE_KNOCKDOWNLAG | STATE_TECHING | STATE_ROLLING | STATE_GRABBING | STATE_GRABBED | STATE_THROW))) {
 		if (State & STATE_LEDGEHOG) {
 			State &= ~STATE_LEDGEHOG;
@@ -393,7 +400,6 @@ void CoolGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 		SoundMoveState |= SOUND_DOUBLEJUMP;
 		SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_DOUBLEJUMP] = frameNumber + Moves->GetMoveSoundLength(XACT_WAVEBANK_MOVEBANK_DOUBLEJUMP);
 	}
-
 	if (inputs & INPUT_SHIELD) {
 		if ((State & STATE_JUMPING) && !(State & (STATE_TECHLAG | STATE_TECHATTEMPT | STATE_GRABBING | STATE_GRABBED))) {
 			State |= STATE_TECHATTEMPT;
@@ -448,7 +454,6 @@ void CoolGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffe
 		AttackDelay = frameNumber + MaxShieldDelay;
 		SoundMoveState &= ~SOUND_SHIELD;
 	}
-
 	if (State & STATE_ROLLING) {
 		Velocity.x = MaxGroundSpeed * Facing.x;
 		if (AnimFrame == 10) {

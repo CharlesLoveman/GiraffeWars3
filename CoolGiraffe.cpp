@@ -122,8 +122,13 @@ void CoolGiraffe::Update(std::array<Giraffe*, GGPO_MAX_PLAYERS> giraffes, const 
 		Projectiles.Append(Projectile(Position + Vector2(0.2f, -1.2f), { Facing.x * 0.5f, 0.0f }, 0.3f, { Facing.x, 0.0f }, 0.1f, 0.1f, 1.0f, true, LastAttackID, frameNumber + 100, NormProjFuncs::SpitOnHit, NormProjFuncs::SpitUpdate, NormProjFuncs::SpitDraw, GiraffePen, SpitBrush));
 	}
 	//Reverse direction in bair
-	else if ((State & STATE_JUMPING) && (State & STATE_WEAK) && (State & STATE_BACK) && AnimFrame == 7) {
-		Facing.x *= -1;
+	else if ((State & STATE_JUMPING) && (State & STATE_WEAK) && (State & STATE_BACK)) {
+		if (AnimFrame == 4 || AnimFrame == 20) {
+			Facing.x *= -1;
+		}
+		else if (AnimFrame == 8) {
+			LastAttackID++;
+		}
 	}
 	//Reverse direction in dtilt
 	else if (!(State & STATE_JUMPING) && (State & STATE_WEAK) && (State & STATE_DOWN) && (AnimFrame == 7 || AnimFrame == 0)) {

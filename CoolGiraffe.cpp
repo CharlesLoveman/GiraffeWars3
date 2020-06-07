@@ -68,8 +68,6 @@ void CoolGiraffe::Update(std::array<Giraffe*, GGPO_MAX_PLAYERS> giraffes, const 
 	++AnimFrame;
 
 	TransitionStates(frameNumber);
-
-	//Read Inputs
 	ParseInputs(inputs, frameNumber, stage);
 
 	//Grab
@@ -81,7 +79,6 @@ void CoolGiraffe::Update(std::array<Giraffe*, GGPO_MAX_PLAYERS> giraffes, const 
 					State &= ~(STATE_WEAK | STATE_HEAVY | STATE_RUNNING);
 					State |= STATE_GRABBING;
 					TechDelay = frameNumber + 30;
-					//GrabPointer = j;
 					break;
 				}
 			}
@@ -115,7 +112,7 @@ void CoolGiraffe::Update(std::array<Giraffe*, GGPO_MAX_PLAYERS> giraffes, const 
 				Projectiles.Append(Projectile(Position + Vector2(0.2f, -1.2f), { Facing.x * 0.65f, -0.65f }, 0.3f, { 0.0f, 0.0f }, 0.1f, 0.1f, 1.0f, true, LastAttackID, AttackDelay - 10, NormProjFuncs::NeckGrabOnHit, NormProjFuncs::NeckGrabUpdate, NormProjFuncs::NeckGrabDraw, GiraffePen, SpitBrush));
 			}
 		}
-		//Main hit of upsmash
+		//Flip during dp
 		else if (AnimFrame == 24) {
 			Facing.x *= -1;
 		}
@@ -131,48 +128,6 @@ void CoolGiraffe::Update(std::array<Giraffe*, GGPO_MAX_PLAYERS> giraffes, const 
 	//Reverse direction in dtilt
 	else if (!(State & STATE_JUMPING) && (State & STATE_WEAK) && (State & STATE_DOWN) && AnimFrame == 7) {
 		Facing.x *= -1;
-	}
-
-
-	//Update State
-	if (State & (STATE_WEAK | STATE_HEAVY | STATE_THROW)) {
-		Hitboxes = Moves->GetHitboxes(AttackNum, AnimFrame);
-		Hurtboxes = Moves->GetHurtboxes(AttackNum, AnimFrame);
-		numHitboxes = (int)(*Hitboxes).size();
-	}
-	else {
-		Hitboxes = nullptr;
-		numHitboxes = 0;
-		if (State & STATE_HITSTUN) {
-			Hurtboxes = Moves->GetHurtboxes(6, AnimFrame % 16);
-		}
-		else if (State & STATE_RUNNING) {
-			Hurtboxes = Moves->GetHurtboxes(1, AnimFrame % 2);
-		}
-		else if (State & STATE_JUMPING) {
-			Hurtboxes = Moves->GetHurtboxes(2, 0);
-		}
-		else if (State & STATE_JUMPSQUAT) {
-			Hurtboxes = Moves->GetHurtboxes(3, AnimFrame);
-		}
-		else if (State & STATE_JUMPLAND) {
-			Hurtboxes = Moves->GetHurtboxes(4, AnimFrame);
-		}
-		else if (State & (STATE_WAVEDASH | STATE_CROUCH)) {
-			Hurtboxes = Moves->GetHurtboxes(7, 0);
-		}
-		else if (State & STATE_ROLLING) {
-			Hurtboxes = Moves->GetHurtboxes(8, 0);
-		}
-		else if (State & STATE_LEDGEHOG) {
-			Hurtboxes = Moves->GetHurtboxes(6, AnimFrame % 16);
-		}
-		else if (State & STATE_GRABBING) {
-			Hurtboxes = Moves->GetHurtboxes(12, 7);
-		}
-		else { //Idle
-			Hurtboxes = Moves->GetHurtboxes(0, 0);
-		}
 	}
 
 	ApplyChanges(giraffes, num_giraffes, frameNumber, i);

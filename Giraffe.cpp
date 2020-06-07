@@ -623,6 +623,53 @@ void Giraffe::ParseInputs(const int inputs, const int frameNumber, Stage& stage)
 
 void Giraffe::ApplyChanges(std::array<Giraffe*, GGPO_MAX_PLAYERS> giraffes, const int num_giraffes, const int frameNumber, const int i)
 {
+	//Update State
+	if (State & (STATE_WEAK | STATE_HEAVY | STATE_THROW)) {
+		Hitboxes = Moves->GetHitboxes(AttackNum, AnimFrame);
+		Hurtboxes = Moves->GetHurtboxes(AttackNum, AnimFrame);
+		numHitboxes = (int)(*Hitboxes).size();
+	}
+	else {
+		Hitboxes = nullptr;
+		numHitboxes = 0;
+		if (State & STATE_HITSTUN) {
+			Hurtboxes = Moves->GetHurtboxes(6, AnimFrame % Moves->GetMoveLength(6));
+		}
+		else if (State & STATE_RUNNING) {
+			Hurtboxes = Moves->GetHurtboxes(1, AnimFrame % Moves->GetMoveLength(1));
+		}
+		else if (State & STATE_JUMPING) {
+			Hurtboxes = Moves->GetHurtboxes(2, 0);
+		}
+		else if (State & STATE_JUMPSQUAT) {
+			Hurtboxes = Moves->GetHurtboxes(3, AnimFrame);
+		}
+		else if (State & STATE_JUMPLAND) {
+			Hurtboxes = Moves->GetHurtboxes(4, AnimFrame);
+		}
+		else if (State & STATE_KNOCKDOWN) {
+			Hurtboxes = Moves->GetHurtboxes(5, 30);
+		}
+		else if (State & STATE_KNOCKDOWNLAG) {
+			Hurtboxes = Moves->GetHurtboxes(5, AnimFrame);
+		}
+		else if (State & STATE_LEDGEHOG) {
+			Hurtboxes = Moves->GetHurtboxes(6, AnimFrame % Moves->GetMoveLength(6));
+		}
+		else if (State & (STATE_WAVEDASH | STATE_CROUCH)) {
+			Hurtboxes = Moves->GetHurtboxes(7, 0);
+		}
+		else if (State & STATE_ROLLING) {
+			Hurtboxes = Moves->GetHurtboxes(8, 0);
+		}
+		else if (State & STATE_GRABBING) {
+			Hurtboxes = Moves->GetHurtboxes(12, 7);
+		}
+		else { //Idle
+			Hurtboxes = Moves->GetHurtboxes(0, 0);
+		}
+	}
+	
 	//Adding Gravity
 	if (State & STATE_JUMPING) {
 		if (Velocity.y < MaxAirSpeed.y) {

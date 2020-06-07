@@ -504,6 +504,12 @@ void Giraffe::ParseInputs(const int inputs, const int frameNumber, Stage& stage)
 			State |= STATE_DOWN;
 			AttackNum = 24;
 		}
+		else if (State & STATE_JUMPING && (inputs & INPUT_RIGHT && Facing.x == -1) || (inputs & INPUT_LEFT && Facing.x == 1)) {
+			//Fsmash
+			State |= STATE_FORWARD;
+			AttackNum = 22;
+			Facing.x *= -1;
+		}
 		else
 		{
 			//Neutral B

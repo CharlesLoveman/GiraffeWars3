@@ -87,21 +87,8 @@ void CoolGiraffe::Update(std::array<Giraffe*, GGPO_MAX_PLAYERS> giraffes, const 
 
 
 	//Character Move-Specific Updates
-	if ((State & STATE_JUMPING) && (State & STATE_HEAVY) && (State & STATE_FORWARD) && AnimFrame == 7) {
-		Collider grabCol = { {Position.x + 1.885000f * Facing.x, Position.y - 0.650000f}, 0.855862f };
-		for (int j = 0; j < num_giraffes; ++j) {
-			if (j != i) {
-				if (giraffes[j]->GrabHit(grabCol, Facing, frameNumber)) {
-					State &= ~(STATE_WEAK | STATE_HEAVY | STATE_RUNNING);
-					State |= STATE_GRABBING;
-					TechDelay = frameNumber + 30;
-					giraffes[j]->Velocity = Velocity;
-					giraffes[j]->State |= STATE_JUMPING;
-					CommandGrabPointer = j;
-					break;
-				}
-			}
-		}
+	if ((State & STATE_JUMPING) && (State & STATE_HEAVY) && (State & STATE_FORWARD) && AnimFrame == 13) {
+		Projectiles.Append(Projectile(Position + Vector2(Facing.x, 0), { 0.1f * Facing.x, 0 }, 1.0f, {Facing.x, 0}, 0.5f, 0.0f, 0.3f, false, LastAttackID, frameNumber + 1000, CoolProjFuncs::StandardOnHit, CoolProjFuncs::StandardUpdate, CoolProjFuncs::FireballDraw, GiraffePen, nullptr));
 	}
 
 

@@ -691,7 +691,7 @@ void Giraffe::ApplyChanges(std::array<Giraffe*, GGPO_MAX_PLAYERS> giraffes, cons
 	}
 	else {
 		if (fabs(Velocity.y) > MaxAirSpeed.y) {
-			Velocity.y *= 0.8f;
+			Velocity.y *= 0.9f;
 		}
 		if (fabs(Velocity.x) > MaxAirSpeed.x) {
 			Velocity.x *= 0.95f;

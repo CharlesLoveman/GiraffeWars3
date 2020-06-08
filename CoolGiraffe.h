@@ -21,6 +21,7 @@ private:
 	HBRUSH ShineBrush;
 	void DrawSelf(HDC hdc, Vector2 Scale, int CurrentFrame, int CurrentAnim);
 	void DrawHitbox(HDC hdc, Vector2 Scale, Vector2 Pos, float Rad);
+	void Landing(Stage& stage, const int frameNumber, std::array<Giraffe*, GGPO_MAX_PLAYERS> giraffes);
 };
 
 #endif

@@ -11,7 +11,7 @@ CoolGiraffe::CoolGiraffe(Vector2 _Position, MoveSet* _Moves, COLORREF _Colour)
 	MaxAirSpeed = Vector2(0.3f, 0.7f);
 	RunAccel = 0.1f;
 	AirAccel = 0.03f;
-	Gravity = 0.02f;
+	Gravity = 0.025f;
 	Facing = { 1.0f, 1.0f };
 
 	//Jumping
@@ -88,11 +88,17 @@ void CoolGiraffe::UniqueChanges(std::array<Giraffe*, GGPO_MAX_PLAYERS> giraffes,
 
 
 	if ((State & STATE_HEAVY) && (State & STATE_UP)) {
-		//Fire neck
-		if (State & STATE_JUMPING) {
-			if (AnimFrame == 10) {
-				Projectiles.Append(Projectile(Position + Vector2(0.2f, -1.2f), { Facing.x * 0.65f, -0.65f }, 0.3f, { 0.0f, 0.0f }, 0.1f, 0.1f, 1.0f, true, LastAttackID, AttackDelay - 10, NormProjFuncs::NeckGrabOnHit, NormProjFuncs::NeckGrabUpdate, NormProjFuncs::NeckGrabDraw, GiraffePen, SpitBrush));
+		////Fire neck
+		//if (State & STATE_JUMPING) {
+		//	if (AnimFrame == 10) {
+		//		Projectiles.Append(Projectile(Position + Vector2(0.2f, -1.2f), { Facing.x * 0.65f, -0.65f }, 0.3f, { 0.0f, 0.0f }, 0.1f, 0.1f, 1.0f, true, LastAttackID, AttackDelay - 10, NormProjFuncs::NeckGrabOnHit, NormProjFuncs::NeckGrabUpdate, NormProjFuncs::NeckGrabDraw, GiraffePen, SpitBrush));
+		//	}
+		//}
+		if ((State & STATE_JUMPING) && AnimFrame >= 13 && AnimFrame <= 23) {
+			if (AnimFrame == 14) {
+				Velocity.y = 0;
 			}
+			Velocity += Vector2(0, -0.2f);
 		}
 		//Flip during dp
 		else if (AnimFrame == 24) {
@@ -132,7 +138,7 @@ void CoolGiraffe::Draw(HDC hdc, Vector2 Scale, int frameNumber)
 	}
 
 
-	if ((State & STATE_HEAVY) && (State & STATE_JUMPING)) {
+	/*if ((State & STATE_HEAVY) && (State & STATE_JUMPING)) {
 		if (State & STATE_UP) {
 			if (AnimFrame >= 10 && AnimFrame <= 30) {
 				POINT points[NUM_POINTS];
@@ -176,7 +182,7 @@ void CoolGiraffe::Draw(HDC hdc, Vector2 Scale, int frameNumber)
 			DrawSelf(hdc, Scale, AnimFrame, AttackNum);
 		}
 		return;
-	}
+	}*/
 
 	if (State & (STATE_WEAK | STATE_HEAVY | STATE_THROW)) {
 		CurrentAnim = AttackNum;
@@ -300,8 +306,8 @@ void CoolGiraffe::Landing(Stage& stage, const int frameNumber, std::array<Giraff
 {
 	SoundMoveState |= SOUND_JUMPLAND;
 	SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_JUMPLAND] = frameNumber + Moves->GetMoveSoundLength(XACT_WAVEBANK_MOVEBANK_JUMPLAND);
-	if ((State & STATE_HEAVY) && !(State & (STATE_FORWARD | STATE_UP | STATE_BACK | STATE_DOWN))) {
-		State &= ~STATE_JUMPING;
+	if ((State & STATE_HEAVY) && !(State & (STATE_FORWARD | STATE_UP | STATE_BACK))) {
+		//State &= ~STATE_JUMPING;
 		HasAirDash = true;
 		HasDoubleJump = false;
 	}
@@ -350,6 +356,51 @@ void CoolGiraffe::Landing(Stage& stage, const int frameNumber, std::array<Giraff
 		}
 		SoundAttackState &= ~(SOUND_DOWNB | SOUND_UPB);
 		State &= ~(STATE_UP | STATE_BACK | STATE_DOWN | STATE_FORWARD | STATE_WEAK | STATE_HEAVY | STATE_JUMPING | STATE_FASTFALL | STATE_TECHLAG | STATE_THROW | STATE_GRABBED | STATE_GRABBING);
+	}
+}
+
+void CoolGiraffe::RecieveHits(Stage& stage, const int frameNumber)
+{
+	if (incomingGrab) {
+		State &= ~(STATE_UP | STATE_BACK | STATE_DOWN | STATE_FORWARD | STATE_WEAK | STATE_HEAVY | STATE_SHIELDING | STATE_DROPSHIELD | STATE_SHIELDSTUN | STATE_JUMPSQUAT | STATE_JUMPLAND | STATE_HITSTUN | STATE_FASTFALL | STATE_DOUBLEJUMPWAIT | STATE_WAVEDASH | STATE_RUNNING | STATE_SHORTHOP | STATE_CROUCH | STATE_TECHATTEMPT | STATE_TECHLAG | STATE_TECHING | STATE_KNOCKDOWN | STATE_KNOCKDOWNLAG | STATE_ROLLING | STATE_GETUPATTACK | STATE_GRABBING | STATE_THROW);
+		State |= STATE_GRABBED;
+		SoundMoveState &= ~(SOUND_SHIELD | SOUND_RUN);
+		incomingGrab = false;
+	}
+
+	if (numIncoming > 0) {
+		if (State & STATE_SHIELDING) {
+			for (int j = 0; j < numIncoming; ++j) {
+				State |= STATE_SHIELDSTUN;
+				AttackDelay = (int)max(AttackDelay, frameNumber + IncomingHits[j].Damage * 50);
+			}
+		}
+		else if (State & STATE_JUMPING && State & STATE_HEAVY && State & STATE_DOWN && AnimFrame >= 5 && AnimFrame <= 29) {
+			AnimFrame = 28;
+			AttackDelay = frameNumber + 30;
+		}
+		else {
+			for (int j = 0; j < numIncoming; ++j) {
+				Knockback += IncomingHits[j].Damage;
+				float KnockbackApplied;
+				if (IncomingHits[j].Fixed) {
+					KnockbackApplied = IncomingHits[j].Knockback;
+				}
+				else {
+					KnockbackApplied = ((((Knockback / 10 + (Knockback * IncomingHits[j].Damage / 20)) * (200 / (Mass + 100)) * 1.4f + 0.18f) * IncomingHits[j].Scale) + IncomingHits[j].Knockback);
+				}
+				Velocity += KnockbackApplied * IncomingHits[j].Force;
+				if (State & STATE_LEDGEHOG) {
+					stage.Ledges[LedgeID].Hogged = false;
+					State &= ~STATE_LEDGEHOG;
+				}
+				State &= ~(STATE_UP | STATE_BACK | STATE_DOWN | STATE_FORWARD | STATE_WEAK | STATE_HEAVY | STATE_JUMPSQUAT | STATE_JUMPLAND | STATE_SHORTHOP | STATE_KNOCKDOWN | STATE_KNOCKDOWNLAG | STATE_GETUPATTACK | STATE_GRABBING | STATE_GRABBED | STATE_THROW);
+				State |= STATE_HITSTUN;
+				SoundMoveState |= SOUND_HITSTUN;
+				SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_HITSTUN] = 100000000;
+				AttackDelay = (int)max(AttackDelay, frameNumber + min(KnockbackApplied * 40, 100));
+			}
+		}
 	}
 }
 

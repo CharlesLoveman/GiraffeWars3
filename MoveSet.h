@@ -18,6 +18,12 @@ public:
 	virtual int GetMoveLength(int MoveId) = 0;
 	virtual int GetAttackSoundLength(int AttackId) = 0;
 	virtual int GetMoveSoundLength(int MoveId) = 0;
+	virtual void InitMoves() = 0;
+	virtual void InitThrows() = 0;
+	virtual void InitTilts() = 0;
+	virtual void InitSmashes() = 0;
+	virtual void InitAerials() = 0;
+	virtual void InitSpecials() = 0;
 };
 
 #endif // !_MOVESET_H_

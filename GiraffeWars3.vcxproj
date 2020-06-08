@@ -90,6 +90,7 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>C:\Users\charl\source\repos\ggpo\src\include</AdditionalIncludeDirectories>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -136,9 +137,12 @@
   <ItemGroup>
     <ClCompile Include="AudioPlayer.cpp" />
     <ClCompile Include="Collider.cpp" />
+    <ClCompile Include="CoolGiraffe.cpp" />
+    <ClCompile Include="CoolMoveSet.cpp" />
     <ClCompile Include="gamestate.cpp" />
     <ClCompile Include="gdi_renderer.cpp" />
     <ClCompile Include="Giraffe.cpp" />
+    <ClCompile Include="Line.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="giraffewar.cpp" />
     <ClCompile Include="NormGiraffe.cpp" />
@@ -155,9 +159,13 @@
     <ClInclude Include="attackbankheader.h" />
     <ClInclude Include="AudioPlayer.h" />
     <ClInclude Include="Collider.h" />
+    <ClInclude Include="CoolGiraffe.h" />
+    <ClInclude Include="CoolMoveSet.h" />
+    <ClInclude Include="CoolProjFuncs.h" />
     <ClInclude Include="gamestate.h" />
     <ClInclude Include="gdi_renderer.h" />
     <ClInclude Include="Giraffe.h" />
+    <ClInclude Include="Line.h" />
     <ClInclude Include="movebankheader.h" />
     <ClInclude Include="MoveSet.h" />
     <ClInclude Include="nongamestate.h" />

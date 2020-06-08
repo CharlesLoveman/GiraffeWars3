@@ -16,6 +16,12 @@ public:
 	int GetMoveLength(int MoveId);
 	int GetAttackSoundLength(int AttackId);
 	int GetMoveSoundLength(int MoveId);
+	void InitMoves();
+	void InitThrows();
+	void InitTilts();
+	void InitSmashes();
+	void InitAerials();
+	void InitSpecials();
 
 private:
 	std::array<std::vector<std::vector<HitCollider>>, NUM_MOVES> Hitboxes;

@@ -9,6 +9,7 @@
 #include <array>
 #include "MoveSet.h"
 #include "NormMoveSet.h"
+#include "CoolMoveSet.h"
 #include "AudioPlayer.h"
 
 #pragma comment(lib, "Ws2_32.lib")
@@ -107,15 +108,24 @@ bool __cdecl gw_advance_frame_callback(int)
 //Match the current state to the one provided by GGPO
 bool __cdecl gw_load_game_state_callback(unsigned char* buffer, int len)
 {
-	
-	int normSize = sizeof(gs.normGiraffes[0]) * gs.normGiraffes.size();
-	int robotSize = sizeof(gs.robotGiraffes[0]) * gs.robotGiraffes.size();
+	int giraffeSize = 0;
 	int ledgeSize = sizeof(gs.stage.Ledges[0]) * gs.stage.Ledges.size();
-	int gsSize = len - normSize - robotSize - ledgeSize;
+	/*int lineSize = 0;
+	if (gs.lines.size() > 0) {
+		lineSize = sizeof(gs.lines[0]) * gs.lines.size();
+	}*/
+	int gsSize = sizeof(gs);
+
 	memcpy(&gs, buffer, gsSize);
-	memcpy(gs.normGiraffes.data(), buffer + gsSize, normSize);
-	memcpy(gs.robotGiraffes.data(), buffer + gsSize + normSize, robotSize);
-	memcpy(gs.stage.Ledges.data(), buffer + gsSize + normSize + robotSize, ledgeSize);
+
+	for (int i = 0; i < gs._num_giraffes; ++i) {
+		memcpy(gs.giraffes[i], buffer + gsSize + giraffeSize, sizeof(*gs.giraffes[i]));
+		giraffeSize += sizeof(*gs.giraffes[i]);
+	}
+
+	//memcpy(gs.lines.data(), buffer + gsSize + giraffeSize, lineSize);
+
+	memcpy(gs.stage.Ledges.data(), buffer + gsSize + giraffeSize, ledgeSize);
 
 	return true;
 }
@@ -124,21 +134,29 @@ bool __cdecl gw_load_game_state_callback(unsigned char* buffer, int len)
 //Saves the current state to the buffer
 bool __cdecl gw_save_game_state_callback(unsigned char** buffer, int* len, int* checksum, int)
 {
-	int normSize = sizeof(gs.normGiraffes[0]) * gs.normGiraffes.size();
-	int robotSize = sizeof(gs.robotGiraffes[0]) * gs.robotGiraffes.size();
+	int giraffeSize = 0;
+	for (int i = 0; i < gs._num_giraffes; ++i) {
+		giraffeSize += sizeof(*gs.giraffes[i]);
+	}
+
 	int ledgeSize = sizeof(gs.stage.Ledges[0]) * gs.stage.Ledges.size();
 	int gsSize = sizeof(gs);
-	*len = gsSize + normSize + robotSize + ledgeSize;
+
+	*len = gsSize + giraffeSize + ledgeSize;
 	*buffer = (unsigned char*)malloc(*len);
 	if (!*buffer) {
 		return false;
 	}
 
-	*checksum = fletcher32_checksum((short*)gs.normGiraffes.data(), sizeof(gs.normGiraffes[0]) * gs.normGiraffes.size() / 2);
+	//*checksum = fletcher32_checksum((short*)gs.normGiraffes.data(), sizeof(gs.normGiraffes[0]) * gs.normGiraffes.size() / 2);
 	memcpy(*buffer, &gs, *len);
-	memcpy(*buffer + gsSize, gs.normGiraffes.data(), normSize);
-	memcpy(*buffer + gsSize + normSize, gs.robotGiraffes.data(), robotSize);
-	memcpy(*buffer + gsSize + normSize + robotSize, gs.stage.Ledges.data(), ledgeSize);
+	*checksum = fletcher32_checksum((short*)buffer, *len);
+	giraffeSize = 0;
+	for (int i = 0; i < gs._num_giraffes; ++i) {
+		memcpy(*buffer + gsSize + giraffeSize, gs.giraffes[i], sizeof(*gs.giraffes[i]));
+		giraffeSize += sizeof(*gs.giraffes[i]);
+	}
+	memcpy(*buffer + gsSize + giraffeSize, gs.stage.Ledges.data(), ledgeSize);
 
 	return true;
 }
@@ -192,8 +210,15 @@ void GiraffeWar_Init(HWND hwnd, unsigned short localport, GGPOPlayer* players, i
 
 	MoveSets[0] = new NormMoveSet();
 	MoveSets[1] = new RobotMoveSet();
-	for (int i = 2; i < GGPO_MAX_PLAYERS; ++i) {
-		MoveSets[i] = new NormMoveSet();
+	MoveSets[2] = new CoolMoveSet();
+
+	for (int i = 0; i < 3; ++i) {
+		MoveSets[i]->InitMoves();
+		MoveSets[i]->InitThrows();
+		MoveSets[i]->InitTilts();
+		MoveSets[i]->InitSmashes();
+		MoveSets[i]->InitAerials();
+		MoveSets[i]->InitSpecials();
 	}
 
 	//Initialize the game state
@@ -258,10 +283,9 @@ void GiraffeWar_InitSpectator(HWND hwnd, unsigned short localport, int num_playe
 	renderer = new GDIRenderer(hwnd);
 	audioPlayer = new AudioPlayer();
 
-	//std::shared_ptr<NormMoveSet> pNorm = std::make_shared<NormMoveSet>();
-	for (int i = 0; i < 4; ++i) {
-		MoveSets[i] = new NormMoveSet();
-	}
+	MoveSets[0] = new NormMoveSet();
+	MoveSets[1] = new RobotMoveSet();
+	MoveSets[2] = new CoolMoveSet();
 
 	//Initialize the game state
 	gs.Init(hwnd, num_players, MoveSets);
@@ -320,7 +344,7 @@ void GiraffeWar_AdvanceFrame(int inputs[], int disconnect_flags)
 
 	//update the checksums
 	ngs.now.framenumber = gs._framenumber;
-	ngs.now.checksum = fletcher32_checksum((short*)& gs.normGiraffes, sizeof(gs.normGiraffes) / 2);
+	ngs.now.checksum = fletcher32_checksum((short*)gs.giraffes[0], sizeof(*gs.giraffes[0]) / 2);
 	if ((gs._framenumber % 90) == 0) {
 		ngs.periodic = ngs.now;
 	}
@@ -397,6 +421,9 @@ void GiraffeWar_Exit()
 {
 	for (int i = 0; i < 4; ++i) {
 		delete MoveSets[i];
+	}
+	for (int i = 0; i < gs._num_giraffes; ++i) {
+		delete gs.giraffes[i];
 	}
 
 	if (ggpo) {

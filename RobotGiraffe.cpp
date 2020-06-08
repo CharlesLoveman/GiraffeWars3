@@ -335,6 +335,7 @@ void RobotGiraffe::DrawSelf(HDC hdc, Vector2 Scale, int CurrentFrame, int Curren
 
 void RobotGiraffe::DrawHitbox(HDC hdc, Vector2 Scale, Vector2 Pos, float Rad)
 {
+	SelectObject(hdc, GiraffePen);
 	Ellipse(hdc, (int)(Scale.x * (Position.x + Facing.x * Pos.x - Rad)), (int)(Scale.y * (Position.y + Facing.y * Pos.y - Rad)), (int)(Scale.x * (Position.x + Facing.x * Pos.x + Rad)), (int)(Scale.y * (Position.y + Facing.y * Pos.y + Rad)));
 }
 

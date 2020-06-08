@@ -145,14 +145,6 @@ void NormGiraffe::Draw(HDC hdc, Vector2 Scale, int frameNumber)
 	int CurrentFrame = 0;
 
 
-	if (State & STATE_INTANGIBLE) {
-		SelectObject(hdc, IntangiblePen);
-	}
-	else {
-		SelectObject(hdc, GiraffePen);
-	}
-
-
 	if ((State & STATE_HEAVY) && (State & STATE_JUMPING)) {
 		if (State & STATE_UP) {
 			if (AnimFrame >= 10 && AnimFrame <= 30) {
@@ -273,7 +265,12 @@ void NormGiraffe::Draw(HDC hdc, Vector2 Scale, int frameNumber)
 
 void NormGiraffe::DrawSelf(HDC hdc, Vector2 Scale, int CurrentFrame, int CurrentAnim)
 {
-	SelectObject(hdc, GiraffePen);
+	if (State & STATE_INTANGIBLE) {
+		SelectObject(hdc, IntangiblePen);
+	}
+	else {
+		SelectObject(hdc, GiraffePen);
+	}
 	std::vector<POINT> points;
 	std::vector<Vector2> vPoints = (*Moves->GetSkelPoints(CurrentAnim, CurrentFrame));
 
@@ -290,6 +287,7 @@ void NormGiraffe::DrawSelf(HDC hdc, Vector2 Scale, int CurrentFrame, int Current
 
 void NormGiraffe::DrawHitbox(HDC hdc, Vector2 Scale, Vector2 Pos,float Rad)
 {
+	SelectObject(hdc, GiraffePen);
 	Ellipse(hdc, Scale.x * (Position.x + Facing.x * Pos.x - Rad), Scale.y * (Position.y + Facing.y * Pos.y - Rad), Scale.x * (Position.x + Facing.x * Pos.x + Rad), Scale.y * (Position.y + Facing.y * Pos.y + Rad));
 }
 

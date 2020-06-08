@@ -254,6 +254,7 @@ void CoolGiraffe::DrawSelf(HDC hdc, Vector2 Scale, int CurrentFrame, int Current
 
 void CoolGiraffe::DrawHitbox(HDC hdc, Vector2 Scale, Vector2 Pos, float Rad)
 {
+	SelectObject(hdc, GiraffePen);
 	Ellipse(hdc, Scale.x * (Position.x + Facing.x * Pos.x - Rad), Scale.y * (Position.y + Facing.y * Pos.y - Rad), Scale.x * (Position.x + Facing.x * Pos.x + Rad), Scale.y * (Position.y + Facing.y * Pos.y + Rad));
 }
 

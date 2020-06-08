@@ -208,7 +208,7 @@ void Giraffe::ParseInputs(const int inputs, const int frameNumber, Stage& stage)
 		State |= STATE_SHORTHOP;
 	}
 	if (inputs & INPUT_SHIELD) {
-		
+		ParseShield(inputs, frameNumber, stage);
 	}
 	else if (State & STATE_SHIELDING) {
 		State &= ~STATE_SHIELDING;

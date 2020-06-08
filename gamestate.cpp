@@ -5,6 +5,7 @@
 #include "gamestate.h"
 #include "MoveSet.h"
 #include "NormGiraffe.h"
+#include "PoshGiraffe.h"
 #include "SimpleMath.h"
 
 
@@ -41,8 +42,10 @@ void GameState::Init(HWND hwnd, int num_players, const std::array<MoveSet*, 4> M
 
 	//int counter = 0;
 
-	giraffes[0] = new CoolGiraffe(Vector2(stageleft + stagewidth * 1.0f / (2.0f * _num_giraffes), 20), MoveSets[2], _giraffeColours[0]);
-	giraffes[1] = new RobotGiraffe(Vector2(stageleft + stagewidth * 3.0f / (2.0f * _num_giraffes), 20), MoveSets[1], _giraffeColours[1]);
+	//giraffes[0] = new CoolGiraffe(Vector2(stageleft + stagewidth * 1.0f / (2.0f * _num_giraffes), 20), MoveSets[2], _giraffeColours[0]);
+	giraffes[0] = new PoshGiraffe(Vector2(stageleft + stagewidth * 1.0f / (2.0f * _num_giraffes), 20), MoveSets[3], _giraffeColours[0]);
+	//giraffes[1] = new RobotGiraffe(Vector2(stageleft + stagewidth * 3.0f / (2.0f * _num_giraffes), 20), MoveSets[1], _giraffeColours[1]);
+	giraffes[1] = new NormGiraffe(Vector2(stageleft + stagewidth * 3.0f / (2.0f * _num_giraffes), 20), MoveSets[0], _giraffeColours[1]);
 	//counter++;
 
 

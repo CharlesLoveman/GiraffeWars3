@@ -140,9 +140,6 @@ void CoolGiraffe::Draw(HDC hdc, Vector2 Scale, int frameNumber)
 	if (State & (STATE_WEAK | STATE_HEAVY | STATE_THROW)) {
 		CurrentAnim = AttackNum;
 		CurrentFrame = AnimFrame;
-		/*for (int i = 0; i < numHitboxes; ++i) {
-			DrawHitbox(hdc, Scale, (*Hitboxes)[i].Position, (*Hitboxes)[i].Radius);
-		}*/
 	}
 	else {
 		if (State & STATE_HITSTUN) {
@@ -152,14 +149,12 @@ void CoolGiraffe::Draw(HDC hdc, Vector2 Scale, int frameNumber)
 		else if (State & STATE_SHIELDSTUN) {
 			SelectObject(hdc, ShieldBrush);
 			DrawHitbox(hdc, Scale, { 0,0 }, 2.5f);
-			//Ellipse(hdc, (Position.x - 2.5f) * Scale.x, (Position.y - 2.5f) * Scale.y, (Position.x + 2.5f) * Scale.x, (Position.y + 2.5f) * Scale.y);
 			CurrentAnim = 6;
 			CurrentFrame = AnimFrame % 16;
 		}
 		else if (State & STATE_SHIELDING) {
 			SelectObject(hdc, ShieldBrush);
 			DrawHitbox(hdc, Scale, { 0,0 }, 2.5f);
-			//Ellipse(hdc, (Position.x - 2.5f) * Scale.x, (Position.y - 2.5f) * Scale.y, (Position.x + 2.5f) * Scale.x, (Position.y + 2.5f) * Scale.y);
 			CurrentAnim = 0;
 			CurrentFrame = 0;
 		}

@@ -64,11 +64,6 @@ NormGiraffe::~NormGiraffe()
 
 void NormGiraffe::UniqueChanges(std::array<Giraffe*, GGPO_MAX_PLAYERS> giraffes, const int num_giraffes, const int i, const int inputs, const int frameNumber, Stage& stage)
 {
-	/*++AnimFrame;
-
-	TransitionStates(frameNumber);
-	ParseInputs(inputs, frameNumber, stage);*/
-
 	//Grab
 	if (State & STATE_WEAK && State & STATE_HEAVY && AnimFrame == 7) {
 		Collider grabCol = { {Position.x + 1.885000f * Facing.x, Position.y - 0.650000f}, 0.855862f };
@@ -138,9 +133,6 @@ void NormGiraffe::UniqueChanges(std::array<Giraffe*, GGPO_MAX_PLAYERS> giraffes,
 	else if ((State & STATE_GETUPATTACK) && (7 <= AnimFrame) && (AnimFrame <= 10)) {
 		Facing.x *= -1;
 	}
-
-	
-	//ApplyChanges(giraffes, num_giraffes, frameNumber, i);
 }
 
 void NormGiraffe::Draw(HDC hdc, Vector2 Scale, int frameNumber)
@@ -222,14 +214,12 @@ void NormGiraffe::Draw(HDC hdc, Vector2 Scale, int frameNumber)
 		else if (State & STATE_SHIELDSTUN) {
 			SelectObject(hdc, ShieldBrush);
 			DrawHitbox(hdc, Scale, { 0,0 }, 2.5f);
-			//Ellipse(hdc, (Position.x - 2.5f) * Scale.x, (Position.y - 2.5f) * Scale.y, (Position.x + 2.5f) * Scale.x, (Position.y + 2.5f) * Scale.y);
 			CurrentAnim = 6;
 			CurrentFrame = AnimFrame % 9;
 		}
 		else if (State & STATE_SHIELDING) {
 			SelectObject(hdc, ShieldBrush);
 			DrawHitbox(hdc, Scale, { 0,0 }, 2.5f);
-			//Ellipse(hdc, (Position.x - 2.5f) * Scale.x, (Position.y - 2.5f) * Scale.y, (Position.x + 2.5f) * Scale.x, (Position.y + 2.5f) * Scale.y);
 			CurrentAnim = 0;
 			CurrentFrame = 0;
 		}
@@ -283,6 +273,7 @@ void NormGiraffe::Draw(HDC hdc, Vector2 Scale, int frameNumber)
 
 void NormGiraffe::DrawSelf(HDC hdc, Vector2 Scale, int CurrentFrame, int CurrentAnim)
 {
+	SelectObject(hdc, GiraffePen);
 	std::vector<POINT> points;
 	std::vector<Vector2> vPoints = (*Moves->GetSkelPoints(CurrentAnim, CurrentFrame));
 

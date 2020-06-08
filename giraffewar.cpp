@@ -10,6 +10,7 @@
 #include "MoveSet.h"
 #include "NormMoveSet.h"
 #include "CoolMoveSet.h"
+#include "PoshMoveSet.h"
 #include "AudioPlayer.h"
 
 #pragma comment(lib, "Ws2_32.lib")
@@ -211,8 +212,9 @@ void GiraffeWar_Init(HWND hwnd, unsigned short localport, GGPOPlayer* players, i
 	MoveSets[0] = new NormMoveSet();
 	MoveSets[1] = new RobotMoveSet();
 	MoveSets[2] = new CoolMoveSet();
+	MoveSets[3] = new PoshMoveSet();
 
-	for (int i = 0; i < 3; ++i) {
+	for (int i = 0; i < 4; ++i) {
 		MoveSets[i]->InitMoves();
 		MoveSets[i]->InitThrows();
 		MoveSets[i]->InitTilts();

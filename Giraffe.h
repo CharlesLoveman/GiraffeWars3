@@ -123,6 +123,7 @@ public:
 	friend struct NormProjFuncs;
 	friend struct RobotProjFuncs;
 	friend struct CoolProjFuncs;
+	friend struct PoshProjFuncs;
 
 protected:
 	virtual void UniqueChanges(std::array<Giraffe*, GGPO_MAX_PLAYERS> giraffes, const int num_giraffes, const int i, const int inputs, const int frameNumber, Stage& stage) = 0;

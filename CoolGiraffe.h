@@ -6,8 +6,8 @@
 #include <memory>
 #include <array>
 
-constexpr int NUM_MOVES_COOL= 24;
-constexpr int NUM_POINTS_COOL = 38;
+//constexpr int NUM_MOVES_COOL= 24;
+//constexpr int NUM_POINTS_COOL = 38;
 
 class CoolGiraffe : public Giraffe {
 public:

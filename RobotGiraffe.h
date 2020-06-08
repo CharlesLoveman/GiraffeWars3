@@ -4,7 +4,7 @@
 #include "Giraffe.h"
 #include "RobotMoveSet.h"
 
-constexpr int NUM_MOVES_ROBOT = 24;
+//constexpr int NUM_MOVES_ROBOT = 24;
 
 class RobotGiraffe : public Giraffe {
 public:

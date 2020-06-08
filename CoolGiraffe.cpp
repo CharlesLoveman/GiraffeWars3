@@ -55,8 +55,7 @@ CoolGiraffe::CoolGiraffe(Vector2 _Position, MoveSet* _Moves, COLORREF _Colour)
 	GiraffePen = CreatePen(PS_SOLID, 1, _Colour);
 	IntangiblePen = CreatePen(PS_SOLID, 1, RGB(255, 255, 255));
 	ShieldBrush = CreateHatchBrush(HS_BDIAGONAL, RGB(0, 255, 127));
-	SpitBrush = CreateSolidBrush(RGB(90, 210, 180));
-	ShineBrush = CreateSolidBrush(RGB(0, 255, 255));
+	FirePen = CreatePen(PS_SOLID, 1, RGB(230, 128, 40));
 }
 
 CoolGiraffe::~CoolGiraffe()
@@ -83,7 +82,7 @@ void CoolGiraffe::UniqueChanges(std::array<Giraffe*, GGPO_MAX_PLAYERS> giraffes,
 
 	//Character Move-Specific Updates
 	if ((State & STATE_JUMPING) && (State & STATE_HEAVY) && (State & STATE_FORWARD) && AnimFrame == 13) {
-		Projectiles.Append(Projectile(Position + Vector2(Facing.x, 0), { 0.1f * Facing.x, 0 }, 1.0f, {Facing.x, 0}, 0.5f, 0.0f, 0.3f, false, LastAttackID, frameNumber + 1000, CoolProjFuncs::StandardOnHit, CoolProjFuncs::StandardUpdate, CoolProjFuncs::FireballDraw, GiraffePen, nullptr));
+		Projectiles.Append(Projectile(Position + Vector2(Facing.x, 0), { 0.1f * Facing.x, 0 }, 1.0f, {Facing.x, 0}, 0.5f, 0.0f, 0.3f, false, LastAttackID, frameNumber + 1000, CoolProjFuncs::StandardOnHit, CoolProjFuncs::StandardUpdate, CoolProjFuncs::FireballDraw, FirePen, nullptr));
 	}
 
 
@@ -128,61 +127,21 @@ void CoolGiraffe::Draw(HDC hdc, Vector2 Scale, int frameNumber)
 
 	int CurrentAnim = 0;
 	int CurrentFrame = 0;
+	
 
-
-	if (State & STATE_INTANGIBLE) {
-		SelectObject(hdc, IntangiblePen);
-	}
-	else {
-		SelectObject(hdc, GiraffePen);
-	}
-
-
-	/*if ((State & STATE_HEAVY) && (State & STATE_JUMPING)) {
-		if (State & STATE_UP) {
-			if (AnimFrame >= 10 && AnimFrame <= 30) {
-				POINT points[NUM_POINTS];
-				for (int i = 0; i < NUM_POINTS; ++i) {
-					points[i] = Giraffe::VecToPoint(Position + Facing * (*Moves->GetSkelPoints(CurrentAnim, CurrentFrame))[i], Scale);
-				}
-				Polyline(hdc, points, 27);
-				Polyline(hdc, &points[36], 2);
-			}
-			else {
-				DrawSelf(hdc, Scale, AnimFrame, AttackNum);
-			}
+	if (State & STATE_HEAVY) {
+		DrawSelf(hdc, Scale, AnimFrame, AttackNum);
+		if (State & STATE_FORWARD && AnimFrame >= 15 && AnimFrame <= 25) {
+			DrawSmallFlame(hdc, Scale, ((*Moves->GetSkelPoints(AttackNum, AnimFrame))[24] + (*Moves->GetSkelPoints(AttackNum, AnimFrame))[27]) * 0.5f, ((*Moves->GetSkelPoints(AttackNum, AnimFrame))[25] + (*Moves->GetSkelPoints(AttackNum, AnimFrame))[26]) * 0.5f);
 		}
-		else if (State & STATE_DOWN) {
-			DrawSelf(hdc, Scale, AnimFrame, AttackNum);
-			SelectObject(hdc, ShineBrush);
-			POINT points[12];
-			float r = 2.5f * cosf(AnimFrame / 15.0f * 3.1415f);
-			float r1 = 0.5f * r;
-			float r2 = 0.866025f * r;
-			points[0] = Giraffe::VecToPoint(Position + Vector2(r, 0), Scale);
-			points[1] = Giraffe::VecToPoint(Position + Vector2(r1, r2), Scale);
-			points[2] = Giraffe::VecToPoint(Position + Vector2(-r1, r2), Scale);
-			points[3] = Giraffe::VecToPoint(Position + Vector2(-r, 0), Scale);
-			points[4] = Giraffe::VecToPoint(Position + Vector2(-r1, -r2), Scale);
-			points[5] = Giraffe::VecToPoint(Position + Vector2(r1, -r2), Scale);
-
-			r *= 0.6f;
-			r1 *= 0.6f;
-			r2 *= 0.6f;
-			points[6] = Giraffe::VecToPoint(Position + Vector2(r, 0), Scale);
-			points[7] = Giraffe::VecToPoint(Position + Vector2(r1, r2), Scale);
-			points[8] = Giraffe::VecToPoint(Position + Vector2(-r1, r2), Scale);
-			points[9] = Giraffe::VecToPoint(Position + Vector2(-r, 0), Scale);
-			points[10] = Giraffe::VecToPoint(Position + Vector2(-r1, -r2), Scale);
-			points[11] = Giraffe::VecToPoint(Position + Vector2(r1, -r2), Scale);
-
-			Polygon(hdc, points, 12);
+		else if (State & STATE_UP && AnimFrame >= 19 && AnimFrame <= 30) {
+			DrawSmallFlame(hdc, Scale, ((*Moves->GetSkelPoints(AttackNum, AnimFrame))[24] + (*Moves->GetSkelPoints(AttackNum, AnimFrame))[27]) * 0.5f, ((*Moves->GetSkelPoints(AttackNum, AnimFrame))[25] + (*Moves->GetSkelPoints(AttackNum, AnimFrame))[26]) * 0.5f);
 		}
-		else {
-			DrawSelf(hdc, Scale, AnimFrame, AttackNum);
+		else if (!(State & (STATE_UP | STATE_FORWARD | STATE_DOWN)) && AnimFrame >= 50 && AnimFrame <= 70) {
+			DrawLargeFlame(hdc, Scale, ((*Moves->GetSkelPoints(AttackNum, AnimFrame))[32] + (*Moves->GetSkelPoints(AttackNum, AnimFrame))[36]) * 0.5f, (*Moves->GetSkelPoints(AttackNum, AnimFrame))[34]);
 		}
 		return;
-	}*/
+	}
 
 	if (State & (STATE_WEAK | STATE_HEAVY | STATE_THROW)) {
 		CurrentAnim = AttackNum;
@@ -264,6 +223,13 @@ void CoolGiraffe::Draw(HDC hdc, Vector2 Scale, int frameNumber)
 
 void CoolGiraffe::DrawSelf(HDC hdc, Vector2 Scale, int CurrentFrame, int CurrentAnim)
 {
+	if (State & STATE_INTANGIBLE) {
+		SelectObject(hdc, IntangiblePen);
+	}
+	else {
+		SelectObject(hdc, GiraffePen);
+	}
+
 	std::vector<POINT> points;
 	std::vector<Vector2> vPoints = (*Moves->GetSkelPoints(CurrentAnim, CurrentFrame));
 
@@ -402,5 +368,57 @@ void CoolGiraffe::RecieveHits(Stage& stage, const int frameNumber)
 			}
 		}
 	}
+}
+
+void CoolGiraffe::DrawSmallFlame(HDC hdc, Vector2 Scale, Vector2 Elbow, Vector2 Hand)
+{
+	SelectObject(hdc, FirePen);
+
+	Vector2 dir = Hand - Elbow;
+	dir.Normalize();
+	Vector2 perp = { -dir.y, dir.x };
+
+	Vector2 controlPoints[11];
+	controlPoints[0] = Position + Facing * (Elbow + 0.2f * dir + 0.25f * perp);
+	controlPoints[1] = Position + Facing * (Elbow + 0.5f * dir + 0.4f * perp);
+	controlPoints[2] = Position + Facing * (Elbow + 0.45f * dir + 0.3f * perp);
+	controlPoints[3] = Position + Facing * (Hand + 0.2f * dir + 0.35f * perp);
+	controlPoints[4] = Position + Facing * (Hand + 0.15f * dir + 0.2f * perp);
+	controlPoints[5] = Position + Facing * (Hand + 0.35f * dir);
+	controlPoints[6] = Position + Facing * (Hand + 0.15f * dir - 0.2f * perp);
+	controlPoints[7] = Position + Facing * (Hand + 0.2f * dir - 0.35f * perp);
+	controlPoints[8] = Position + Facing * (Elbow + 0.45f * dir - 0.3f * perp);
+	controlPoints[9] = Position + Facing * (Elbow + 0.5f * dir - 0.4f * perp);
+	controlPoints[10] = Position + Facing * (Elbow + 0.2f * dir - 0.25f * perp);
+
+	POINT points[31];
+	CoolProjFuncs::Crackle(points, controlPoints, 10, 3, 0.3f, Scale);
+	Polyline(hdc, points, 31);
+}
+
+void CoolGiraffe::DrawLargeFlame(HDC hdc, Vector2 Scale, Vector2 Neck, Vector2 Head)
+{
+	SelectObject(hdc, FirePen);
+
+	Vector2 dir = Head - Neck;
+	dir.Normalize();
+	Vector2 perp = { -dir.y, dir.x };
+
+	Vector2 controlPoints[11];
+	controlPoints[0] = Position + Facing * (Head - 2.4f * dir + 0.25f * perp);
+	controlPoints[1] = Position + Facing * (Head - 1.0f * dir + 1.4f * perp);
+	controlPoints[2] = Position + Facing * (Head - 0.7f * dir + 1.0f * perp);
+	controlPoints[3] = Position + Facing * (Head - 0.4f * dir + 1.2f * perp);
+	controlPoints[4] = Position + Facing * (Head + 0.3f * dir + 0.8f * perp);
+	controlPoints[5] = Position + Facing * (Head + 0.7f * dir);
+	controlPoints[6] = Position + Facing * (Head + 0.3f * dir - 0.8f * perp);
+	controlPoints[7] = Position + Facing * (Head - 0.4f * dir - 1.2f * perp);
+	controlPoints[8] = Position + Facing * (Head - 0.7f * dir - 1.0f * perp);
+	controlPoints[9] = Position + Facing * (Head - 1.0f * dir - 1.4f * perp);
+	controlPoints[10] = Position + Facing * (Head - 2.4f * dir - 0.25f * perp);
+
+	POINT points[51];
+	CoolProjFuncs::Crackle(points, controlPoints, 10, 5, 0.5f, Scale);
+	Polyline(hdc, points, 51);
 }
 

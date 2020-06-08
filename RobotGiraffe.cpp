@@ -58,8 +58,9 @@ RobotGiraffe::RobotGiraffe(Vector2 _Position, MoveSet* _Moves, COLORREF _Colour)
 	GiraffePen = CreatePen(PS_SOLID, 1, _Colour);
 	IntangiblePen = CreatePen(PS_SOLID, 1, RGB(255, 255, 255));
 	ShieldBrush = CreateHatchBrush(HS_BDIAGONAL, RGB(0, 255, 127));
-	SpitBrush = CreateSolidBrush(RGB(90, 210, 180));
-	ShineBrush = CreateSolidBrush(RGB(0, 255, 255));
+	//FirePen = CreatePen(PS_SOLID, 1, RGB(230, 128, 40));
+	LaserPen = CreatePen(PS_SOLID, 1, RGB(0, 255, 255));
+	LanceBrush = CreateSolidBrush(RGB(0, 0, 0));
 }
 
 RobotGiraffe::~RobotGiraffe()
@@ -72,9 +73,10 @@ void RobotGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraff
 	++Charge;
 
 	TransitionStates(frameNumber);
-	if (HasSword == false && SwordDelay >= frameNumber) {
+	if (HasSword == false && frameNumber >= SwordDelay) {
 		HasSword = true;
 	}
+
 	ParseInputs(inputs, frameNumber, stage);
 	UniqueChanges(giraffes, num_giraffes, i, inputs, frameNumber, stage);
 	ApplyChanges(giraffes, num_giraffes, frameNumber, i);
@@ -108,7 +110,7 @@ void RobotGiraffe::UniqueChanges(std::array<Giraffe*, GGPO_MAX_PLAYERS> giraffes
 
 	//Throw lance
 	if ((State & STATE_WEAK) && (State & STATE_JUMPING) && (State & STATE_BACK) && AnimFrame == 10) {
-		Projectiles.Append(Projectile(Position + Vector2(0, -1.7f), { Facing.x * -0.8f, 0.0f }, 0.3f, { -Facing.x, 0.0f }, 1.6f, 0.3f, 0.3f, false, LastAttackID, frameNumber + 50, RobotProjFuncs::StandardOnHit, RobotProjFuncs::StandardUpdate, RobotProjFuncs::LanceDraw, GiraffePen, CreateSolidBrush(0)));
+		Projectiles.Append(Projectile(Position + Vector2(0, -1.7f), { Facing.x * -0.8f, 0.0f }, 0.3f, { -Facing.x, 0.0f }, 1.6f, 0.3f, 0.3f, false, LastAttackID, frameNumber + 50, RobotProjFuncs::StandardOnHit, RobotProjFuncs::StandardUpdate, RobotProjFuncs::LanceDraw, GiraffePen, LanceBrush));
 	}
 	//Fire Missile
 	else if ((State & STATE_WEAK) && (State & STATE_JUMPING) &&!(State & (STATE_UP | STATE_FORWARD | STATE_BACK | STATE_DOWN)) && AnimFrame >= 7 && AnimFrame <= 15 && AnimFrame % 2 == 0) {
@@ -134,7 +136,7 @@ void RobotGiraffe::UniqueChanges(std::array<Giraffe*, GGPO_MAX_PLAYERS> giraffes
 		}
 		//Throw sword
 		else if ((State & STATE_JUMPING) && (State & STATE_FORWARD) && AnimFrame == 10 && HasSword) {
-			Projectiles.Append(Projectile(Position, { 0.5f * Facing.x, 0 }, 1.5f, {Facing.x, 0.5f}, 0.5f, 0.5f, 0.5f, false, LastAttackID, frameNumber + 50, RobotProjFuncs::SwordOnHit, RobotProjFuncs::SwordUpdate, RobotProjFuncs::SwordDraw, GiraffePen, nullptr));
+			Projectiles.Append(Projectile(Position, { 0.5f * Facing.x, 0 }, 1.5f, {Facing.x, 0.5f}, 0.5f, 0.5f, 0.5f, false, LastAttackID, frameNumber + 50, RobotProjFuncs::SwordOnHit, RobotProjFuncs::SwordUpdate, RobotProjFuncs::SwordDraw, LaserPen, nullptr));
 			HasSword = false;
 			SwordDelay = frameNumber + 100;
 		}
@@ -147,10 +149,10 @@ void RobotGiraffe::UniqueChanges(std::array<Giraffe*, GGPO_MAX_PLAYERS> giraffes
 				}
 			}
 			if (!BigLaser && AnimFrame == 7) {
-				Projectiles.Append(Projectile(Position + Vector2(0.5, -0.5f), { Facing.x, 0.0f }, 0.3f, { Facing.x, 0.0f }, 0.1f, 0.1f, 0.0f, true, LastAttackID, frameNumber + 50, RobotProjFuncs::StandardOnHit, RobotProjFuncs::StandardUpdate, RobotProjFuncs::SmallLaserDraw, GiraffePen, nullptr));
+				Projectiles.Append(Projectile(Position + Vector2(0.5, -0.5f), { Facing.x, 0.0f }, 0.3f, { Facing.x, 0.0f }, 0.1f, 0.1f, 0.0f, true, LastAttackID, frameNumber + 50, RobotProjFuncs::StandardOnHit, RobotProjFuncs::StandardUpdate, RobotProjFuncs::SmallLaserDraw, LaserPen, nullptr));
 			}
 			else if (BigLaser && AnimFrame >= 7) {
-				Projectiles.Append(Projectile(Position + Vector2(0.5f, -1.0f), { 5 * Facing.x, -3.0f }, 1.0f, { Facing.x, -1.0f }, 2.0f, 1.0f, 1.0f, false, LastAttackID++, frameNumber + 50, RobotProjFuncs::StandardOnHit, RobotProjFuncs::StandardUpdate, RobotProjFuncs::BigLaserDraw, GiraffePen, nullptr));
+				Projectiles.Append(Projectile(Position + Vector2(0.5f, -1.0f), { 5 * Facing.x, -3.0f }, 1.0f, { Facing.x, -1.0f }, 2.0f, 1.0f, 1.0f, false, LastAttackID++, frameNumber + 50, RobotProjFuncs::StandardOnHit, RobotProjFuncs::StandardUpdate, RobotProjFuncs::BigLaserDraw, LaserPen, nullptr));
 				if (State & STATE_JUMPING) {
 					Velocity = { 0, -Gravity - 0.00001f };
 				}
@@ -158,8 +160,6 @@ void RobotGiraffe::UniqueChanges(std::array<Giraffe*, GGPO_MAX_PLAYERS> giraffes
 		}
 	}
 }
-
-
 
 void RobotGiraffe::Draw(HDC hdc, Vector2 Scale, int frameNumber)
 {
@@ -328,6 +328,7 @@ void RobotGiraffe::Draw(HDC hdc, Vector2 Scale, int frameNumber)
 
 void RobotGiraffe::DrawSelf(HDC hdc, Vector2 Scale, int CurrentFrame, int CurrentAnim)
 {
+	SelectObject(hdc, GiraffePen);
 	std::vector<POINT> points;
 	std::vector<Vector2> vPoints = (*Moves->GetSkelPoints(CurrentAnim, CurrentFrame));
 
@@ -406,6 +407,7 @@ void RobotGiraffe::DrawMace(HDC hdc, Vector2 Scale, Vector2 Neck, Vector2 Head)
 
 void RobotGiraffe::DrawBlast(HDC hdc, Vector2 Scale, Vector2 Neck, Vector2 Head)
 {
+	SelectObject(hdc, LaserPen);
 	Vector2 dir = Head - Neck;
 	dir.Normalize();
 	Vector2 perp = { -dir.y, dir.x };
@@ -434,6 +436,7 @@ void RobotGiraffe::DrawBeamSword(HDC hdc, Vector2 Scale, Vector2 Neck, Vector2 H
 {
 	DrawSword(hdc, Scale, Neck, Head);
 	
+	SelectObject(hdc, LaserPen);
 	Vector2 dir = Head - Neck;
 	dir.Normalize();
 	Vector2 perp = { -dir.y, dir.x };

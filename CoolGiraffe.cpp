@@ -104,10 +104,6 @@ void CoolGiraffe::Update(std::array<Giraffe*, GGPO_MAX_PLAYERS> giraffes, const 
 			Facing.x *= -1;
 		}
 	}
-	//Fire spit
-	else if ((State & STATE_HEAVY) && !(State & (STATE_WEAK | STATE_UP | STATE_FORWARD | STATE_BACK | STATE_DOWN)) && AnimFrame == 13) {
-		Projectiles.Append(Projectile(Position + Vector2(0.2f, -1.2f), { Facing.x * 0.5f, 0.0f }, 0.3f, { Facing.x, 0.0f }, 0.1f, 0.1f, 1.0f, true, LastAttackID, frameNumber + 100, NormProjFuncs::SpitOnHit, NormProjFuncs::SpitUpdate, NormProjFuncs::SpitDraw, GiraffePen, SpitBrush));
-	}
 	//Reverse direction in bair
 	else if ((State & STATE_JUMPING) && (State & STATE_WEAK) && (State & STATE_BACK)) {
 		if (AnimFrame == 4 || AnimFrame == 20) {

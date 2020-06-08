@@ -63,13 +63,8 @@ CoolGiraffe::~CoolGiraffe()
 {
 }
 
-void CoolGiraffe::Update(std::array<Giraffe*, GGPO_MAX_PLAYERS> giraffes, const int num_giraffes, const int i, const int inputs, const int frameNumber, Stage& stage)
+void CoolGiraffe::UniqueChanges(std::array<Giraffe*, GGPO_MAX_PLAYERS> giraffes, const int num_giraffes, const int i, const int inputs, const int frameNumber, Stage& stage)
 {
-	++AnimFrame;
-
-	TransitionStates(frameNumber);
-	ParseInputs(inputs, frameNumber, stage);
-
 	//Grab
 	if (State & STATE_WEAK && State & STATE_HEAVY && AnimFrame == 7) {
 		Collider grabCol = { {Position.x + 1.885000f * Facing.x, Position.y - 0.650000f}, 0.855862f };
@@ -117,8 +112,6 @@ void CoolGiraffe::Update(std::array<Giraffe*, GGPO_MAX_PLAYERS> giraffes, const 
 	else if (!(State & STATE_JUMPING) && (State & STATE_WEAK) && (State & STATE_DOWN) && (AnimFrame == 7 || AnimFrame == 0)) {
 		Facing.x *= -1;
 	}
-
-	ApplyChanges(giraffes, num_giraffes, frameNumber, i);
 }
 
 void CoolGiraffe::Draw(HDC hdc, Vector2 Scale, int frameNumber)

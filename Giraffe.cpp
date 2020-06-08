@@ -63,6 +63,15 @@ POINT Giraffe::VecToPoint(Vector2 vec, Vector2 scale)
 	return { (int)(vec.x * scale.x), (int)(vec.y * scale.y) };
 }
 
+void Giraffe::Update(std::array<Giraffe*, GGPO_MAX_PLAYERS> giraffes, const int num_giraffes, const int i, const int inputs, const int frameNumber, Stage& stage)
+{
+	++AnimFrame;
+	TransitionStates(frameNumber);
+	ParseInputs(inputs, frameNumber, stage);
+	UniqueChanges(giraffes, num_giraffes, i, inputs, frameNumber, stage);
+	ApplyChanges(giraffes, num_giraffes, frameNumber, i);
+}
+
 void Giraffe::Move(Stage& stage, const int frameNumber, std::array<Giraffe*, 4> giraffes, std::vector<Line>& lines)
 {
 	//Recieve incoming hits

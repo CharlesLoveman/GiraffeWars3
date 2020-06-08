@@ -66,21 +66,22 @@ RobotGiraffe::~RobotGiraffe()
 {
 }
 
-void RobotGiraffe::Update(std::array<Giraffe*, GGPO_MAX_PLAYERS> giraffes, const int num_giraffes, const int i, const int inputs, const int frameNumber, Stage& stage)
+void RobotGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffes, const int i, const int inputs, const int frameNumber, Stage& stage)
 {
 	++AnimFrame;
 	++Charge;
 
-
 	TransitionStates(frameNumber);
-
 	if (HasSword == false && SwordDelay >= frameNumber) {
 		HasSword = true;
 	}
-
 	ParseInputs(inputs, frameNumber, stage);
-	
+	UniqueChanges(giraffes, num_giraffes, i, inputs, frameNumber, stage);
+	ApplyChanges(giraffes, num_giraffes, frameNumber, i);
+}
 
+void RobotGiraffe::UniqueChanges(std::array<Giraffe*, GGPO_MAX_PLAYERS> giraffes, const int num_giraffes, const int i, const int inputs, const int frameNumber, Stage& stage)
+{
 	//Grab
 	if (State & STATE_WEAK && State & STATE_HEAVY && AnimFrame == 11) {
 		Projectiles.Append(Projectile(Position + Vector2(Facing.x * 0.5f, 0), { Facing.x * 0.6f, 0 }, 0.5f, { 0,0 }, 0, 0, 0, true, LastAttackID, frameNumber + 15, RobotProjFuncs::GrabberOnHit, RobotProjFuncs::StandardUpdate, RobotProjFuncs::GrabberDraw, GiraffePen, ShieldBrush));
@@ -156,8 +157,6 @@ void RobotGiraffe::Update(std::array<Giraffe*, GGPO_MAX_PLAYERS> giraffes, const
 			}
 		}
 	}
-
-	ApplyChanges(giraffes, num_giraffes, frameNumber, i);
 }
 
 

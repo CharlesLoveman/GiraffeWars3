@@ -62,12 +62,12 @@ NormGiraffe::~NormGiraffe()
 {
 }
 
-void NormGiraffe::Update(std::array<Giraffe*, GGPO_MAX_PLAYERS> giraffes, const int num_giraffes, const int i, const int inputs, const int frameNumber, Stage& stage)
+void NormGiraffe::UniqueChanges(std::array<Giraffe*, GGPO_MAX_PLAYERS> giraffes, const int num_giraffes, const int i, const int inputs, const int frameNumber, Stage& stage)
 {
-	++AnimFrame;
+	/*++AnimFrame;
 
 	TransitionStates(frameNumber);
-	ParseInputs(inputs, frameNumber, stage);
+	ParseInputs(inputs, frameNumber, stage);*/
 
 	//Grab
 	if (State & STATE_WEAK && State & STATE_HEAVY && AnimFrame == 7) {
@@ -140,7 +140,7 @@ void NormGiraffe::Update(std::array<Giraffe*, GGPO_MAX_PLAYERS> giraffes, const 
 	}
 
 	
-	ApplyChanges(giraffes, num_giraffes, frameNumber, i);
+	//ApplyChanges(giraffes, num_giraffes, frameNumber, i);
 }
 
 void NormGiraffe::Draw(HDC hdc, Vector2 Scale, int frameNumber)

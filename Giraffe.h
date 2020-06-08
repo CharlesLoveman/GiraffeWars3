@@ -101,7 +101,7 @@ enum GiraffeSoundAttackStates {
 class Giraffe {
 public:
 	virtual ~Giraffe() { };
-	virtual void Update(std::array<Giraffe*, GGPO_MAX_PLAYERS> giraffes, const int num_giraffes, const int i, const int inputs, const int frameNumber, Stage& stage) = 0;
+	virtual void Update(std::array<Giraffe*, GGPO_MAX_PLAYERS> giraffes, const int num_giraffes, const int i, const int inputs, const int frameNumber, Stage& stage);
 	virtual void Draw(HDC hdc, Vector2 Scale, int frameNumber) = 0;
 	virtual void Move(Stage& stage, const int frameNumber, std::array<Giraffe*, GGPO_MAX_PLAYERS> giraffes, std::vector<Line>& lines);
 	bool AddHit(HitCollider hit, int ID, Vector2 facing, Vector2 position);
@@ -125,6 +125,7 @@ public:
 	friend struct CoolProjFuncs;
 
 protected:
+	virtual void UniqueChanges(std::array<Giraffe*, GGPO_MAX_PLAYERS> giraffes, const int num_giraffes, const int i, const int inputs, const int frameNumber, Stage& stage) = 0;
 	virtual void TransitionStates(const int frameNumber);
 	virtual void ParseInputs(const int inputs, const int frameNumber, Stage& stage);
 	virtual void ApplyChanges(std::array<Giraffe*, GGPO_MAX_PLAYERS> giraffes, const int num_giraffes, const int frameNumber, const int i);

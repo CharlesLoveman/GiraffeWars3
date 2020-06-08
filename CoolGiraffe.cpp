@@ -87,13 +87,7 @@ void CoolGiraffe::UniqueChanges(std::array<Giraffe*, GGPO_MAX_PLAYERS> giraffes,
 
 
 	if ((State & STATE_HEAVY) && (State & STATE_UP)) {
-		////Fire neck
-		//if (State & STATE_JUMPING) {
-		//	if (AnimFrame == 10) {
-		//		Projectiles.Append(Projectile(Position + Vector2(0.2f, -1.2f), { Facing.x * 0.65f, -0.65f }, 0.3f, { 0.0f, 0.0f }, 0.1f, 0.1f, 1.0f, true, LastAttackID, AttackDelay - 10, NormProjFuncs::NeckGrabOnHit, NormProjFuncs::NeckGrabUpdate, NormProjFuncs::NeckGrabDraw, GiraffePen, SpitBrush));
-		//	}
-		//}
-		if ((State & STATE_JUMPING) && AnimFrame >= 13 && AnimFrame <= 23) {
+		if (State & STATE_JUMPING && AnimFrame >= 13 && AnimFrame <= 23) {
 			if (AnimFrame == 14) {
 				Velocity.y = 0;
 			}

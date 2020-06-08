@@ -303,3 +303,60 @@ void CoolGiraffe::DrawHitbox(HDC hdc, Vector2 Scale, Vector2 Pos, float Rad)
 	Ellipse(hdc, Scale.x * (Position.x + Facing.x * Pos.x - Rad), Scale.y * (Position.y + Facing.y * Pos.y - Rad), Scale.x * (Position.x + Facing.x * Pos.x + Rad), Scale.y * (Position.y + Facing.y * Pos.y + Rad));
 }
 
+void CoolGiraffe::Landing(Stage& stage, const int frameNumber, std::array<Giraffe*, GGPO_MAX_PLAYERS> giraffes)
+{
+	SoundMoveState |= SOUND_JUMPLAND;
+	SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_JUMPLAND] = frameNumber + Moves->GetMoveSoundLength(XACT_WAVEBANK_MOVEBANK_JUMPLAND);
+	if ((State & STATE_HEAVY) && !(State & (STATE_FORWARD | STATE_UP | STATE_BACK | STATE_DOWN))) {
+		State &= ~STATE_JUMPING;
+		HasAirDash = true;
+		HasDoubleJump = false;
+	}
+	else {
+		if (State & STATE_HITSTUN && !(State & STATE_TECHATTEMPT)) {
+			if (Velocity.x > 0) {
+				Facing.x = -1;
+			}
+			else {
+				Facing.x = 1;
+			}
+			Velocity = { 0,0 };
+			State |= STATE_KNOCKDOWNLAG;
+			State &= ~STATE_HITSTUN;
+			AnimFrame = 0;
+			TechDelay = frameNumber + 30;
+			SoundMoveState |= SOUND_KNOCKDOWN;
+			SoundMoveState &= ~SOUND_HITSTUN;
+			SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_KNOCKDOWN] = frameNumber + Moves->GetMoveSoundLength(XACT_WAVEBANK_MOVEBANK_KNOCKDOWN);
+		}
+		else if (State & STATE_GRABBING) {
+			State &= ~STATE_GRABBING;
+			giraffes[CommandGrabPointer]->State &= ~STATE_GRABBED;
+		}
+		else {
+			if (State & (STATE_WEAK | STATE_HEAVY)) {
+				State |= STATE_HITSTUN;
+				AttackDelay = frameNumber + Moves->GetLandingLag(max(0, (AttackNum - 25)));
+				SoundMoveState |= SOUND_HITSTUN;
+				SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_HITSTUN] = AttackDelay;
+			}
+			else if ((State & STATE_TECHATTEMPT) && (State & STATE_HITSTUN)) {
+				State &= ~STATE_TECHATTEMPT;
+				State |= STATE_TECHING | STATE_INTANGIBLE;
+				TechDelay = frameNumber + 20;
+				SoundMoveState &= ~SOUND_HITSTUN;
+				SoundMoveState |= SOUND_TECH;
+				SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_TECH] = frameNumber + Moves->GetMoveSoundLength(XACT_WAVEBANK_MOVEBANK_TECH);
+			}
+
+			State |= STATE_JUMPLAND;
+			HasAirDash = true;
+			HasDoubleJump = false;
+			JumpDelay = frameNumber + MaxJumpDelay / 2;
+			AnimFrame = 0;
+		}
+		SoundAttackState &= ~(SOUND_DOWNB | SOUND_UPB);
+		State &= ~(STATE_UP | STATE_BACK | STATE_DOWN | STATE_FORWARD | STATE_WEAK | STATE_HEAVY | STATE_JUMPING | STATE_FASTFALL | STATE_TECHLAG | STATE_THROW | STATE_GRABBED | STATE_GRABBING);
+	}
+}
+

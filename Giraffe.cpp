@@ -208,7 +208,7 @@ void Giraffe::ParseInputs(const int inputs, const int frameNumber, Stage& stage)
 		State |= STATE_SHORTHOP;
 	}
 	if (inputs & INPUT_SHIELD) {
-		
+		ParseShield(inputs, frameNumber, stage);
 	}
 	else if (State & STATE_SHIELDING) {
 		State &= ~STATE_SHIELDING;
@@ -298,54 +298,14 @@ void Giraffe::ApplyChanges(std::array<Giraffe*, GGPO_MAX_PLAYERS> giraffes, cons
 	}
 	else {
 		if (fabs(Velocity.y) > MaxAirSpeed.y) {
-			Velocity.y *= 0.9f;
+			Velocity.y *= 0.95f;
 		}
 		if (fabs(Velocity.x) > MaxAirSpeed.x) {
 			Velocity.x *= 0.95f;
 		}
 	}
 
-
-
-
-	//Apply hits to other giraffes
-	for (int p = Projectiles.Size() - 1; p >= 0; --p) {
-		for (int j = 0; j < num_giraffes; ++j) {
-			if (j != i) {
-				if ((*giraffes[j]).ProjectileHit(Projectiles[p])) {
-					Projectiles[p].OnHit(Projectiles[p], *this, giraffes[j], frameNumber);
-					Projectiles.Remove(p);
-					SoundAttackState |= SOUND_WEAK;
-					SoundAttackDelay[XACT_WAVEBANK_ATTACKBANK_WEAK] = frameNumber + Moves->GetAttackSoundLength(XACT_WAVEBANK_ATTACKBANK_WEAK);
-					break;
-				}
-			}
-		}
-	}
-
-
-	if (!(Hitboxes == nullptr)) {
-		for (int j = 0; j < num_giraffes; ++j) {
-			if (j != i) {
-				for (int h = 0; h < numHitboxes; ++h) {
-					if ((*giraffes[j]).AddHit((*Hitboxes)[h], LastAttackID, Facing, Position)) {
-						if ((*Hitboxes)[h].Damage > 1) {
-							SoundAttackState |= SOUND_HEAVY;
-							SoundAttackDelay[XACT_WAVEBANK_ATTACKBANK_HEAVY] = frameNumber + Moves->GetAttackSoundLength(XACT_WAVEBANK_ATTACKBANK_HEAVY);
-						}
-						else if ((*Hitboxes)[h].Damage > 0.5f) {
-							SoundAttackState |= SOUND_MEDIUM;
-							SoundAttackDelay[XACT_WAVEBANK_ATTACKBANK_MEDIUM] = frameNumber + Moves->GetAttackSoundLength(XACT_WAVEBANK_ATTACKBANK_MEDIUM);
-						}
-						else {
-							SoundAttackState |= SOUND_WEAK;
-							SoundAttackDelay[XACT_WAVEBANK_ATTACKBANK_WEAK] = frameNumber + Moves->GetAttackSoundLength(XACT_WAVEBANK_ATTACKBANK_WEAK);
-						}
-					}
-				}
-			}
-		}
-	}
+	GiveHits(giraffes, num_giraffes, frameNumber, i);
 }
 
 void Giraffe::ParseWalk(const int inputs, const int frameNumber, Stage& stage)
@@ -658,6 +618,48 @@ void Giraffe::ParseShield(const int inputs, const int frameNumber, Stage& stage)
 		Velocity.x = 0;
 		SoundMoveState |= SOUND_SHIELD;
 		SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_SHIELD] = 1000000000;
+	}
+}
+
+void Giraffe::GiveHits(std::array<Giraffe*, GGPO_MAX_PLAYERS> giraffes, const int num_giraffes, const int frameNumber, const int i)
+{
+	//Apply hits to other giraffes
+	for (int p = Projectiles.Size() - 1; p >= 0; --p) {
+		for (int j = 0; j < num_giraffes; ++j) {
+			if (j != i) {
+				if ((*giraffes[j]).ProjectileHit(Projectiles[p])) {
+					Projectiles[p].OnHit(Projectiles[p], *this, giraffes[j], frameNumber);
+					Projectiles.Remove(p);
+					SoundAttackState |= SOUND_WEAK;
+					SoundAttackDelay[XACT_WAVEBANK_ATTACKBANK_WEAK] = frameNumber + Moves->GetAttackSoundLength(XACT_WAVEBANK_ATTACKBANK_WEAK);
+					break;
+				}
+			}
+		}
+	}
+
+
+	if (!(Hitboxes == nullptr)) {
+		for (int j = 0; j < num_giraffes; ++j) {
+			if (j != i) {
+				for (int h = 0; h < numHitboxes; ++h) {
+					if ((*giraffes[j]).AddHit((*Hitboxes)[h], LastAttackID, Facing, Position)) {
+						if ((*Hitboxes)[h].Damage > 1) {
+							SoundAttackState |= SOUND_HEAVY;
+							SoundAttackDelay[XACT_WAVEBANK_ATTACKBANK_HEAVY] = frameNumber + Moves->GetAttackSoundLength(XACT_WAVEBANK_ATTACKBANK_HEAVY);
+						}
+						else if ((*Hitboxes)[h].Damage > 0.5f) {
+							SoundAttackState |= SOUND_MEDIUM;
+							SoundAttackDelay[XACT_WAVEBANK_ATTACKBANK_MEDIUM] = frameNumber + Moves->GetAttackSoundLength(XACT_WAVEBANK_ATTACKBANK_MEDIUM);
+						}
+						else {
+							SoundAttackState |= SOUND_WEAK;
+							SoundAttackDelay[XACT_WAVEBANK_ATTACKBANK_WEAK] = frameNumber + Moves->GetAttackSoundLength(XACT_WAVEBANK_ATTACKBANK_WEAK);
+						}
+					}
+				}
+			}
+		}
 	}
 }
 

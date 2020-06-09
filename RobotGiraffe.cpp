@@ -255,9 +255,6 @@ void RobotGiraffe::Draw(HDC hdc, Vector2 Scale, int frameNumber)
 	if (State & (STATE_WEAK | STATE_HEAVY | STATE_THROW)) {
 		CurrentAnim = AttackNum;
 		CurrentFrame = AnimFrame;
-		/*for (int i = 0; i < numHitboxes; ++i) {
-			DrawHitbox(hdc, Scale, (*Hitboxes)[i].Position, (*Hitboxes)[i].Radius);
-		}*/
 	}
 	else {
 		if (State & STATE_HITSTUN) {
@@ -267,14 +264,12 @@ void RobotGiraffe::Draw(HDC hdc, Vector2 Scale, int frameNumber)
 		else if (State & STATE_SHIELDSTUN) {
 			SelectObject(hdc, ShieldBrush);
 			DrawHitbox(hdc, Scale, { 0,0 }, 2.5f);
-			//Ellipse(hdc, (Position.x - 2.5f) * Scale.x, (Position.y - 2.5f) * Scale.y, (Position.x + 2.5f) * Scale.x, (Position.y + 2.5f) * Scale.y);
 			CurrentAnim = 6;
 			CurrentFrame = AnimFrame % 8;
 		}
 		else if (State & STATE_SHIELDING) {
 			SelectObject(hdc, ShieldBrush);
 			DrawHitbox(hdc, Scale, { 0,0 }, 2.5f);
-			//Ellipse(hdc, (Position.x - 2.5f) * Scale.x, (Position.y - 2.5f) * Scale.y, (Position.x + 2.5f) * Scale.x, (Position.y + 2.5f) * Scale.y);
 			CurrentAnim = 0;
 			CurrentFrame = 0;
 		}
@@ -326,6 +321,11 @@ void RobotGiraffe::Draw(HDC hdc, Vector2 Scale, int frameNumber)
 	DrawSelf(hdc, Scale, CurrentFrame, CurrentAnim);
 }
 
+int RobotGiraffe::Size()
+{
+	return sizeof(*this);
+}
+
 void RobotGiraffe::DrawSelf(HDC hdc, Vector2 Scale, int CurrentFrame, int CurrentAnim)
 {
 	SelectObject(hdc, GiraffePen);
@@ -340,6 +340,7 @@ void RobotGiraffe::DrawSelf(HDC hdc, Vector2 Scale, int CurrentFrame, int Curren
 
 void RobotGiraffe::DrawHitbox(HDC hdc, Vector2 Scale, Vector2 Pos, float Rad)
 {
+	SelectObject(hdc, GiraffePen);
 	Ellipse(hdc, (int)(Scale.x * (Position.x + Facing.x * Pos.x - Rad)), (int)(Scale.y * (Position.y + Facing.y * Pos.y - Rad)), (int)(Scale.x * (Position.x + Facing.x * Pos.x + Rad)), (int)(Scale.y * (Position.y + Facing.y * Pos.y + Rad)));
 }
 

@@ -10,6 +10,7 @@
 #include "MoveSet.h"
 #include "NormMoveSet.h"
 #include "CoolMoveSet.h"
+#include "PoshMoveSet.h"
 #include "AudioPlayer.h"
 
 #pragma comment(lib, "Ws2_32.lib")
@@ -119,8 +120,8 @@ bool __cdecl gw_load_game_state_callback(unsigned char* buffer, int len)
 	memcpy(&gs, buffer, gsSize);
 
 	for (int i = 0; i < gs._num_giraffes; ++i) {
-		memcpy(gs.giraffes[i], buffer + gsSize + giraffeSize, sizeof(*gs.giraffes[i]));
-		giraffeSize += sizeof(*gs.giraffes[i]);
+		memcpy(gs.giraffes[i], buffer + gsSize + giraffeSize, gs.giraffes[i]->Size());
+		giraffeSize += gs.giraffes[i]->Size();
 	}
 
 	//memcpy(gs.lines.data(), buffer + gsSize + giraffeSize, lineSize);
@@ -136,7 +137,7 @@ bool __cdecl gw_save_game_state_callback(unsigned char** buffer, int* len, int* 
 {
 	int giraffeSize = 0;
 	for (int i = 0; i < gs._num_giraffes; ++i) {
-		giraffeSize += sizeof(*gs.giraffes[i]);
+		giraffeSize += gs.giraffes[i]->Size();
 	}
 
 	int ledgeSize = sizeof(gs.stage.Ledges[0]) * gs.stage.Ledges.size();
@@ -153,8 +154,8 @@ bool __cdecl gw_save_game_state_callback(unsigned char** buffer, int* len, int* 
 	*checksum = fletcher32_checksum((short*)buffer, *len);
 	giraffeSize = 0;
 	for (int i = 0; i < gs._num_giraffes; ++i) {
-		memcpy(*buffer + gsSize + giraffeSize, gs.giraffes[i], sizeof(*gs.giraffes[i]));
-		giraffeSize += sizeof(*gs.giraffes[i]);
+		memcpy(*buffer + gsSize + giraffeSize, gs.giraffes[i], gs.giraffes[i]->Size());
+		giraffeSize += gs.giraffes[i]->Size();
 	}
 	memcpy(*buffer + gsSize + giraffeSize, gs.stage.Ledges.data(), ledgeSize);
 
@@ -211,8 +212,9 @@ void GiraffeWar_Init(HWND hwnd, unsigned short localport, GGPOPlayer* players, i
 	MoveSets[0] = new NormMoveSet();
 	MoveSets[1] = new RobotMoveSet();
 	MoveSets[2] = new CoolMoveSet();
+	MoveSets[3] = new PoshMoveSet();
 
-	for (int i = 0; i < 3; ++i) {
+	for (int i = 0; i < 4; ++i) {
 		MoveSets[i]->InitMoves();
 		MoveSets[i]->InitThrows();
 		MoveSets[i]->InitTilts();

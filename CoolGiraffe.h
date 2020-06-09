@@ -6,8 +6,8 @@
 #include <memory>
 #include <array>
 
-constexpr int NUM_MOVES_COOL= 24;
-constexpr int NUM_POINTS_COOL = 38;
+//constexpr int NUM_MOVES_COOL= 24;
+//constexpr int NUM_POINTS_COOL = 38;
 
 class CoolGiraffe : public Giraffe {
 public:
@@ -16,6 +16,7 @@ public:
 
 	void UniqueChanges(std::array<Giraffe*, 4> giraffes, const int num_giraffes, const int i, const int inputs, const int frameNumber, Stage& stage);
 	void Draw(HDC hdc, Vector2 Scale, int frameNumber);
+	int Size();
 private:
 	HPEN FirePen;
 	void DrawSelf(HDC hdc, Vector2 Scale, int CurrentFrame, int CurrentAnim);

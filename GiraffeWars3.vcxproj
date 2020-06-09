@@ -147,6 +147,8 @@
     <ClCompile Include="giraffewar.cpp" />
     <ClCompile Include="NormGiraffe.cpp" />
     <ClCompile Include="NormMoveSet.cpp" />
+    <ClCompile Include="PoshGiraffe.cpp" />
+    <ClCompile Include="PoshMoveSet.cpp" />
     <ClCompile Include="Projectile.cpp" />
     <ClCompile Include="RobotGiraffe.cpp" />
     <ClCompile Include="RobotMoveSet.cpp" />
@@ -173,6 +175,9 @@
     <ClInclude Include="NormGiraffe.h" />
     <ClInclude Include="NormMoveSet.h" />
     <ClInclude Include="NormProjFuncs.h" />
+    <ClInclude Include="PoshGiraffe.h" />
+    <ClInclude Include="PoshMoveSet.h" />
+    <ClInclude Include="PoshProjFuncs.h" />
     <ClInclude Include="Projectile.h" />
     <ClInclude Include="renderer.h" />
     <ClInclude Include="resource.h" />

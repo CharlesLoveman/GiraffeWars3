@@ -26,7 +26,9 @@ private:
 	void DrawCrown(HDC hdc, Vector2 Scale, Vector2 Head1, Vector2 Head2);
 	void DrawTie(HDC hdc, Vector2 Scale, Vector2 Pos, Vector2 Dir);
 	void GiveHits(std::array<Giraffe*, GGPO_MAX_PLAYERS> giraffes, const int num_giraffes, const int frameNumber, const int i);
+	void RecieveHits(Stage& stage, const int frameNumber);
 
+	void ChangeHat();
 	int Hat;
 	float Multiplier;
 	HBRUSH MonocleBrush;

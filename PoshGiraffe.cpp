@@ -1,4 +1,5 @@
 #include "PoshGiraffe.h"
+#include "PoshProjFuncs.h"
 
 PoshGiraffe::PoshGiraffe(Vector2 _Position, MoveSet* _Moves, COLORREF _Colour)
 {
@@ -47,8 +48,6 @@ PoshGiraffe::PoshGiraffe(Vector2 _Position, MoveSet* _Moves, COLORREF _Colour)
 	Knockback = 0;
 	Mass = 80;
 	CommandGrabPointer = 0;
-	/*Hat = 0;
-	Multiplier = 1.0f;*/
 	Hat = 0;
 	Multiplier = 1.0f;
 
@@ -83,40 +82,24 @@ void PoshGiraffe::UniqueChanges(std::array<Giraffe*, GGPO_MAX_PLAYERS> giraffes,
 	}
 	
 	if (State & STATE_HEAVY && !(State & (STATE_WEAK | STATE_UP | STATE_BACK | STATE_DOWN | STATE_FORWARD)) && AnimFrame == 5) {
-		Hat = (Hat + 1) % 4;
+		ChangeHat();
+	}
+
+	else if (State & STATE_HEAVY && State & STATE_JUMPING && State & STATE_FORWARD && AnimFrame == 7) {
 		switch (Hat) {
 		case 1:
-			MaxGroundSpeed = 0.3f;
-			MaxAirSpeed = Vector2(0.3f, 0.7f);
-			RunAccel = 0.06f;
-			AirAccel = 0.024f;
-			Gravity = 0.01f;
-			Multiplier = 0.6f;
+			Projectiles.Append(Projectile(Position + Facing * (*Moves->GetSkelPoints(AttackNum, AnimFrame))[31], { 0.4f * Facing.x, 0.0f }, 0.3f, { 0.3f * Facing.x, -0.7f }, 0.3f, 0.1f, 0.4f, false, LastAttackID, frameNumber + 100, PoshProjFuncs::StandardOnHit, PoshProjFuncs::StandardUpdate, PoshProjFuncs::SombreroDraw, GiraffePen, nullptr));
 			break;
 		case 2:
-			MaxGroundSpeed = 0.6f;
-			MaxAirSpeed = Vector2(0.5f, 0.7f);
-			RunAccel = 0.1f;
-			AirAccel = 0.032f;
-			Gravity = 0.03f;
-			Multiplier = 0.8f;
+			Projectiles.Append(Projectile(Position + Facing * (*Moves->GetSkelPoints(AttackNum, AnimFrame))[31], { Facing.x, 0.0f }, 0.3f, { 0.4f * Facing.x, 0.1f }, 0.3f, 0.1f, 0.4f, false, LastAttackID, frameNumber + 100, PoshProjFuncs::StandardOnHit, PoshProjFuncs::StandardUpdate, PoshProjFuncs::RobinDraw, GiraffePen, nullptr));
 			break;
 		case 3:
-			MaxGroundSpeed = 0.3f;
-			MaxAirSpeed = Vector2(0.2f, 0.5f);
-			RunAccel = 0.05f;
-			AirAccel = 0.02f;
-			Gravity = 0.02f;
-			Multiplier = 1.2f;
+			Projectiles.Append(Projectile(Position + Facing * (*Moves->GetSkelPoints(AttackNum, AnimFrame))[31], { 0.25f * Facing.x, 0.0f }, 0.3f, { Facing.x, 0.0f }, 0.6f, 0.1f, 0.4f, false, LastAttackID, frameNumber + 100, PoshProjFuncs::StandardOnHit, PoshProjFuncs::StandardUpdate, PoshProjFuncs::CrownDraw, GiraffePen, nullptr));
 			break;
 		default:
-			MaxGroundSpeed = 0.4f;
-			MaxAirSpeed = Vector2(0.3f, 0.7f);
-			RunAccel = 0.08f;
-			AirAccel = 0.028f;
-			Gravity = 0.015f;
-			Multiplier = 1.0f;
+			Projectiles.Append(Projectile(Position + Facing * (*Moves->GetSkelPoints(AttackNum, AnimFrame))[31], { 0.5f * Facing.x, 0.0f }, 0.3f, {Facing.x, -0.2}, 0.4f, 0.1f, 0.5f, false, LastAttackID, frameNumber + 100, PoshProjFuncs::StandardOnHit, PoshProjFuncs::StandardUpdate, PoshProjFuncs::TopHatDraw, GiraffePen, nullptr));
 		}
+		ChangeHat();
 	}
 }
 
@@ -395,5 +378,81 @@ void PoshGiraffe::GiveHits(std::array<Giraffe*, GGPO_MAX_PLAYERS> giraffes, cons
 				}
 			}
 		}
+	}
+}
+
+void PoshGiraffe::RecieveHits(Stage& stage, const int frameNumber)
+{
+	if (incomingGrab) {
+		State &= ~(STATE_UP | STATE_BACK | STATE_DOWN | STATE_FORWARD | STATE_WEAK | STATE_HEAVY | STATE_SHIELDING | STATE_DROPSHIELD | STATE_SHIELDSTUN | STATE_JUMPSQUAT | STATE_JUMPLAND | STATE_HITSTUN | STATE_FASTFALL | STATE_DOUBLEJUMPWAIT | STATE_WAVEDASH | STATE_RUNNING | STATE_SHORTHOP | STATE_CROUCH | STATE_TECHATTEMPT | STATE_TECHLAG | STATE_TECHING | STATE_KNOCKDOWN | STATE_KNOCKDOWNLAG | STATE_ROLLING | STATE_GETUPATTACK | STATE_GRABBING | STATE_THROW);
+		State |= STATE_GRABBED;
+		SoundMoveState &= ~(SOUND_SHIELD | SOUND_RUN);
+		incomingGrab = false;
+	}
+	if (State & STATE_SHIELDING) {
+		for (int j = 0; j < numIncoming; ++j) {
+			State |= STATE_SHIELDSTUN;
+			AttackDelay = (int)max(AttackDelay, frameNumber + IncomingHits[j].Damage * 50);
+		}
+	}
+	else {
+		for (int j = 0; j < numIncoming; ++j) {
+			Knockback += IncomingHits[j].Damage * Multiplier;
+			float KnockbackApplied;
+			if (IncomingHits[j].Fixed) {
+				KnockbackApplied = IncomingHits[j].Knockback;
+			}
+			else {
+				KnockbackApplied = ((((Knockback / 10 + (Knockback * IncomingHits[j].Damage * Multiplier / 20)) * (200 / (Mass + 100)) * 1.4f + 0.18f) * IncomingHits[j].Scale) + IncomingHits[j].Knockback);
+			}
+			Velocity += KnockbackApplied * IncomingHits[j].Force;
+			if (State & STATE_LEDGEHOG) {
+				stage.Ledges[LedgeID].Hogged = false;
+				State &= ~STATE_LEDGEHOG;
+			}
+			State &= ~(STATE_UP | STATE_BACK | STATE_DOWN | STATE_FORWARD | STATE_WEAK | STATE_HEAVY | STATE_JUMPSQUAT | STATE_JUMPLAND | STATE_SHORTHOP | STATE_KNOCKDOWN | STATE_KNOCKDOWNLAG | STATE_GETUPATTACK | STATE_GRABBING | STATE_GRABBED | STATE_THROW);
+			State |= STATE_HITSTUN;
+			SoundMoveState |= SOUND_HITSTUN;
+			SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_HITSTUN] = 100000000;
+			AttackDelay = (int)max(AttackDelay, frameNumber + min(KnockbackApplied * 40, 100));
+		}
+	}
+}
+
+void PoshGiraffe::ChangeHat()
+{
+	Hat = (Hat + 1) % 4;
+	switch (Hat) {
+	case 1:
+		MaxGroundSpeed = 0.3f;
+		MaxAirSpeed = Vector2(0.3f, 0.7f);
+		RunAccel = 0.06f;
+		AirAccel = 0.024f;
+		Gravity = 0.01f;
+		Multiplier = 0.6f;
+		break;
+	case 2:
+		MaxGroundSpeed = 0.6f;
+		MaxAirSpeed = Vector2(0.5f, 0.7f);
+		RunAccel = 0.1f;
+		AirAccel = 0.032f;
+		Gravity = 0.03f;
+		Multiplier = 0.8f;
+		break;
+	case 3:
+		MaxGroundSpeed = 0.3f;
+		MaxAirSpeed = Vector2(0.2f, 0.5f);
+		RunAccel = 0.05f;
+		AirAccel = 0.02f;
+		Gravity = 0.02f;
+		Multiplier = 1.2f;
+		break;
+	default:
+		MaxGroundSpeed = 0.4f;
+		MaxAirSpeed = Vector2(0.3f, 0.7f);
+		RunAccel = 0.08f;
+		AirAccel = 0.028f;
+		Gravity = 0.015f;
+		Multiplier = 1.0f;
 	}
 }

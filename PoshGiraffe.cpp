@@ -81,25 +81,39 @@ void PoshGiraffe::UniqueChanges(std::array<Giraffe*, GGPO_MAX_PLAYERS> giraffes,
 		}
 	}
 	
-	if (State & STATE_HEAVY && !(State & (STATE_WEAK | STATE_UP | STATE_BACK | STATE_DOWN | STATE_FORWARD)) && AnimFrame == 5) {
-		ChangeHat();
-	}
-
-	else if (State & STATE_HEAVY && State & STATE_JUMPING && State & STATE_FORWARD && AnimFrame == 7) {
-		switch (Hat) {
-		case 1:
-			Projectiles.Append(Projectile(Position + Facing * (*Moves->GetSkelPoints(AttackNum, AnimFrame))[31], { 0.4f * Facing.x, 0.0f }, 0.3f, { 0.3f * Facing.x, -0.7f }, 0.3f, 0.1f, 0.4f, false, LastAttackID, frameNumber + 100, PoshProjFuncs::StandardOnHit, PoshProjFuncs::StandardUpdate, PoshProjFuncs::SombreroDraw, GiraffePen, nullptr));
-			break;
-		case 2:
-			Projectiles.Append(Projectile(Position + Facing * (*Moves->GetSkelPoints(AttackNum, AnimFrame))[31], { Facing.x, 0.0f }, 0.3f, { 0.4f * Facing.x, 0.1f }, 0.3f, 0.1f, 0.4f, false, LastAttackID, frameNumber + 100, PoshProjFuncs::StandardOnHit, PoshProjFuncs::StandardUpdate, PoshProjFuncs::RobinDraw, GiraffePen, nullptr));
-			break;
-		case 3:
-			Projectiles.Append(Projectile(Position + Facing * (*Moves->GetSkelPoints(AttackNum, AnimFrame))[31], { 0.25f * Facing.x, 0.0f }, 0.3f, { Facing.x, 0.0f }, 0.6f, 0.1f, 0.4f, false, LastAttackID, frameNumber + 100, PoshProjFuncs::StandardOnHit, PoshProjFuncs::StandardUpdate, PoshProjFuncs::CrownDraw, GiraffePen, nullptr));
-			break;
-		default:
-			Projectiles.Append(Projectile(Position + Facing * (*Moves->GetSkelPoints(AttackNum, AnimFrame))[31], { 0.5f * Facing.x, 0.0f }, 0.3f, {Facing.x, -0.2}, 0.4f, 0.1f, 0.5f, false, LastAttackID, frameNumber + 100, PoshProjFuncs::StandardOnHit, PoshProjFuncs::StandardUpdate, PoshProjFuncs::TopHatDraw, GiraffePen, nullptr));
+	if (State & STATE_HEAVY) {
+		if (!(State & (STATE_WEAK | STATE_UP | STATE_BACK | STATE_DOWN | STATE_FORWARD)) && AnimFrame == 5) {
+			ChangeHat();
 		}
-		ChangeHat();
+
+		else if (State & STATE_JUMPING && State & STATE_FORWARD && AnimFrame == 7) {
+			switch (Hat) {
+			case 1:
+				Projectiles.Append(Projectile(Position + Facing * (*Moves->GetSkelPoints(AttackNum, AnimFrame))[31], { 0.4f * Facing.x, 0.0f }, 0.3f, { 0.3f * Facing.x, -0.7f }, 0.3f, 0.1f, 0.4f, false, LastAttackID, frameNumber + 100, PoshProjFuncs::StandardOnHit, PoshProjFuncs::StandardUpdate, PoshProjFuncs::SombreroDraw, GiraffePen, nullptr));
+				break;
+			case 2:
+				Projectiles.Append(Projectile(Position + Facing * (*Moves->GetSkelPoints(AttackNum, AnimFrame))[31], { Facing.x, 0.0f }, 0.3f, { 0.4f * Facing.x, 0.1f }, 0.3f, 0.1f, 0.4f, false, LastAttackID, frameNumber + 100, PoshProjFuncs::StandardOnHit, PoshProjFuncs::StandardUpdate, PoshProjFuncs::RobinDraw, GiraffePen, nullptr));
+				break;
+			case 3:
+				Projectiles.Append(Projectile(Position + Facing * (*Moves->GetSkelPoints(AttackNum, AnimFrame))[31], { 0.25f * Facing.x, 0.0f }, 0.3f, { Facing.x, 0.0f }, 0.6f, 0.1f, 0.4f, false, LastAttackID, frameNumber + 100, PoshProjFuncs::StandardOnHit, PoshProjFuncs::StandardUpdate, PoshProjFuncs::CrownDraw, GiraffePen, nullptr));
+				break;
+			default:
+				Projectiles.Append(Projectile(Position + Facing * (*Moves->GetSkelPoints(AttackNum, AnimFrame))[31], { 0.5f * Facing.x, 0.0f }, 0.3f, { Facing.x, -0.2 }, 0.4f, 0.1f, 0.5f, false, LastAttackID, frameNumber + 100, PoshProjFuncs::StandardOnHit, PoshProjFuncs::StandardUpdate, PoshProjFuncs::TopHatDraw, GiraffePen, nullptr));
+			}
+			ChangeHat();
+		}
+
+		else if (STATE_JUMPING && State & STATE_UP) {
+			if (AnimFrame == 0) {
+				Velocity.y = 0;
+			}
+			else if (AnimFrame >= 7 && AnimFrame <= 20) {
+				Velocity.y -= 0.075f;
+			}
+			else if (AnimFrame == 21) {
+				Velocity.y *= 0.8f;
+			}
+		}
 	}
 }
 
@@ -388,6 +402,7 @@ void PoshGiraffe::RecieveHits(Stage& stage, const int frameNumber)
 		State |= STATE_GRABBED;
 		SoundMoveState &= ~(SOUND_SHIELD | SOUND_RUN);
 		incomingGrab = false;
+
 	}
 	if (State & STATE_SHIELDING) {
 		for (int j = 0; j < numIncoming; ++j) {

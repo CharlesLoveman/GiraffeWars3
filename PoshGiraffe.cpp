@@ -419,6 +419,204 @@ void PoshGiraffe::RecieveHits(Stage& stage, const int frameNumber)
 	}
 }
 
+void PoshGiraffe::Landing(Stage& stage, const int frameNumber, std::array<Giraffe*, GGPO_MAX_PLAYERS> giraffes)
+{
+	SoundMoveState |= SOUND_JUMPLAND;
+	SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_JUMPLAND] = frameNumber + Moves->GetMoveSoundLength(XACT_WAVEBANK_MOVEBANK_JUMPLAND);
+	if ((State & STATE_HEAVY) && (State & STATE_DOWN)) {
+		//State &= ~STATE_JUMPING;
+		Velocity.x = 0;
+		HasAirDash = true;
+		HasDoubleJump = false;
+	}
+	else {
+		if (State & STATE_HITSTUN && !(State & STATE_TECHATTEMPT)) {
+			if (Velocity.x > 0) {
+				Facing.x = -1;
+			}
+			else {
+				Facing.x = 1;
+			}
+			Velocity = { 0,0 };
+			State |= STATE_KNOCKDOWNLAG;
+			State &= ~STATE_HITSTUN;
+			AnimFrame = 0;
+			TechDelay = frameNumber + 30;
+			SoundMoveState |= SOUND_KNOCKDOWN;
+			SoundMoveState &= ~SOUND_HITSTUN;
+			SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_KNOCKDOWN] = frameNumber + Moves->GetMoveSoundLength(XACT_WAVEBANK_MOVEBANK_KNOCKDOWN);
+		}
+		else if (State & STATE_GRABBING) {
+			State &= ~STATE_GRABBING;
+			giraffes[CommandGrabPointer]->State &= ~STATE_GRABBED;
+		}
+		else {
+			if (State & (STATE_WEAK | STATE_HEAVY)) {
+				State |= STATE_HITSTUN;
+				AttackDelay = frameNumber + Moves->GetLandingLag(max(0, (AttackNum - 25)));
+				SoundMoveState |= SOUND_HITSTUN;
+				SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_HITSTUN] = AttackDelay;
+			}
+			else if ((State & STATE_TECHATTEMPT) && (State & STATE_HITSTUN)) {
+				State &= ~STATE_TECHATTEMPT;
+				State |= STATE_TECHING | STATE_INTANGIBLE;
+				TechDelay = frameNumber + 20;
+				SoundMoveState &= ~SOUND_HITSTUN;
+				SoundMoveState |= SOUND_TECH;
+				SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_TECH] = frameNumber + Moves->GetMoveSoundLength(XACT_WAVEBANK_MOVEBANK_TECH);
+			}
+
+			State |= STATE_JUMPLAND;
+			HasAirDash = true;
+			HasDoubleJump = false;
+			JumpDelay = frameNumber + MaxJumpDelay / 2;
+			AnimFrame = 0;
+		}
+		SoundAttackState &= ~(SOUND_DOWNB | SOUND_UPB);
+		State &= ~(STATE_UP | STATE_BACK | STATE_DOWN | STATE_FORWARD | STATE_WEAK | STATE_HEAVY | STATE_JUMPING | STATE_FASTFALL | STATE_TECHLAG | STATE_THROW | STATE_GRABBED | STATE_GRABBING);
+	}
+}
+
+void PoshGiraffe::ParseWalk(const int inputs, const int frameNumber, Stage& stage)
+{
+	if (State & STATE_HEAVY && State & STATE_DOWN) {
+		return;
+	}
+	if (State & STATE_LEDGEHOG) {
+		if (inputs & INPUT_DOWN) {
+			State &= ~STATE_LEDGEHOG;
+			stage.Ledges[LedgeID].Hogged = false;
+			State |= STATE_JUMPING | STATE_DOUBLEJUMPWAIT;
+			JumpDelay = frameNumber + MaxJumpDelay * 2;
+			SoundMoveState &= ~SOUND_HITSTUN;
+		}
+	}
+	else if (State & STATE_GRABBING) {
+		if ((inputs & INPUT_RIGHT && Facing.x == 1) || (inputs & INPUT_LEFT && Facing.x == -1)) {
+			State &= ~STATE_GRABBING;
+			State |= STATE_FORWARD | STATE_THROW;
+			AttackNum = 13;
+			AttackDelay = frameNumber + Moves->GetMoveLength(AttackNum);
+			AnimFrame = 0;
+			LastAttackID++;
+			SoundAttackState |= SOUND_FTHROW;
+			SoundAttackDelay[XACT_WAVEBANK_ATTACKBANK_FTHROW] = frameNumber + Moves->GetAttackSoundLength(XACT_WAVEBANK_ATTACKBANK_FTHROW);
+		}
+		else if (inputs & INPUT_UP) {
+			State &= ~STATE_GRABBING;
+			State |= STATE_UP | STATE_THROW;
+			AttackNum = 14;
+			AttackDelay = frameNumber + Moves->GetMoveLength(AttackNum);
+			AnimFrame = 0;
+			LastAttackID++;
+			SoundAttackState |= SOUND_UPTHROW;
+			SoundAttackDelay[XACT_WAVEBANK_ATTACKBANK_UPTHROW] = frameNumber + Moves->GetAttackSoundLength(XACT_WAVEBANK_ATTACKBANK_UPTHROW);
+		}
+		else if (inputs & INPUT_DOWN) {
+			State &= ~STATE_GRABBING;
+			State |= STATE_DOWN | STATE_THROW;
+			AttackNum = 15;
+			AttackDelay = frameNumber + Moves->GetMoveLength(AttackNum);
+			AnimFrame = 0;
+			LastAttackID++;
+			SoundAttackState |= SOUND_DOWNTHROW;
+			SoundAttackDelay[XACT_WAVEBANK_ATTACKBANK_DOWNTHROW] = frameNumber + Moves->GetAttackSoundLength(XACT_WAVEBANK_ATTACKBANK_DOWNTHROW);
+		}
+		else if ((inputs & INPUT_LEFT && Facing.x == 1) || (inputs & INPUT_RIGHT && Facing.x == -1)) {
+			State &= ~STATE_GRABBING;
+			State |= STATE_BACK | STATE_THROW;
+			AttackNum = 16;
+			AttackDelay = frameNumber + Moves->GetMoveLength(AttackNum);
+			AnimFrame = 0;
+			LastAttackID++;
+			SoundAttackState |= SOUND_BACKTHROW;
+			SoundAttackDelay[XACT_WAVEBANK_ATTACKBANK_BACKTHROW] = frameNumber + Moves->GetAttackSoundLength(XACT_WAVEBANK_ATTACKBANK_BACKTHROW);
+		}
+	}
+	else if (State & STATE_HITSTUN) {
+		if (State & STATE_JUMPING) {
+			if (inputs & INPUT_LEFT && Velocity.x > -MaxAirSpeed.x) {
+				Velocity.x -= AirAccel / 10.0f;
+			}
+			else if (inputs & INPUT_RIGHT && Velocity.x < MaxAirSpeed.x) {
+				Velocity.x += AirAccel / 10.0f;
+			}
+			if (inputs & INPUT_UP && Velocity.y > -MaxAirSpeed.y) {
+				Velocity.y -= AirAccel / 10.0f;
+			}
+			else if (inputs & INPUT_DOWN && Velocity.y < MaxAirSpeed.y) {
+				Velocity.y += AirAccel / 10.0f;
+			}
+		}
+	}
+	else if (State & STATE_JUMPING) {
+		if (inputs & INPUT_LEFT && Velocity.x > -MaxAirSpeed.x) {
+			Velocity.x -= AirAccel;
+		}
+		else if (inputs & INPUT_RIGHT && Velocity.x < MaxAirSpeed.x) {
+			Velocity.x += AirAccel;
+		}
+		if (inputs & INPUT_DOWN && !(inputs & (INPUT_WEAK | INPUT_HEAVY)) && !(State & STATE_FASTFALL)) {
+			State |= STATE_FASTFALL;
+			SoundMoveState |= SOUND_FASTFALL;
+			SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_FASTFALL] = frameNumber + Moves->GetMoveSoundLength(XACT_WAVEBANK_MOVEBANK_FASTFALL);
+		}
+	}
+	else if (State & (STATE_TECHING | STATE_SHIELDING | STATE_KNOCKDOWN)) {
+		if (inputs & INPUT_LEFT) {
+			State &= ~(STATE_TECHING | STATE_SHIELDING | STATE_KNOCKDOWN | STATE_CROUCH);
+			State |= STATE_ROLLING | STATE_INTANGIBLE;
+			AttackDelay = frameNumber + 20;
+			AnimFrame = 0;
+			Facing = { -1, 1 };
+			SoundMoveState |= SOUND_ROLL;
+			SoundMoveState &= ~SOUND_SHIELD;
+			SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_ROLL] = frameNumber + Moves->GetMoveSoundLength(XACT_WAVEBANK_MOVEBANK_ROLL);
+		}
+		else if (inputs & INPUT_RIGHT) {
+			State &= ~(STATE_TECHING | STATE_SHIELDING | STATE_KNOCKDOWN | STATE_CROUCH);
+			State |= STATE_ROLLING | STATE_INTANGIBLE;
+			AttackDelay = frameNumber + 20;
+			AnimFrame = 0;
+			Facing = { 1, 1 };
+			SoundMoveState |= SOUND_ROLL;
+			SoundMoveState &= ~SOUND_SHIELD;
+			SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_ROLL] = frameNumber + Moves->GetMoveSoundLength(XACT_WAVEBANK_MOVEBANK_ROLL);
+		}
+	}
+	else if (!(State & (STATE_WEAK | STATE_HEAVY))) {
+		if (inputs & INPUT_LEFT && Velocity.x > -MaxGroundSpeed) {
+			Velocity.x -= RunAccel;
+			State &= ~STATE_CROUCH;
+			State |= STATE_RUNNING;
+			Facing = { -1, 1 };
+			SoundMoveState |= SOUND_RUN;
+			SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_RUN] = frameNumber + Moves->GetMoveSoundLength(XACT_WAVEBANK_MOVEBANK_RUN);
+		}
+		else if (inputs & INPUT_RIGHT && Velocity.x < MaxGroundSpeed) {
+			Velocity.x += RunAccel;
+			State &= ~STATE_CROUCH;
+			State |= STATE_RUNNING;
+			Facing = { 1, 1 };
+			SoundMoveState |= SOUND_RUN;
+			SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_RUN] = frameNumber + Moves->GetMoveSoundLength(XACT_WAVEBANK_MOVEBANK_RUN);
+		}
+		else if (!(inputs & (INPUT_LEFT | INPUT_RIGHT))) {
+			State &= ~STATE_RUNNING;
+			SoundMoveState &= ~SOUND_RUN;
+		}
+
+		if (inputs & INPUT_DOWN && !(inputs & (INPUT_WEAK | INPUT_HEAVY)) && !(State & (STATE_CROUCH | STATE_ROLLING))) {
+			State |= STATE_CROUCH;
+			SoundMoveState |= SOUND_CROUCH;
+			SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_CROUCH] = frameNumber + Moves->GetMoveSoundLength(XACT_WAVEBANK_MOVEBANK_CROUCH);
+		}
+		else if (!(inputs & INPUT_DOWN) && State & STATE_CROUCH) {
+			State &= ~STATE_CROUCH;
+		}
+	}
+}
+
 void PoshGiraffe::ChangeHat()
 {
 	Hat = (Hat + 1) % 4;

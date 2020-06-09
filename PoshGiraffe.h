@@ -27,6 +27,8 @@ private:
 	void DrawTie(HDC hdc, Vector2 Scale, Vector2 Pos, Vector2 Dir);
 	void GiveHits(std::array<Giraffe*, GGPO_MAX_PLAYERS> giraffes, const int num_giraffes, const int frameNumber, const int i);
 	void RecieveHits(Stage& stage, const int frameNumber);
+	void Landing(Stage& stage, const int frameNumber, std::array<Giraffe*, GGPO_MAX_PLAYERS> giraffes);
+	void ParseWalk(const int inputs, const int frameNumber, Stage& stage);
 
 	void ChangeHat();
 	int Hat;

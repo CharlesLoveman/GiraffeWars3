@@ -16,6 +16,7 @@ public:
 
 	void UniqueChanges(std::array<Giraffe*, GGPO_MAX_PLAYERS> giraffes, const int num_giraffes, const int i, const int inputs, const int frameNumber, Stage& stage);
 	void Draw(HDC hdc, Vector2 Scale, int frameNumber);
+	int Size();
 private:
 	void DrawSelf(HDC hdc, Vector2 Scale, int CurrentFrame, int CurrentAnim);
 	void DrawHitbox(HDC hdc, Vector2 Scale, Vector2 Pos, float Rad);
@@ -24,7 +25,10 @@ private:
 	void DrawRobin(HDC hdc, Vector2 Scale, Vector2 Head1, Vector2 Head2);
 	void DrawCrown(HDC hdc, Vector2 Scale, Vector2 Head1, Vector2 Head2);
 	void DrawTie(HDC hdc, Vector2 Scale, Vector2 Pos, Vector2 Dir);
+	void GiveHits(std::array<Giraffe*, GGPO_MAX_PLAYERS> giraffes, const int num_giraffes, const int frameNumber, const int i);
+
 	int Hat;
+	float Multiplier;
 	HBRUSH MonocleBrush;
 	HBRUSH TieBrush;
 };

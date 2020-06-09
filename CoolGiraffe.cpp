@@ -210,6 +210,11 @@ void CoolGiraffe::Draw(HDC hdc, Vector2 Scale, int frameNumber)
 	DrawSelf(hdc, Scale, CurrentFrame, CurrentAnim);
 }
 
+int CoolGiraffe::Size()
+{
+	return sizeof(*this);
+}
+
 void CoolGiraffe::DrawSelf(HDC hdc, Vector2 Scale, int CurrentFrame, int CurrentAnim)
 {
 	if (State & STATE_INTANGIBLE) {
@@ -226,30 +231,30 @@ void CoolGiraffe::DrawSelf(HDC hdc, Vector2 Scale, int CurrentFrame, int Current
 		points.push_back(Giraffe::VecToPoint(Position + Facing * vPoints[i], Scale));
 	}
 
-	if (points.size() > 40) {
-		Polyline(hdc, &points[0], 30);
-		PolyBezier(hdc, &points[29], 4);
-		Polyline(hdc, &points[32], 5);
-		PolyBezier(hdc, &points[36], 4);
-		Polyline(hdc, &points[39], 2);
-		Polyline(hdc, &points[41], 19);
+	//if (points.size() > 40) {
+	Polyline(hdc, &points[0], 30);
+	PolyBezier(hdc, &points[29], 4);
+	Polyline(hdc, &points[32], 5);
+	PolyBezier(hdc, &points[36], 4);
+	Polyline(hdc, &points[39], 2);
+	Polyline(hdc, &points[41], 19);
 
-		Vector2 dir = vPoints[36] - vPoints[35];
-		dir.Normalize();
-		Vector2 perp = { -dir.y, dir.x };
+	Vector2 dir = vPoints[36] - vPoints[35];
+	dir.Normalize();
+	Vector2 perp = { -dir.y, dir.x };
 
-		for (int i = 0; i < 20; ++i) {
-			points[i] = VecToPoint(Position + Facing * (vPoints[36] + i / 20.0f * dir + 0.1f * sinf((AnimFrame + i) / (0.5f * 3.14159f)) * perp), Scale);
-		}
-		Polyline(hdc, &points[0], 20);
+	for (int i = 0; i < 20; ++i) {
+		points[i] = VecToPoint(Position + Facing * (vPoints[36] + i / 20.0f * dir + 0.1f * sinf((AnimFrame + i) / (0.5f * 3.14159f)) * perp), Scale);
 	}
-	else {
-		Polyline(hdc, &points[0], 27);
-		PolyBezier(hdc, &points[26], 4);
-		Polyline(hdc, &points[29], 5);
-		PolyBezier(hdc, &points[33], 4);
-		Polyline(hdc, &points[36], 2);
-	}
+	Polyline(hdc, &points[0], 20);
+	//}
+	//else {
+	//	Polyline(hdc, &points[0], 27);
+	//	PolyBezier(hdc, &points[26], 4);
+	//	Polyline(hdc, &points[29], 5);
+	//	PolyBezier(hdc, &points[33], 4);
+	//	Polyline(hdc, &points[36], 2);
+	//}
 }
 
 void CoolGiraffe::DrawHitbox(HDC hdc, Vector2 Scale, Vector2 Pos, float Rad)

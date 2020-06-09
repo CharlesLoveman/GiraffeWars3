@@ -120,8 +120,8 @@ bool __cdecl gw_load_game_state_callback(unsigned char* buffer, int len)
 	memcpy(&gs, buffer, gsSize);
 
 	for (int i = 0; i < gs._num_giraffes; ++i) {
-		memcpy(gs.giraffes[i], buffer + gsSize + giraffeSize, sizeof(*gs.giraffes[i]));
-		giraffeSize += sizeof(*gs.giraffes[i]);
+		memcpy(gs.giraffes[i], buffer + gsSize + giraffeSize, gs.giraffes[i]->Size());
+		giraffeSize += gs.giraffes[i]->Size();
 	}
 
 	//memcpy(gs.lines.data(), buffer + gsSize + giraffeSize, lineSize);
@@ -137,7 +137,7 @@ bool __cdecl gw_save_game_state_callback(unsigned char** buffer, int* len, int* 
 {
 	int giraffeSize = 0;
 	for (int i = 0; i < gs._num_giraffes; ++i) {
-		giraffeSize += sizeof(*gs.giraffes[i]);
+		giraffeSize += gs.giraffes[i]->Size();
 	}
 
 	int ledgeSize = sizeof(gs.stage.Ledges[0]) * gs.stage.Ledges.size();
@@ -154,8 +154,8 @@ bool __cdecl gw_save_game_state_callback(unsigned char** buffer, int* len, int* 
 	*checksum = fletcher32_checksum((short*)buffer, *len);
 	giraffeSize = 0;
 	for (int i = 0; i < gs._num_giraffes; ++i) {
-		memcpy(*buffer + gsSize + giraffeSize, gs.giraffes[i], sizeof(*gs.giraffes[i]));
-		giraffeSize += sizeof(*gs.giraffes[i]);
+		memcpy(*buffer + gsSize + giraffeSize, gs.giraffes[i], gs.giraffes[i]->Size());
+		giraffeSize += gs.giraffes[i]->Size();
 	}
 	memcpy(*buffer + gsSize + giraffeSize, gs.stage.Ledges.data(), ledgeSize);
 

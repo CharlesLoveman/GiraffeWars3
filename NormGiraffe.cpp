@@ -263,6 +263,11 @@ void NormGiraffe::Draw(HDC hdc, Vector2 Scale, int frameNumber)
 	DrawSelf(hdc, Scale, CurrentFrame, CurrentAnim);
 }
 
+int NormGiraffe::Size()
+{
+	return sizeof(*this);
+}
+
 void NormGiraffe::DrawSelf(HDC hdc, Vector2 Scale, int CurrentFrame, int CurrentAnim)
 {
 	if (State & STATE_INTANGIBLE) {

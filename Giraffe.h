@@ -109,6 +109,8 @@ public:
 	bool GrabHit(Collider col, Vector2 _Facing, int frameNumber);
 	static POINT VecToPoint(Vector2 vec, Vector2 scale);
 
+	virtual int Size() = 0;
+
 	Vector2 Position;
 	Vector2 Velocity;
 	int State;
@@ -137,6 +139,7 @@ protected:
 	virtual void ParseJump(const int inputs, const int frameNumber, Stage& stage);
 	virtual void ParseShield(const int inputs, const int frameNumber, Stage& stage);
 
+	virtual void GiveHits(std::array<Giraffe*, GGPO_MAX_PLAYERS> giraffes, const int num_giraffes, const int frameNumber, const int i);
 	virtual void RecieveHits(Stage& stage, const int frameNumber);
 	virtual void StageIntersection(Stage& stage, const int frameNumber, std::array<Giraffe*, GGPO_MAX_PLAYERS> giraffes, Vector2 offset, bool hogging, bool bounced, bool landed);
 	virtual void Hogging(Stage& stage, const int frameNumber, std::array<Giraffe*, GGPO_MAX_PLAYERS> giraffes);

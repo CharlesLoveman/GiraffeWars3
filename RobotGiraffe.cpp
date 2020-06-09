@@ -321,6 +321,11 @@ void RobotGiraffe::Draw(HDC hdc, Vector2 Scale, int frameNumber)
 	DrawSelf(hdc, Scale, CurrentFrame, CurrentAnim);
 }
 
+int RobotGiraffe::Size()
+{
+	return sizeof(*this);
+}
+
 void RobotGiraffe::DrawSelf(HDC hdc, Vector2 Scale, int CurrentFrame, int CurrentAnim)
 {
 	SelectObject(hdc, GiraffePen);

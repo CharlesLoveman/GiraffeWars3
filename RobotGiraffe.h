@@ -6,6 +6,11 @@
 
 //constexpr int NUM_MOVES_ROBOT = 24;
 
+enum RobotState {
+	ROBOTSTATE_BIGLASER = (1 << 0),
+	ROBOTSTATE_HASSWORD = (1 << 1),
+};
+
 class RobotGiraffe : public Giraffe {
 public:
 	RobotGiraffe(Vector2 _Position, MoveSet* _Moves, COLORREF _Colour);
@@ -14,6 +19,7 @@ public:
 	void Update(std::array<Giraffe*, 4> giraffes, const int num_giraffes, const int i, const int inputs, const int frameNumber, Stage& stage);
 	void UniqueChanges(std::array<Giraffe*, 4> giraffes, const int num_giraffes, const int i, const int inputs, const int frameNumber, Stage& stage);
 	void Draw(HDC hdc, Vector2 Scale, int frameNumber);
+	int Size();
 private:
 	HPEN LaserPen;
 	//HPEN FirePen;

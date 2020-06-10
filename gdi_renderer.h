@@ -24,14 +24,18 @@ protected:
 	void DrawConnectState(HDC hdc, Giraffe& giraffe, PlayerConnectionInfo& info);
 	void DrawGiraffeInfo(HDC hdc, Giraffe& giraffe, int i);
 	void CreateGDIFont(HDC hdc);
+	void CreateTitleFont(HDC hdc);
 
 	void DrawNormIcon(HDC hdc, Vector2 position, Vector2 scale);
 	void DrawPoshIcon(HDC hdc, Vector2 position, Vector2 scale);
 	void DrawCoolIcon(HDC hdc, Vector2 position, Vector2 scale);
 	void DrawRobotIcon(HDC hdc, Vector2 position, Vector2 scale);
 
+	void DrawTitle();
+
 	Vector2 Scale;
 	HFONT _font;
+	HFONT titlefont;
 	HWND _hwnd;
 	RECT _rc;
 	HGLRC _hrc;

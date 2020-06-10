@@ -19,6 +19,7 @@ GDIRenderer::GDIRenderer(HWND hwnd) :
 	*_status = '\0';
 	GetClientRect(hwnd, &_rc);
 	CreateGDIFont(hdc);
+	CreateTitleFont(hdc);
 	ReleaseDC(_hwnd, hdc);
 
 	Scale = { 1.0f / 54.0f * (_rc.right - _rc.left), 1.0f / 48.0f * (_rc.bottom - _rc.top) };
@@ -41,6 +42,7 @@ GDIRenderer::GDIRenderer(HWND hwnd) :
 GDIRenderer::~GDIRenderer() 
 {
 	DeleteObject(_font);
+	DeleteObject(titlefont);
 }
 
 void GDIRenderer::Draw(GameState& gs, NonGameState& ngs)
@@ -56,6 +58,12 @@ void GDIRenderer::Draw(GameState& gs, NonGameState& ngs)
 	switch (gs.state) {
 	case 1:
 		DrawCharSelect(gs, ngs, hdc);
+		break;
+	case 2:
+		SetTextAlign(hdc, TA_BOTTOM | TA_CENTER);
+		SetTextColor(hdc, RGB(255,255,255));
+		SelectObject(hdc, titlefont);
+		TextOutA(hdc, (_rc.left + _rc.right) / 2, (_rc.top + _rc.bottom) / 2, "Giraffe Wars 3", 14);
 		break;
 	default:
 		DrawGameLoop(gs, ngs, hdc);
@@ -260,6 +268,25 @@ void GDIRenderer::CreateGDIFont(HDC)
 		L"Papyrus");
 }
 
+void GDIRenderer::CreateTitleFont(HDC hdc)
+{
+	titlefont = CreateFontW(
+		-50,
+		-10,
+		0,
+		0,
+		0,
+		FALSE,
+		FALSE,
+		FALSE,
+		ANSI_CHARSET,
+		OUT_TT_PRECIS,
+		CLIP_DEFAULT_PRECIS,
+		ANTIALIASED_QUALITY,
+		FF_DONTCARE | DEFAULT_PITCH,
+		L"Papyrus");
+}
+
 void GDIRenderer::DrawNormIcon(HDC hdc, Vector2 position, Vector2 scale)
 {
 	POINT points[6];
@@ -361,4 +388,8 @@ void GDIRenderer::DrawRobotIcon(HDC hdc, Vector2 position, Vector2 scale)
 	Vector2 EyePos = position + 0.15f * right;
 	float radius = scale.x / 25.0f;
 	Ellipse(hdc, (int)(EyePos.x - radius), (int)(EyePos.y - radius), (int)(EyePos.x + radius), (int)(EyePos.y + radius));
+}
+
+void GDIRenderer::DrawTitle()
+{
 }

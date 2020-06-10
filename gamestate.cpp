@@ -35,7 +35,7 @@ void GameState::Init(HWND hwnd, int num_players) {
 	float stagetop = 30.0f;
 
 
-	state = 1;
+	state = 2;
 
 	stage.Box = { stageleft, stagetop, stageleft + stagewidth, stagetop + stageheight };
 	stage.Platforms = { {(float)(stageleft + stagewidth / 2.0f - stagewidth / 10.0f), (float)(stagetop - 2 * stageheight - 0.1f), (float)(stageleft + stagewidth / 2.0f + stagewidth / 10.0f), (float)(stagetop - 2 * stageheight + 0.1f)}, {(float)(stageleft + stagewidth / 4.0f - stagewidth / 10.0f), (float)(stagetop - stageheight - 0.1f), (float)(stageleft + stagewidth / 4.0f + stagewidth / 10.0f), (float)(stagetop - stageheight + 0.1f)}, {(float)(stageleft + 3 * stagewidth / 4.0f - stagewidth / 10.0f), (float)(stagetop - stageheight - 0.1f), (float)(stageleft + 3 * stagewidth / 4.0f + stagewidth / 10.0f), (float)(stagetop - stageheight + 0.1f)} };
@@ -71,12 +71,26 @@ void GameState::Update(int inputs[], int disconnect_flags)
 		}
 	}
 	//State 1 is the character selection
-	else {
+	else if (state == 1) {
 		if (ParseCharSelectInputs(inputs)) {
 			CreateGiraffes();
 			state = 0;
 		}
 	}
+	//State 2 is the title screen
+	else if (state == 2) {
+		int Finished = 0;
+		for (int i = 0; i < _num_giraffes; ++i) {
+			Finished += inputs[i];
+		}
+		if (Finished) {
+			state = 1;
+			for (int i = 0; i < _num_giraffes; ++i) {
+				selectDelay[i] = _framenumber + 30;
+			}
+		}
+	}
+
 	
 }
 
@@ -111,24 +125,29 @@ bool GameState::ParseCharSelectInputs(int inputs[])
 {
 	bool Finished = true;
 	for (int i = 0; i < _num_giraffes; ++i) {
-		if (inputs[i] & INPUT_WEAK && !selected[i]) {
-			selected[i] = true;
-		}
-		else if (inputs[i] & INPUT_HEAVY && selected[i]) {
-			selected[i] = false;
-		}
-
-		if (!selected[i] && _framenumber >= selectDelay[i]) {
-			if (inputs[i] & INPUT_LEFT) {
-				selectors[i] = (selectors[i] - 1) % 4;
+		if (_framenumber >= selectDelay[i]) {
+			if (inputs[i] & INPUT_WEAK && !selected[i]) {
+				selected[i] = true;
 				selectDelay[i] = _framenumber + 10;
 			}
-			else if (inputs[i] & INPUT_RIGHT) {
-				selectors[i] = (selectors[i] + 1) % 4;
+			else if (inputs[i] & INPUT_HEAVY && selected[i]) {
+				selected[i] = false;
 				selectDelay[i] = _framenumber + 10;
+			}
+
+			if (!selected[i]) {
+				if (inputs[i] & INPUT_LEFT) {
+					selectors[i] = (selectors[i] - 1) % 4;
+					selectDelay[i] = _framenumber + 10;
+				}
+				else if (inputs[i] & INPUT_RIGHT) {
+					selectors[i] = (selectors[i] + 1) % 4;
+					selectDelay[i] = _framenumber + 10;
+				}
 			}
 		}
 		Finished &= selected[i];
+
 	}
 	return Finished;
 }

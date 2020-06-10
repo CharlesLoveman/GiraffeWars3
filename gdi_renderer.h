@@ -31,8 +31,6 @@ protected:
 	void DrawCoolIcon(HDC hdc, Vector2 position, Vector2 scale);
 	void DrawRobotIcon(HDC hdc, Vector2 position, Vector2 scale);
 
-	void DrawTitle();
-
 	Vector2 Scale;
 	HFONT _font;
 	HFONT titlefont;

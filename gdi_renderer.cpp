@@ -61,7 +61,7 @@ void GDIRenderer::Draw(GameState& gs, NonGameState& ngs)
 		break;
 	case 2:
 		SetTextAlign(hdc, TA_BOTTOM | TA_CENTER);
-		SetTextColor(hdc, RGB(255,255,255));
+		SetTextColor(hdc, RGB((int)(255 * fabs(sinf(gs._framenumber / (0.1f * 3.14159f)))), (int)(255 * fabs(cosf(37 + gs._framenumber / (10 * 3.14159f)))), (int)(255 * fabs(sinf(71 + gs._framenumber / (10 * cosf(gs._framenumber) * 3.14159f))))));
 		SelectObject(hdc, titlefont);
 		TextOutA(hdc, (_rc.left + _rc.right) / 2, (_rc.top + _rc.bottom) / 2, "Giraffe Wars 3", 14);
 		break;
@@ -388,8 +388,4 @@ void GDIRenderer::DrawRobotIcon(HDC hdc, Vector2 position, Vector2 scale)
 	Vector2 EyePos = position + 0.15f * right;
 	float radius = scale.x / 25.0f;
 	Ellipse(hdc, (int)(EyePos.x - radius), (int)(EyePos.y - radius), (int)(EyePos.x + radius), (int)(EyePos.y + radius));
-}
-
-void GDIRenderer::DrawTitle()
-{
 }

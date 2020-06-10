@@ -13,7 +13,7 @@ enum RobotState {
 
 class RobotGiraffe : public Giraffe {
 public:
-	RobotGiraffe(Vector2 _Position, MoveSet* _Moves, COLORREF _Colour);
+	RobotGiraffe(Vector2 _Position, COLORREF _Colour);
 	~RobotGiraffe();
 
 	void Update(std::array<Giraffe*, 4> giraffes, const int num_giraffes, const int i, const int inputs, const int frameNumber, Stage& stage);

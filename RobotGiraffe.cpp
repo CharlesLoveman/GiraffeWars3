@@ -1,7 +1,7 @@
 #include "RobotGiraffe.h"
 #include "RobotProjFuncs.h"
 
-RobotGiraffe::RobotGiraffe(Vector2 _Position, MoveSet* _Moves, COLORREF _Colour)
+RobotGiraffe::RobotGiraffe(Vector2 _Position, COLORREF _Colour)
 {
 	//Movement
 	Position = _Position;
@@ -41,7 +41,13 @@ RobotGiraffe::RobotGiraffe(Vector2 _Position, MoveSet* _Moves, COLORREF _Colour)
 	AttackNum = 0;
 	MaxShieldDelay = 5;
 	TechDelay = 0;
-	Moves = _Moves;
+	Moves = new RobotMoveSet();
+	Moves->InitMoves();
+	Moves->InitThrows();
+	Moves->InitTilts();
+	Moves->InitSmashes();
+	Moves->InitAerials();
+	Moves->InitSpecials();
 
 	//Misc
 	Stocks = 3;
@@ -65,6 +71,7 @@ RobotGiraffe::RobotGiraffe(Vector2 _Position, MoveSet* _Moves, COLORREF _Colour)
 
 RobotGiraffe::~RobotGiraffe()
 {
+	delete Moves;
 }
 
 void RobotGiraffe::Update(std::array<Giraffe*, 4> giraffes, const int num_giraffes, const int i, const int inputs, const int frameNumber, Stage& stage)

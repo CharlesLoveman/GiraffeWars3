@@ -13,20 +13,25 @@
 //Structure to be serialized at each frame
 //Needs to be small
 
-constexpr int MAX_PLAYERS = 4;
-
-
 struct GameState
 {
-	void Init(HWND hwnd, int num_players, const std::array<MoveSet*, 4> MoveSets);
+public:
+	void Init(HWND hwnd, int num_players);
 	void Update(int inputs[], int disconnect_flags);
 
+	int state;
+	int selectors[GGPO_MAX_PLAYERS];
+	bool selected[GGPO_MAX_PLAYERS];
+	int selectDelay[GGPO_MAX_PLAYERS];
 	int _framenumber;
 	int _num_giraffes;
 	RECT _bounds;
 	std::array<Giraffe*, GGPO_MAX_PLAYERS> giraffes;
 	Stage stage;
 	std::vector<Line> lines;
+private:
+	void CreateGiraffes();
+	bool ParseCharSelectInputs(int inputs[]);
 };
 #endif // !_GAMESTATE_H_
 

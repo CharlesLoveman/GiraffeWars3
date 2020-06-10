@@ -11,7 +11,7 @@
 
 class NormGiraffe : public Giraffe {
 public:
-	NormGiraffe(Vector2 _Position, MoveSet* _Moves, COLORREF _Colour);
+	NormGiraffe(Vector2 _Position, COLORREF _Colour);
 	~NormGiraffe();
 
 	void UniqueChanges(std::array<Giraffe*, 4> giraffes, const int num_giraffes, const int i, const int inputs, const int frameNumber, Stage& stage);

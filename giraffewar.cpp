@@ -18,7 +18,7 @@
 
 GameState gs = { 0 };
 NonGameState ngs = { 0 };
-std::array<MoveSet*, 4> MoveSets;
+//std::array<MoveSet*, 4> MoveSets;
 struct {
 	int	key;
 	int	input;
@@ -96,11 +96,11 @@ bool __cdecl gw_on_event_callback(GGPOEvent *info)
 //Move foreward one frame during a rollback
 bool __cdecl gw_advance_frame_callback(int)
 {
-	int inputs[MAX_PLAYERS] = { 0 };
+	int inputs[GGPO_MAX_PLAYERS] = { 0 };
 	int disconnect_flags;
 
 	//uses the inputs from GGPO, not from the keyboard
-	ggpo_synchronize_input(ggpo, (void*)inputs, sizeof(int) * MAX_PLAYERS, &disconnect_flags);
+	ggpo_synchronize_input(ggpo, (void*)inputs, sizeof(int) * GGPO_MAX_PLAYERS, &disconnect_flags);
 	GiraffeWar_AdvanceFrame(inputs, disconnect_flags);
 	return true;
 }
@@ -109,25 +109,24 @@ bool __cdecl gw_advance_frame_callback(int)
 //Match the current state to the one provided by GGPO
 bool __cdecl gw_load_game_state_callback(unsigned char* buffer, int len)
 {
-	int giraffeSize = 0;
-	int ledgeSize = sizeof(gs.stage.Ledges[0]) * gs.stage.Ledges.size();
-	/*int lineSize = 0;
-	if (gs.lines.size() > 0) {
-		lineSize = sizeof(gs.lines[0]) * gs.lines.size();
-	}*/
-	int gsSize = sizeof(gs);
+	if (gs.state == 0) {
+		int giraffeSize = 0;
+		int ledgeSize = sizeof(gs.stage.Ledges[0]) * gs.stage.Ledges.size();
+		int gsSize = sizeof(gs);
 
-	memcpy(&gs, buffer, gsSize);
+		memcpy(&gs, buffer, gsSize);
 
-	for (int i = 0; i < gs._num_giraffes; ++i) {
-		memcpy(gs.giraffes[i], buffer + gsSize + giraffeSize, gs.giraffes[i]->Size());
-		giraffeSize += gs.giraffes[i]->Size();
+		for (int i = 0; i < gs._num_giraffes; ++i) {
+			memcpy(gs.giraffes[i], buffer + gsSize + giraffeSize, gs.giraffes[i]->Size());
+			giraffeSize += gs.giraffes[i]->Size();
+		}
+
+		memcpy(gs.stage.Ledges.data(), buffer + gsSize + giraffeSize, ledgeSize);
 	}
-
-	//memcpy(gs.lines.data(), buffer + gsSize + giraffeSize, lineSize);
-
-	memcpy(gs.stage.Ledges.data(), buffer + gsSize + giraffeSize, ledgeSize);
-
+	else {
+		int gsSize = sizeof(gs);
+		memcpy(&gs, buffer, gsSize);
+	}
 	return true;
 }
 
@@ -135,29 +134,42 @@ bool __cdecl gw_load_game_state_callback(unsigned char* buffer, int len)
 //Saves the current state to the buffer
 bool __cdecl gw_save_game_state_callback(unsigned char** buffer, int* len, int* checksum, int)
 {
-	int giraffeSize = 0;
-	for (int i = 0; i < gs._num_giraffes; ++i) {
-		giraffeSize += gs.giraffes[i]->Size();
-	}
+	if (gs.state == 0) {
+		int giraffeSize = 0;
+		for (int i = 0; i < gs._num_giraffes; ++i) {
+			giraffeSize += gs.giraffes[i]->Size();
+		}
+		int ledgeSize = sizeof(gs.stage.Ledges[0]) * gs.stage.Ledges.size();
 
-	int ledgeSize = sizeof(gs.stage.Ledges[0]) * gs.stage.Ledges.size();
-	int gsSize = sizeof(gs);
+		int gsSize = sizeof(gs);
 
-	*len = gsSize + giraffeSize + ledgeSize;
-	*buffer = (unsigned char*)malloc(*len);
-	if (!*buffer) {
-		return false;
-	}
+		*len = gsSize + giraffeSize + ledgeSize;
+		*buffer = (unsigned char*)malloc(*len);
+		if (!*buffer) {
+			return false;
+		}
 
-	//*checksum = fletcher32_checksum((short*)gs.normGiraffes.data(), sizeof(gs.normGiraffes[0]) * gs.normGiraffes.size() / 2);
-	memcpy(*buffer, &gs, *len);
-	*checksum = fletcher32_checksum((short*)buffer, *len);
-	giraffeSize = 0;
-	for (int i = 0; i < gs._num_giraffes; ++i) {
-		memcpy(*buffer + gsSize + giraffeSize, gs.giraffes[i], gs.giraffes[i]->Size());
-		giraffeSize += gs.giraffes[i]->Size();
+		memcpy(*buffer, &gs, *len);
+		giraffeSize = 0;
+		for (int i = 0; i < gs._num_giraffes; ++i) {
+			memcpy(*buffer + gsSize + giraffeSize, gs.giraffes[i], gs.giraffes[i]->Size());
+			giraffeSize += gs.giraffes[i]->Size();
+		}
+		memcpy(*buffer + gsSize + giraffeSize, gs.stage.Ledges.data(), ledgeSize);
+
+		*checksum = fletcher32_checksum((short*)buffer, *len / 2);
 	}
-	memcpy(*buffer + gsSize + giraffeSize, gs.stage.Ledges.data(), ledgeSize);
+	else {
+		int gsSize = sizeof(gs);
+		*len = gsSize;
+		*buffer = (unsigned char*)malloc(*len);
+		if (!*buffer) {
+			return false;
+		}
+
+		memcpy(*buffer, &gs, *len);
+		*checksum = fletcher32_checksum((short*)buffer, *len / 2);
+	}
 
 	return true;
 }
@@ -209,7 +221,7 @@ void GiraffeWar_Init(HWND hwnd, unsigned short localport, GGPOPlayer* players, i
 	audioPlayer = new AudioPlayer();
 	
 
-	MoveSets[0] = new NormMoveSet();
+	/*MoveSets[0] = new NormMoveSet();
 	MoveSets[1] = new RobotMoveSet();
 	MoveSets[2] = new CoolMoveSet();
 	MoveSets[3] = new PoshMoveSet();
@@ -221,10 +233,10 @@ void GiraffeWar_Init(HWND hwnd, unsigned short localport, GGPOPlayer* players, i
 		MoveSets[i]->InitSmashes();
 		MoveSets[i]->InitAerials();
 		MoveSets[i]->InitSpecials();
-	}
+	}*/
 
 	//Initialize the game state
-	gs.Init(hwnd, num_players, MoveSets);
+	gs.Init(hwnd, num_players);
 	ngs.num_players = num_players;
 
 	//Fill in the callback structure used by GGPO
@@ -285,12 +297,12 @@ void GiraffeWar_InitSpectator(HWND hwnd, unsigned short localport, int num_playe
 	renderer = new GDIRenderer(hwnd);
 	audioPlayer = new AudioPlayer();
 
-	MoveSets[0] = new NormMoveSet();
+	/*MoveSets[0] = new NormMoveSet();
 	MoveSets[1] = new RobotMoveSet();
-	MoveSets[2] = new CoolMoveSet();
+	MoveSets[2] = new CoolMoveSet();*/
 
 	//Initialize the game state
-	gs.Init(hwnd, num_players, MoveSets);
+	gs.Init(hwnd, num_players);
 
 	//Create the callback structure
 	GGPOSessionCallbacks cb = { 0 };
@@ -333,7 +345,7 @@ void GiraffeWar_DrawCurrentFrame()
 	if (renderer != nullptr) {
 		renderer->Draw(gs, ngs);
 	}
-	if (audioPlayer != nullptr) {
+	if (audioPlayer != nullptr && gs.state == 0) {
 		audioPlayer->Update(gs);
 	}
 }
@@ -346,7 +358,7 @@ void GiraffeWar_AdvanceFrame(int inputs[], int disconnect_flags)
 
 	//update the checksums
 	ngs.now.framenumber = gs._framenumber;
-	ngs.now.checksum = fletcher32_checksum((short*)gs.giraffes[0], sizeof(*gs.giraffes[0]) / 2);
+	ngs.now.checksum = fletcher32_checksum((short*)&gs, sizeof(gs) / 2);
 	if ((gs._framenumber % 90) == 0) {
 		ngs.periodic = ngs.now;
 	}
@@ -388,7 +400,7 @@ void GiraffeWar_RunFrame(HWND hwnd)
 {
 	GGPOErrorCode result = GGPO_OK;
 	int disconnect_flags;
-	int inputs[MAX_PLAYERS] = { 0 };
+	int inputs[GGPO_MAX_PLAYERS] = { 0 };
 
 	if (ngs.local_player_handle != GGPO_INVALID_HANDLE) {
 		int input = ReadInputs(hwnd);
@@ -402,7 +414,7 @@ void GiraffeWar_RunFrame(HWND hwnd)
 	//if we have enough input to move forward, then ggpo will provide the new inputs
 
 	if (GGPO_SUCCEEDED(result)) {
-		result = ggpo_synchronize_input(ggpo, (void*)inputs, sizeof(int) * MAX_PLAYERS, &disconnect_flags);
+		result = ggpo_synchronize_input(ggpo, (void*)inputs, sizeof(int) * GGPO_MAX_PLAYERS, &disconnect_flags);
 		if (GGPO_SUCCEEDED(result)) {
 			//Advance a frame with the new inputs
 			GiraffeWar_AdvanceFrame(inputs, disconnect_flags);
@@ -421,9 +433,6 @@ void GiraffeWar_Idle(int time)
 
 void GiraffeWar_Exit()
 {
-	for (int i = 0; i < 4; ++i) {
-		delete MoveSets[i];
-	}
 	for (int i = 0; i < gs._num_giraffes; ++i) {
 		delete gs.giraffes[i];
 	}

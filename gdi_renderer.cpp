@@ -35,8 +35,8 @@ GDIRenderer::GDIRenderer(HWND hwnd) :
 	}
 
 	_redBrush = CreateSolidBrush(RGB(255, 0, 0));
-	_stageBrush = CreateSolidBrush(RGB(127, 127, 127));
 	_blackBrush = CreateSolidBrush(0);
+	_stageBrush = CreateSolidBrush(RGB(127, 127, 127));
 }
 
 GDIRenderer::~GDIRenderer() 
@@ -67,6 +67,9 @@ void GDIRenderer::Draw(GameState& gs, NonGameState& ngs)
 		break;
 	case 3:
 		DrawWinners(gs, ngs, hdc);
+		break;
+	case 4:
+		DrawStageSelect(gs, ngs, hdc);
 		break;
 	default:
 		DrawGameLoop(gs, ngs, hdc);
@@ -201,6 +204,62 @@ void GDIRenderer::DrawWinners(GameState& gs, NonGameState& ngs, HDC hdc)
 
 }
 
+void GDIRenderer::DrawStageSelect(GameState& gs, NonGameState& ngs, HDC hdc)
+{
+	//Do something
+	//SelectObject(hdc, _stageBrush);
+	switch (gs.selectors[GGPO_MAX_PLAYERS]) {
+	case 1:
+	{
+		RECT platBox = {
+		(int)(_rc.left + 0.45f * (_rc.right - _rc.left)),
+		(int)(_rc.top + 0.5f * (_rc.bottom - _rc.top)),
+		(int)(_rc.left + 0.55f * (_rc.right - _rc.left)),
+		(int)(_rc.top + 0.51f * (_rc.bottom - _rc.top))
+		};
+		FillRect(hdc, &platBox, _stageBrush);
+		break;
+	}
+	case 3:
+	{
+		RECT platBox = {
+		(int)(_rc.left + 0.475f * (_rc.right - _rc.left)),
+		(int)(_rc.top + 0.45f * (_rc.bottom - _rc.top)),
+		(int)(_rc.left + 0.525f * (_rc.right - _rc.left)),
+		(int)(_rc.top + 0.46f * (_rc.bottom - _rc.top))
+		};
+		FillRect(hdc, &platBox, _stageBrush);
+	}
+	case 2:
+	{
+		RECT platBox = {
+		(int)(_rc.left + 0.4f * (_rc.right - _rc.left)),
+		(int)(_rc.top + 0.5f * (_rc.bottom - _rc.top)),
+		(int)(_rc.left + 0.45f * (_rc.right - _rc.left)),
+		(int)(_rc.top + 0.51f * (_rc.bottom - _rc.top))
+		};
+		FillRect(hdc, &platBox, _stageBrush);
+		platBox = {
+		(int)(_rc.left + 0.55f * (_rc.right - _rc.left)),
+		(int)(_rc.top + 0.5f * (_rc.bottom - _rc.top)),
+		(int)(_rc.left + 0.6f * (_rc.right - _rc.left)),
+		(int)(_rc.top + 0.51f * (_rc.bottom - _rc.top))
+		};
+		FillRect(hdc, &platBox, _stageBrush);
+		break;
+	}
+	default:
+		break;
+	}
+	RECT stageBox = { 
+		(int)(_rc.left + 0.35f * (_rc.right - _rc.left)),
+		(int)(_rc.top + 0.55f * (_rc.bottom - _rc.top)),
+		(int)(_rc.left + 0.65f * (_rc.right - _rc.left)),
+		(int)(_rc.top + 0.6f * (_rc.bottom - _rc.top))
+	};
+	FillRect(hdc, &stageBox, _stageBrush);
+}
+
 void GDIRenderer::SetStatusText(const char* text)
 {
 	strcpy_s(_status, text);
@@ -208,7 +267,7 @@ void GDIRenderer::SetStatusText(const char* text)
 
 void GDIRenderer::DrawStage(HDC hdc, Stage stage)
 {
-	stage.Draw(hdc, Scale, _stageBrush);
+	stage.Draw(hdc, Scale);
 	SetTextAlign(hdc, TA_TOP | TA_CENTER);
 }
 

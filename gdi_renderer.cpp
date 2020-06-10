@@ -35,6 +35,7 @@ GDIRenderer::GDIRenderer(HWND hwnd) :
 
 	_redBrush = CreateSolidBrush(RGB(255, 0, 0));
 	_stageBrush = CreateSolidBrush(RGB(127, 127, 127));
+	_blackBrush = CreateSolidBrush(0);
 }
 
 GDIRenderer::~GDIRenderer() 
@@ -100,6 +101,14 @@ void GDIRenderer::DrawGameLoop(GameState& gs, NonGameState& ngs, HDC hdc)
 
 void GDIRenderer::DrawCharSelect(GameState& gs, NonGameState& ngs, HDC hdc)
 {
+	float width = _rc.right - _rc.left;
+	float height = _rc.bottom - _rc.top;
+	
+	DrawNormIcon(hdc, { width / 5.0f, height / 2.0f }, { width / 5.0f, height / 3.0f });
+	DrawPoshIcon(hdc, { (2 * width) / 5.0f, height / 2.0f }, { width / 5.0f, height / 3.0f });
+	DrawCoolIcon(hdc, { (3 * width) / 5.0f, height / 2.0f }, { width / 5.0f, height / 3.0f });
+	DrawRobotIcon(hdc, { (4 * width) / 5.0f, height / 2.0f }, { width / 5.0f, height / 3.0f });
+
 	for (int i = 0; i < gs._num_giraffes; ++i) {
 		SetTextColor(hdc, _giraffeColours[i]);
 		if (gs.selected[i]) {
@@ -108,14 +117,13 @@ void GDIRenderer::DrawCharSelect(GameState& gs, NonGameState& ngs, HDC hdc)
 		else {
 			SelectObject(hdc, _giraffePens[i]);
 		}
-		float width = _rc.right - _rc.left;
-		float height = _rc.bottom - _rc.top;
+
 		POINT points[5];
-		points[0] = { (int)(width / 5.0f * (gs.selectors[i] + 0.5f)), (int)(height / 3.0f) };
-		points[1] = { (int)(width / 5.0f * (gs.selectors[i] + 1.5f)), (int)(height / 3.0f) };
-		points[2] = { (int)(width / 5.0f * (gs.selectors[i] + 1.5f)), (int)((2 * height) / 3.0f) };
-		points[3] = { (int)(width / 5.0f * (gs.selectors[i] + 0.5f)), (int)((2 * height) / 3.0f) };
-		points[4] = { (int)(width / 5.0f * (gs.selectors[i] + 0.5f)), (int)(height / 3.0f) };
+		points[0] = { (int)(width / 5.0f * (gs.selectors[i] + 0.5f) + i), (int)(height / 3.0f + i) };
+		points[1] = { (int)(width / 5.0f * (gs.selectors[i] + 1.5f) - i), (int)(height / 3.0f + i) };
+		points[2] = { (int)(width / 5.0f * (gs.selectors[i] + 1.5f) - i), (int)((2 * height) / 3.0f - i) };
+		points[3] = { (int)(width / 5.0f * (gs.selectors[i] + 0.5f) + i), (int)((2 * height) / 3.0f - i) };
+		points[4] = { (int)(width / 5.0f * (gs.selectors[i] + 0.5f) + i), (int)(height / 3.0f + i) };
 		Polyline(hdc, points, 5);
 	}
 }
@@ -123,13 +131,6 @@ void GDIRenderer::DrawCharSelect(GameState& gs, NonGameState& ngs, HDC hdc)
 void GDIRenderer::SetStatusText(const char* text)
 {
 	strcpy_s(_status, text);
-}
-
-void GDIRenderer::DrawGiraffe(HDC hdc, int which, GameState& gs)
-{
-	Giraffe* giraffe = gs.giraffes[which];
-	
-	//Ellipse(hdc, (int)(giraffe->Position.x - 10), (int)(giraffe->Position.y - 10), (int)(giraffe->Position.x + 10), (int)(giraffe->Position.y + 10));
 }
 
 void GDIRenderer::DrawStage(HDC hdc, Stage stage)
@@ -219,4 +220,111 @@ void GDIRenderer::CreateGDIFont(HDC)
 		ANTIALIASED_QUALITY,
 		FF_DONTCARE | DEFAULT_PITCH,
 		L"Tahoma");
+}
+
+void GDIRenderer::DrawNormIcon(HDC hdc, Vector2 position, Vector2 scale)
+{
+	SelectObject(hdc, SelectedPen);
+	POINT points[6];
+	Vector2 right = { scale.x, 0 };
+	Vector2 up = { 0, -scale.y };
+	Vector2 _scale = { 1,1 };
+
+	points[0] = Giraffe::VecToPoint(position - 0.4f * right - 0.15f * up, _scale);
+	points[1] = Giraffe::VecToPoint(position - 0.4f * right + 0.15f * up, _scale);
+	points[2] = Giraffe::VecToPoint(position + 0.2f * right + 0.15f * up, _scale);
+	points[3] = Giraffe::VecToPoint(position + 0.4f * right, _scale);
+	points[4] = Giraffe::VecToPoint(position + 0.2f * right - 0.15f * up, _scale);
+	points[5] = Giraffe::VecToPoint(position - 0.4f * right - 0.15f * up, _scale);
+
+	Polyline(hdc, points, 6);
+}
+
+void GDIRenderer::DrawPoshIcon(HDC hdc, Vector2 position, Vector2 scale)
+{
+	SelectObject(hdc, SelectedPen);
+	POINT points[6];
+	Vector2 right = { scale.x, 0 };
+	Vector2 up = { 0, -scale.y };
+	Vector2 _scale = { 1,1 };
+
+	points[0] = Giraffe::VecToPoint(position - 0.15f * right - 0.3f * up, _scale);
+	points[1] = Giraffe::VecToPoint(position - 0.15f * right - 0.1f * up, _scale);
+	points[2] = Giraffe::VecToPoint(position + 0.15f * right - 0.1f * up, _scale);
+	points[3] = Giraffe::VecToPoint(position + 0.25f * right - 0.2f * up, _scale);
+	points[4] = Giraffe::VecToPoint(position + 0.15f * right - 0.3f * up, _scale);
+	points[5] = Giraffe::VecToPoint(position - 0.15f * right - 0.3f * up, _scale);
+
+	Polyline(hdc, points, 6);
+
+	points[0] = Giraffe::VecToPoint(position - 0.4f * right - 0.1f * up, _scale);
+	points[1] = Giraffe::VecToPoint(position - 0.15f * right - 0.1f * up, _scale);
+	points[2] = Giraffe::VecToPoint(position - 0.15f * right + 0.4f * up, _scale);
+	points[3] = Giraffe::VecToPoint(position + 0.15f * right + 0.4f * up, _scale);
+	points[4] = Giraffe::VecToPoint(position + 0.15f * right - 0.1f * up, _scale);
+	points[5] = Giraffe::VecToPoint(position + 0.4f * right - 0.1f * up, _scale);
+
+	Polyline(hdc, points, 6);
+
+	SelectObject(hdc, _blackBrush);
+	Vector2 MonoclePos = position + 0.1f * right - 0.2f * up;
+	float radius = scale.x / 20.0f;
+	Ellipse(hdc, (int)(MonoclePos.x - radius), (int)(MonoclePos.y - radius), (int)(MonoclePos.x + radius), (int)(MonoclePos.y + radius));
+
+	points[0] = Giraffe::VecToPoint(MonoclePos - Vector2(radius, 0), _scale);
+	points[1] = Giraffe::VecToPoint(MonoclePos - Vector2(radius, -2 * radius), _scale);
+
+	Polyline(hdc, points, 2);
+}
+
+void GDIRenderer::DrawCoolIcon(HDC hdc, Vector2 position, Vector2 scale)
+{
+	SelectObject(hdc, SelectedPen);
+	POINT points[21];
+	Vector2 right = { scale.x, 0 };
+	Vector2 up = { 0, -scale.y };
+	Vector2 _scale = { 1,1 };
+
+	points[0] = Giraffe::VecToPoint(position - 0.1f * right - 0.15f * up, _scale);
+	points[1] = Giraffe::VecToPoint(position - 0.1f * right + 0.15f * up, _scale);
+	points[2] = Giraffe::VecToPoint(position + 0.3f * right + 0.15f * up, _scale);
+	points[3] = Giraffe::VecToPoint(position + 0.4f * right, _scale);
+	points[4] = Giraffe::VecToPoint(position + 0.3f * right - 0.15f * up, _scale);
+	points[5] = Giraffe::VecToPoint(position - 0.1f * right - 0.15f * up, _scale);
+
+	Polyline(hdc, points, 6);
+
+	for (int i = 0; i < 20; ++i) {
+		points[i] = Giraffe::VecToPoint(position -0.1f * right + 0.15f * up + (-i / 50.0f * right) + 0.1f * sinf(i / (3.14159f)) * up, _scale);
+	}
+	Polyline(hdc, points, 20);
+
+	for (int i = 20; i >= 0; --i) {
+		points[i] = points[i-1];
+		points[i].y -= 0.05f * up.y;
+	}
+	points[0] = Giraffe::VecToPoint(position + 0.3333333f * right + 0.1f * up, _scale);
+	Polyline(hdc, points, 20);
+}
+
+void GDIRenderer::DrawRobotIcon(HDC hdc, Vector2 position, Vector2 scale)
+{
+	SelectObject(hdc, SelectedPen);
+	Vector2 right = { scale.x, 0 };
+	Vector2 up = { 0, -scale.y };
+	Vector2 _scale = { 1,1 };
+
+	POINT points[5];
+	points[0] = Giraffe::VecToPoint(position - 0.3f * right - 0.15f * up, _scale);
+	points[1] = Giraffe::VecToPoint(position - 0.3f * right + 0.15f * up, _scale);
+	points[2] = Giraffe::VecToPoint(position + 0.3f * right + 0.15f * up, _scale);
+	points[3] = Giraffe::VecToPoint(position + 0.3f * right - 0.15f * up, _scale);
+	points[4] = Giraffe::VecToPoint(position - 0.3f * right - 0.15f * up, _scale);
+
+	Polyline(hdc, points, 5);
+
+	SelectObject(hdc, _redBrush);
+	Vector2 EyePos = position + 0.15f * right;
+	float radius = scale.x / 25.0f;
+	Ellipse(hdc, (int)(EyePos.x - radius), (int)(EyePos.y - radius), (int)(EyePos.x + radius), (int)(EyePos.y + radius));
 }

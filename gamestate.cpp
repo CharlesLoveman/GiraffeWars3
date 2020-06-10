@@ -34,11 +34,6 @@ void GameState::Init(HWND hwnd, int num_players) {
 	float stageheight = 5.0f;
 	float stagetop = 30.0f;
 
-	COLORREF _giraffeColours[4];
-	_giraffeColours[0] = RGB(255, 0, 0);
-	_giraffeColours[1] = RGB(0, 255, 0);
-	_giraffeColours[2] = RGB(0, 0, 255);
-	_giraffeColours[3] = RGB(255, 255, 0);
 
 	//int counter = 0;
 
@@ -48,10 +43,11 @@ void GameState::Init(HWND hwnd, int num_players) {
 	//giraffes[1] = new NormGiraffe(Vector2(stageleft + stagewidth * 3.0f / (2.0f * _num_giraffes), 20), MoveSets[0], _giraffeColours[1]);
 	//counter++;
 
-
 	stage.Box = { stageleft, stagetop, stageleft + stagewidth, stagetop + stageheight };
 	stage.Platforms = { {(float)(stageleft + stagewidth / 2.0f - stagewidth / 10.0f), (float)(stagetop - 2 * stageheight - 0.1f), (float)(stageleft + stagewidth / 2.0f + stagewidth / 10.0f), (float)(stagetop - 2 * stageheight + 0.1f)}, {(float)(stageleft + stagewidth / 4.0f - stagewidth / 10.0f), (float)(stagetop - stageheight - 0.1f), (float)(stageleft + stagewidth / 4.0f + stagewidth / 10.0f), (float)(stagetop - stageheight + 0.1f)}, {(float)(stageleft + 3 * stagewidth / 4.0f - stagewidth / 10.0f), (float)(stagetop - stageheight - 0.1f), (float)(stageleft + 3 * stagewidth / 4.0f + stagewidth / 10.0f), (float)(stagetop - stageheight + 0.1f)} };
 	stage.Ledges = { { { {stageleft, stagetop + 0.5f}, 0.5f}, false, true}, { {{stageleft + stagewidth, stagetop + 0.5f}, 0.5f}, false, false } };
+
+	CreateGiraffes();
 
 	InflateRect(&_bounds, -8, -8);
 }
@@ -82,13 +78,27 @@ void GameState::Update(int inputs[], int disconnect_flags)
 
 void GameState::CreateGiraffes()
 {
-	/*for (int i = 0; i < _num_giraffes; ++i) {
+	COLORREF _giraffeColours[4];
+	_giraffeColours[0] = RGB(255, 0, 0);
+	_giraffeColours[1] = RGB(0, 255, 0);
+	_giraffeColours[2] = RGB(0, 0, 255);
+
+	_giraffeColours[3] = RGB(255, 255, 0);
+	for (int i = 0; i < _num_giraffes; ++i) {
 		switch (selectors[i])
 		{
 		case 1:
-			giraffes[i] = new RobotGiraffe(Vector2(stage.Box.left + (stage.Box.right - stage.Box.left) * i / (2.0f * _num_giraffes), 20), MoveSets[1], _giraffeColours[1]);
+			giraffes[i] = new PoshGiraffe(Vector2(stage.Box.left + (stage.Box.right - stage.Box.left) * (2 * i + 1) / (2.0f * _num_giraffes), 20), _giraffeColours[i]);
+			break;
+		case 2:
+			giraffes[i] = new CoolGiraffe(Vector2(stage.Box.left + (stage.Box.right - stage.Box.left) * (2 * i + 1) / (2.0f * _num_giraffes), 20), _giraffeColours[i]);
+			break;
+		case 3:
+			giraffes[i] = new RobotGiraffe(Vector2(stage.Box.left + (stage.Box.right - stage.Box.left) * (2 * i + 1) / (2.0f * _num_giraffes), 20), _giraffeColours[i]);
+			break;
 		default:
+			giraffes[i] = new NormGiraffe(Vector2(stage.Box.left + (stage.Box.right - stage.Box.left) * (2 * i + 1) / (2.0f * _num_giraffes), 20), _giraffeColours[i]);
 			break;
 		}
-	}*/
+	}
 }

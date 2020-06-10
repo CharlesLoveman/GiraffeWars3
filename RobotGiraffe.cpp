@@ -67,6 +67,7 @@ RobotGiraffe::RobotGiraffe(Vector2 _Position, COLORREF _Colour)
 	//FirePen = CreatePen(PS_SOLID, 1, RGB(230, 128, 40));
 	LaserPen = CreatePen(PS_SOLID, 1, RGB(0, 255, 255));
 	LanceBrush = CreateSolidBrush(RGB(0, 0, 0));
+	RedBrush = CreateSolidBrush(RGB(255, 0, 0));
 }
 
 RobotGiraffe::~RobotGiraffe()
@@ -150,7 +151,7 @@ void RobotGiraffe::UniqueChanges(std::array<Giraffe*, GGPO_MAX_PLAYERS> giraffes
 		//Laser
 		else if (!(State & (STATE_WEAK | STATE_UP | STATE_FORWARD | STATE_BACK | STATE_DOWN))) {
 			if (AnimFrame == 0) {
-				BigLaser = Charge > 1000;
+				BigLaser = Charge > CHARGELIMIT;
 				if (BigLaser) {
 					Charge = 0;
 				}
@@ -343,6 +344,14 @@ void RobotGiraffe::DrawSelf(HDC hdc, Vector2 Scale, int CurrentFrame, int Curren
 		points.push_back(Giraffe::VecToPoint(Position + Facing * vPoints[i], Scale));
 	}
 	Polyline(hdc, &points[0], points.size());
+
+	if (Charge > CHARGELIMIT) {
+		SelectObject(hdc, RedBrush);
+		Vector2 EyePos = { vPoints[26].x + vPoints[27].x, vPoints[27].y + vPoints[28].y };
+		EyePos *= 0.5f;
+		float Radius = 0.2f;
+		DrawHitbox(hdc, Scale, EyePos, Radius);
+	}
 }
 
 void RobotGiraffe::DrawHitbox(HDC hdc, Vector2 Scale, Vector2 Pos, float Rad)

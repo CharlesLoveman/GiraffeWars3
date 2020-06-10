@@ -4,7 +4,7 @@
 #include "Giraffe.h"
 #include "RobotMoveSet.h"
 
-//constexpr int NUM_MOVES_ROBOT = 24;
+constexpr int CHARGELIMIT = 1000;
 
 enum RobotState {
 	ROBOTSTATE_BIGLASER = (1 << 0),
@@ -24,6 +24,7 @@ private:
 	HPEN LaserPen;
 	//HPEN FirePen;
 	HBRUSH LanceBrush;
+	HBRUSH RedBrush;
 	int Charge;
 	bool BigLaser;
 	bool HasSword;

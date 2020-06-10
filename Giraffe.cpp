@@ -465,6 +465,7 @@ void Giraffe::ParseWeak(const int inputs, const int frameNumber, Stage& stage)
 	else if ((inputs & INPUT_SHIELD || State & STATE_SHIELDING) && !(State & (STATE_JUMPING))) {
 		State &= ~STATE_SHIELDING;
 		State |= STATE_HEAVY;//Code grabs as weak and heavy
+		SoundMoveState &= ~SOUND_SHIELD;
 		AttackNum = 12;
 	}
 	else if ((inputs & INPUT_RIGHT && Facing.x == 1) || (inputs & INPUT_LEFT && Facing.x == -1)) {

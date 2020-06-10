@@ -100,7 +100,7 @@ void RobotGiraffe::UniqueChanges(std::array<Giraffe*, GGPO_MAX_PLAYERS> giraffes
 	if ((State & STATE_JUMPING) && (State & STATE_HEAVY) && (State & STATE_FORWARD) && AnimFrame == 7) {
 		Collider grabCol = { {Position.x + 1.885000f * Facing.x, Position.y - 0.650000f}, 0.855862f };
 		for (int j = 0; j < num_giraffes; ++j) {
-			if (j != i) {
+			if (j != i && giraffes[j]->Stocks > 0) {
 				if (giraffes[j]->GrabHit(grabCol, Facing, frameNumber)) {
 					State &= ~(STATE_WEAK | STATE_HEAVY | STATE_RUNNING);
 					State |= STATE_GRABBING;

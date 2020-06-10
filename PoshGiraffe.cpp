@@ -78,7 +78,7 @@ void PoshGiraffe::UniqueChanges(std::array<Giraffe*, GGPO_MAX_PLAYERS> giraffes,
 	if (State & STATE_WEAK && State & STATE_HEAVY && AnimFrame == 7) {
 		Collider grabCol = { {Position.x + 1.885000f * Facing.x, Position.y - 0.650000f}, 0.855862f };
 		for (int j = 0; j < num_giraffes; ++j) {
-			if (j != i) {
+			if (j != i && giraffes[j]->Stocks > 0) {
 				if (giraffes[j]->GrabHit(grabCol, Facing, frameNumber)) {
 					State &= ~(STATE_WEAK | STATE_HEAVY | STATE_RUNNING);
 					State |= STATE_GRABBING;
@@ -364,8 +364,8 @@ void PoshGiraffe::GiveHits(std::array<Giraffe*, GGPO_MAX_PLAYERS> giraffes, cons
 	//Apply hits to other giraffes
 	for (int p = Projectiles.Size() - 1; p >= 0; --p) {
 		for (int j = 0; j < num_giraffes; ++j) {
-			if (j != i) {
-				if ((*giraffes[j]).ProjectileHit(Projectiles[p])) {
+			if (j != i && giraffes[j]->Stocks > 0) {
+				if (giraffes[j]->ProjectileHit(Projectiles[p])) {
 					Projectiles[p].OnHit(Projectiles[p], *this, giraffes[j], frameNumber);
 					Projectiles.Remove(p);
 					SoundAttackState |= SOUND_WEAK;
@@ -379,11 +379,11 @@ void PoshGiraffe::GiveHits(std::array<Giraffe*, GGPO_MAX_PLAYERS> giraffes, cons
 
 	if (!(Hitboxes == nullptr)) {
 		for (int j = 0; j < num_giraffes; ++j) {
-			if (j != i) {
+			if (j != i && giraffes[j]->Stocks > 0) {
 				for (int h = 0; h < numHitboxes; ++h) {
 					HitCollider hitbox = (*Hitboxes)[h];
 					hitbox.Damage *= Multiplier;
-					if ((*giraffes[j]).AddHit(hitbox, LastAttackID, Facing, Position)) {
+					if (giraffes[j]->AddHit(hitbox, LastAttackID, Facing, Position)) {
 						if (hitbox.Damage > 1) {
 							SoundAttackState |= SOUND_HEAVY;
 							SoundAttackDelay[XACT_WAVEBANK_ATTACKBANK_HEAVY] = frameNumber + Moves->GetAttackSoundLength(XACT_WAVEBANK_ATTACKBANK_HEAVY);

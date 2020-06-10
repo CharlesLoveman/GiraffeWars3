@@ -626,8 +626,8 @@ void Giraffe::GiveHits(std::array<Giraffe*, GGPO_MAX_PLAYERS> giraffes, const in
 	//Apply hits to other giraffes
 	for (int p = Projectiles.Size() - 1; p >= 0; --p) {
 		for (int j = 0; j < num_giraffes; ++j) {
-			if (j != i) {
-				if ((*giraffes[j]).ProjectileHit(Projectiles[p])) {
+			if (j != i && giraffes[j]->Stocks > 0) {
+				if (giraffes[j]->ProjectileHit(Projectiles[p])) {
 					Projectiles[p].OnHit(Projectiles[p], *this, giraffes[j], frameNumber);
 					Projectiles.Remove(p);
 					SoundAttackState |= SOUND_WEAK;
@@ -641,9 +641,9 @@ void Giraffe::GiveHits(std::array<Giraffe*, GGPO_MAX_PLAYERS> giraffes, const in
 
 	if (!(Hitboxes == nullptr)) {
 		for (int j = 0; j < num_giraffes; ++j) {
-			if (j != i) {
+			if (j != i && giraffes[j]->Stocks > 0) {
 				for (int h = 0; h < numHitboxes; ++h) {
-					if ((*giraffes[j]).AddHit((*Hitboxes)[h], LastAttackID, Facing, Position)) {
+					if (giraffes[j]->AddHit((*Hitboxes)[h], LastAttackID, Facing, Position)) {
 						if ((*Hitboxes)[h].Damage > 1) {
 							SoundAttackState |= SOUND_HEAVY;
 							SoundAttackDelay[XACT_WAVEBANK_ATTACKBANK_HEAVY] = frameNumber + Moves->GetAttackSoundLength(XACT_WAVEBANK_ATTACKBANK_HEAVY);

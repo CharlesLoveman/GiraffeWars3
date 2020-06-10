@@ -65,6 +65,9 @@ void GDIRenderer::Draw(GameState& gs, NonGameState& ngs)
 		SelectObject(hdc, titlefont);
 		TextOutA(hdc, (_rc.left + _rc.right) / 2, (_rc.top + _rc.bottom) / 2, "Giraffe Wars 3", 14);
 		break;
+	case 3:
+		DrawWinners(gs, ngs, hdc);
+		break;
 	default:
 		DrawGameLoop(gs, ngs, hdc);
 		break;
@@ -134,7 +137,9 @@ void GDIRenderer::DrawGameLoop(GameState& gs, NonGameState& ngs, HDC hdc)
 			break;
 		}
 
-		gs.giraffes[i]->Draw(hdc, Scale, gs._framenumber);
+		if (gs.giraffes[i]->Stocks > 0) {
+			gs.giraffes[i]->Draw(hdc, Scale, gs._framenumber);
+		}
 		DrawConnectState(hdc, *gs.giraffes[i], ngs.players[i]);
 		//DrawGiraffeInfo(hdc, *gs.giraffes[i], i);
 	}
@@ -171,6 +176,29 @@ void GDIRenderer::DrawCharSelect(GameState& gs, NonGameState& ngs, HDC hdc)
 		points[4] = { (int)(width / 5.0f * (gs.selectors[i] + 0.5f) + i), (int)(height / 3.0f + i) };
 		Polyline(hdc, points, 5);
 	}
+}
+
+void GDIRenderer::DrawWinners(GameState& gs, NonGameState& ngs, HDC hdc)
+{
+	int winner = -1;
+	for (int i = 0; i < gs._num_giraffes; ++i) {
+		if (gs.giraffes[i]->Stocks > 0) {
+			winner = i;
+			break;
+		}
+	}
+	SetTextAlign(hdc, TA_BOTTOM | TA_CENTER);
+	SetTextColor(hdc, RGB((int)(255 * fabs(sinf(gs._framenumber / (0.1f * 3.14159f)))), (int)(255 * fabs(cosf(37 + gs._framenumber / (10 * 3.14159f)))), (int)(255 * fabs(sinf(71 + gs._framenumber / (10 * cosf(gs._framenumber) * 3.14159f))))));
+	SelectObject(hdc, titlefont);
+	if (winner >= 0) {
+		std::string text = ("Player " + std::to_string(winner) + " wins!");
+		TextOutA(hdc, (_rc.left + _rc.right) / 2, (_rc.top + _rc.bottom) / 2, text.c_str(), text.length());
+		gs.giraffes[winner]->Draw(hdc, Scale, gs._framenumber);
+	}
+	else {
+		TextOutA(hdc, (_rc.left + _rc.right) / 2, (_rc.top + _rc.bottom) / 2, "Draw!", 5);
+	}
+
 }
 
 void GDIRenderer::SetStatusText(const char* text)
@@ -284,7 +312,7 @@ void GDIRenderer::CreateTitleFont(HDC hdc)
 		CLIP_DEFAULT_PRECIS,
 		ANTIALIASED_QUALITY,
 		FF_DONTCARE | DEFAULT_PITCH,
-		L"Papyrus");
+		L"Jokerman");
 }
 
 void GDIRenderer::DrawNormIcon(HDC hdc, Vector2 position, Vector2 scale)

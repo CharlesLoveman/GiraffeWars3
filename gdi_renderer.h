@@ -19,6 +19,7 @@ protected:
 
 	void DrawGameLoop(GameState& gs, NonGameState& ngs, HDC hdc);
 	void DrawCharSelect(GameState& gs, NonGameState& ngs, HDC hdc);
+	void DrawWinners(GameState& gs, NonGameState& ngs, HDC hdc);
 
 	void DrawStage(HDC hdc, Stage stage);
 	void DrawConnectState(HDC hdc, Giraffe& giraffe, PlayerConnectionInfo& info);

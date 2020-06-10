@@ -30,7 +30,7 @@ void GameState::Init(HWND hwnd, int num_players) {
 	_num_giraffes = num_players;
 
 	float stagewidth = 30.0f;
-	float stageleft = 10.0f;
+	float stageleft = 12.0f;
 	float stageheight = 5.0f;
 	float stagetop = 30.0f;
 
@@ -53,15 +53,30 @@ void GameState::Update(int inputs[], int disconnect_flags)
 	++_framenumber;
 
 	//State 0 is the main game
-	if (state == 0) {
+	switch (state) {
+	case 0:
+	{
+		int alive = _num_giraffes;
 		for (int i = 0; i < _num_giraffes; ++i) {
-			if (!(disconnect_flags & (1 << i))) {
-				(*giraffes[i]).Update(giraffes, _num_giraffes, i, inputs[i], _framenumber, stage);
+			if (!(disconnect_flags & (1 << i)) && giraffes[i]->Stocks > 0) {
+				giraffes[i]->Update(giraffes, _num_giraffes, i, inputs[i], _framenumber, stage);
+			}
+			else {
+				--alive;
 			}
 		}
 
+		if (alive <= 1) {
+			for (int i = 0; i < _num_giraffes; ++i) {
+				giraffes[i]->Position = { (stage.Box.left + stage.Box.right) / 2.0f, 30 };
+				selectDelay[i] = _framenumber + 30;
+			}
+			state = 3;
+			break;
+		}
+
 		for (int i = 0; i < _num_giraffes; ++i) {
-			(*giraffes[i]).Move(stage, _framenumber, giraffes, lines);
+			giraffes[i]->Move(stage, _framenumber, giraffes, lines);
 		}
 
 		for (int i = lines.size() - 1; i > 0; --i) {
@@ -69,16 +84,21 @@ void GameState::Update(int inputs[], int disconnect_flags)
 				lines.erase(lines.begin() + i);
 			}
 		}
+		break;
 	}
+		
 	//State 1 is the character selection
-	else if (state == 1) {
+	case 1:
+	{
 		if (ParseCharSelectInputs(inputs)) {
 			CreateGiraffes();
 			state = 0;
 		}
+		break;
 	}
 	//State 2 is the title screen
-	else if (state == 2) {
+	case 2:
+	{
 		int Finished = 0;
 		for (int i = 0; i < _num_giraffes; ++i) {
 			Finished += inputs[i];
@@ -89,6 +109,26 @@ void GameState::Update(int inputs[], int disconnect_flags)
 				selectDelay[i] = _framenumber + 30;
 			}
 		}
+		break;
+
+	}
+	//State 3 is the win screen
+	case 3:
+		int Finished = 0;
+		for (int i = 0; i < _num_giraffes; ++i) {
+			if (_framenumber >= selectDelay[i]) {
+				Finished += inputs[i];
+			}
+		}
+		if (Finished) {
+			state = 1;
+			for (int i = 0; i < _num_giraffes; ++i) {
+				delete giraffes[i];
+				selected[i] = false;
+				selectDelay[i] = _framenumber + 30;
+			}
+		}
+		break;
 	}
 
 	

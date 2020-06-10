@@ -433,8 +433,10 @@ void GiraffeWar_Idle(int time)
 
 void GiraffeWar_Exit()
 {
-	for (int i = 0; i < gs._num_giraffes; ++i) {
-		delete gs.giraffes[i];
+	if (gs.state == 0 || gs.state == 3) {
+		for (int i = 0; i < gs._num_giraffes; ++i) {
+			delete gs.giraffes[i];
+		}
 	}
 
 	if (ggpo) {

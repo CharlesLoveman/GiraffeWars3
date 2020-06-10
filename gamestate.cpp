@@ -17,30 +17,19 @@ extern GGPOSession* ggpo;
 
 //Initialise the game state
 void GameState::Init(HWND hwnd, int num_players) {
-	int w, h;
+	//int w, h;
 
 	GetClientRect(hwnd, &_bounds);
 	InflateRect(&_bounds, -8, -8);
 
-	w = _bounds.right - _bounds.left;
-	h = _bounds.bottom - _bounds.top;
+	/*w = _bounds.right - _bounds.left;
+	h = _bounds.bottom - _bounds.top;*/
 
 	_framenumber = 0;
 
 	_num_giraffes = num_players;
 
-	float stagewidth = 30.0f;
-	float stageleft = 12.0f;
-	float stageheight = 5.0f;
-	float stagetop = 30.0f;
-
-
 	state = 2;
-
-	stage.Box = { stageleft, stagetop, stageleft + stagewidth, stagetop + stageheight };
-	stage.Platforms = { {(float)(stageleft + stagewidth / 2.0f - stagewidth / 10.0f), (float)(stagetop - 2 * stageheight - 0.1f), (float)(stageleft + stagewidth / 2.0f + stagewidth / 10.0f), (float)(stagetop - 2 * stageheight + 0.1f)}, {(float)(stageleft + stagewidth / 4.0f - stagewidth / 10.0f), (float)(stagetop - stageheight - 0.1f), (float)(stageleft + stagewidth / 4.0f + stagewidth / 10.0f), (float)(stagetop - stageheight + 0.1f)}, {(float)(stageleft + 3 * stagewidth / 4.0f - stagewidth / 10.0f), (float)(stagetop - stageheight - 0.1f), (float)(stageleft + 3 * stagewidth / 4.0f + stagewidth / 10.0f), (float)(stagetop - stageheight + 0.1f)} };
-	stage.Ledges = { { { {stageleft, stagetop + 0.5f}, 0.5f}, false, true}, { {{stageleft + stagewidth, stagetop + 0.5f}, 0.5f}, false, false } };
-
 
 	InflateRect(&_bounds, -8, -8);
 }
@@ -106,7 +95,7 @@ void GameState::Update(int inputs[], int disconnect_flags)
 			Finished += inputs[i];
 		}
 		if (Finished) {
-			state = 1;
+			state = 4;
 			for (int i = 0; i < _num_giraffes; ++i) {
 				selectDelay[i] = _framenumber + 30;
 			}
@@ -116,6 +105,7 @@ void GameState::Update(int inputs[], int disconnect_flags)
 	}
 	//State 3 is the win screen
 	case 3:
+	{
 		int Finished = 0;
 		for (int i = 0; i < _num_giraffes; ++i) {
 			if (_framenumber >= selectDelay[i]) {
@@ -123,7 +113,7 @@ void GameState::Update(int inputs[], int disconnect_flags)
 			}
 		}
 		if (Finished) {
-			state = 1;
+			state = 4;
 			for (int i = 0; i < _num_giraffes; ++i) {
 				delete giraffes[i];
 				selected[i] = false;
@@ -132,8 +122,33 @@ void GameState::Update(int inputs[], int disconnect_flags)
 		}
 		break;
 	}
-
-	
+	//State 4 is the stage selection screen
+	case 4:
+	{
+		for (int i = 0; i < _num_giraffes; ++i) {
+			if (_framenumber >= selectDelay[i]) {
+				if (inputs[i] & INPUT_WEAK) {
+					state = 1;
+					selectDelay[i] = _framenumber + 30;
+					CreateStage();
+					break;
+				}
+				if (inputs[i] & INPUT_LEFT) {
+					selectors[GGPO_MAX_PLAYERS] = (selectors[GGPO_MAX_PLAYERS] - 1) % 4;
+					if (selectors[i] < 0) {
+						selectors[i] += 4;
+					}
+					selectDelay[i] = _framenumber + 10;
+				}
+				else if (inputs[i] & INPUT_RIGHT) {
+					selectors[GGPO_MAX_PLAYERS] = (selectors[GGPO_MAX_PLAYERS] + 1) % 4;
+					selectDelay[i] = _framenumber + 10;
+				}
+			}
+		}
+		break;
+	}
+	}
 }
 
 void GameState::CreateGiraffes()
@@ -161,6 +176,55 @@ void GameState::CreateGiraffes()
 			break;
 		}
 	}
+}
+
+void GameState::CreateStage()
+{
+	float width = 54;
+	float height = 48;
+	
+	float stagewidth;
+	float stageleft;
+	float stageheight;
+	float stagetop;
+
+	switch (selectors[GGPO_MAX_PLAYERS])
+	{
+	case 0:
+		stagewidth = 20.0f;
+		stageleft = (width - stagewidth) / 2;
+		stageheight = 1.0f;
+		stagetop = 24.5f;
+		stage.Platforms = {};
+		stage.Brush = CreateSolidBrush(RGB(180, 210, 220));
+		break;
+	case 1:
+		stagewidth = 28.0f;
+		stageleft = (width - stagewidth) / 2;
+		stageheight = 3.5f;
+		stagetop = 27.5f;
+		stage.Platforms = { {(float)(stageleft + stagewidth / 2.0f - stagewidth / 7.5f), (float)(stagetop - stageheight - 0.1f), (float)(stageleft + stagewidth / 2.0f + stagewidth / 7.5f), (float)(stagetop - stageheight + 0.1f)} };
+		stage.Brush = CreateSolidBrush(RGB(226, 237, 164));
+		break;
+	case 2:
+		stagewidth = 35.0f;
+		stageleft = (width - stagewidth) / 2;
+		stageheight = 3.0f;
+		stagetop = 32.0f;
+		stage.Platforms = { {(float)(stageleft + stagewidth / 5.0f - stagewidth / 12.5f), (float)(stagetop - 1.5f * stageheight - 0.1f), (float)(stageleft + stagewidth / 5.0f + stagewidth / 12.5f), (float)(stagetop - 1.5f * stageheight + 0.1f)}, {(float)(stageleft + 4 * stagewidth / 5.0f - stagewidth / 12.5f), (float)(stagetop - 1.5f * stageheight - 0.1f), (float)(stageleft + 4 * stagewidth / 5.0f + stagewidth / 12.5f), (float)(stagetop - 1.5f * stageheight + 0.1f)} };
+		stage.Brush = CreateSolidBrush(RGB(20, 100, 20));
+		break;
+	default:
+		stagewidth = 25.0f;
+		stageleft = (width - stagewidth) / 2;
+		stageheight = 4.0f;
+		stagetop = 30.0f;
+		stage.Platforms = { {(float)(stageleft + stagewidth / 2.0f - stagewidth / 10.0f), (float)(stagetop - 2 * stageheight - 0.1f), (float)(stageleft + stagewidth / 2.0f + stagewidth / 10.0f), (float)(stagetop - 2 * stageheight + 0.1f)}, {(float)(stageleft + stagewidth / 4.0f - stagewidth / 10.0f), (float)(stagetop - stageheight - 0.1f), (float)(stageleft + stagewidth / 4.0f + stagewidth / 10.0f), (float)(stagetop - stageheight + 0.1f)}, {(float)(stageleft + 3 * stagewidth / 4.0f - stagewidth / 10.0f), (float)(stagetop - stageheight - 0.1f), (float)(stageleft + 3 * stagewidth / 4.0f + stagewidth / 10.0f), (float)(stagetop - stageheight + 0.1f)} };
+		stage.Brush = CreateSolidBrush(RGB(130, 30, 215));
+		break;
+	}
+	stage.Box = { stageleft, stagetop, stageleft + stagewidth, stagetop + stageheight };
+	stage.Ledges = { { { {stageleft, stagetop + 0.5f}, 0.5f}, false, true}, { {{stageleft + stagewidth, stagetop + 0.5f}, 0.5f}, false, false } };
 }
 
 bool GameState::ParseCharSelectInputs(int inputs[])

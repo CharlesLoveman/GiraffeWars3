@@ -25,9 +25,10 @@ public:
 	VecRect Box;
 	std::vector<VecRect> Platforms;
 	std::vector<Ledge> Ledges;
+	HBRUSH Brush;
 	bool Intersects(Vector2 pos, Collider col, bool down, bool jumping, bool falling, bool hitstun, bool& landed, bool& bounced, Vector2& facing, Vector2& offset, Vector2& deltaV, bool& hogging, int& ledgeID);
 	bool KillProjectile(Projectile p);
-	void Draw(HDC hdc, Vector2 Scale, HBRUSH Brush);
+	void Draw(HDC hdc, Vector2 Scale);
 };
 
 #endif // !_STAGE_H_

@@ -20,7 +20,7 @@ public:
 	void Update(int inputs[], int disconnect_flags);
 
 	int state;
-	int selectors[GGPO_MAX_PLAYERS];
+	int selectors[GGPO_MAX_PLAYERS + 1];
 	bool selected[GGPO_MAX_PLAYERS];
 	int selectDelay[GGPO_MAX_PLAYERS];
 	int _framenumber;
@@ -31,6 +31,7 @@ public:
 	std::vector<Line> lines;
 private:
 	void CreateGiraffes();
+	void CreateStage();
 	bool ParseCharSelectInputs(int inputs[]);
 };
 #endif // !_GAMESTATE_H_

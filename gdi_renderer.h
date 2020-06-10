@@ -20,6 +20,7 @@ protected:
 	void DrawGameLoop(GameState& gs, NonGameState& ngs, HDC hdc);
 	void DrawCharSelect(GameState& gs, NonGameState& ngs, HDC hdc);
 	void DrawWinners(GameState& gs, NonGameState& ngs, HDC hdc);
+	void DrawStageSelect(GameState& gs, NonGameState& ngs, HDC hdc);
 
 	void DrawStage(HDC hdc, Stage stage);
 	void DrawConnectState(HDC hdc, Giraffe& giraffe, PlayerConnectionInfo& info);
@@ -42,7 +43,6 @@ protected:
 	COLORREF _giraffeColours[GGPO_MAX_PLAYERS];
 	HPEN _giraffePens[GGPO_MAX_PLAYERS];
 	HBRUSH _redBrush;
-	HBRUSH _stageBrush;
 	HBRUSH _blackBrush;
 	HPEN SelectedPen;
 };

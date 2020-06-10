@@ -35,7 +35,6 @@ GDIRenderer::GDIRenderer(HWND hwnd) :
 	}
 
 	_redBrush = CreateSolidBrush(RGB(255, 0, 0));
-	_stageBrush = CreateSolidBrush(RGB(127, 127, 127));
 	_blackBrush = CreateSolidBrush(0);
 }
 
@@ -67,6 +66,9 @@ void GDIRenderer::Draw(GameState& gs, NonGameState& ngs)
 		break;
 	case 3:
 		DrawWinners(gs, ngs, hdc);
+		break;
+	case 4:
+		DrawStageSelect(gs, ngs, hdc);
 		break;
 	default:
 		DrawGameLoop(gs, ngs, hdc);
@@ -201,6 +203,11 @@ void GDIRenderer::DrawWinners(GameState& gs, NonGameState& ngs, HDC hdc)
 
 }
 
+void GDIRenderer::DrawStageSelect(GameState& gs, NonGameState& ngs, HDC hdc)
+{
+	//Do something
+}
+
 void GDIRenderer::SetStatusText(const char* text)
 {
 	strcpy_s(_status, text);
@@ -208,7 +215,7 @@ void GDIRenderer::SetStatusText(const char* text)
 
 void GDIRenderer::DrawStage(HDC hdc, Stage stage)
 {
-	stage.Draw(hdc, Scale, _stageBrush);
+	stage.Draw(hdc, Scale);
 	SetTextAlign(hdc, TA_TOP | TA_CENTER);
 }
 

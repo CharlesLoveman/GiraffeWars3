@@ -127,7 +127,7 @@ bool Stage::KillProjectile(Projectile p)
 	return !(p.Position.x + p.Radius < Box.left || p.Position.x - p.Radius > Box.right || p.Position.y + p.Radius < Box.top || p.Position.y - p.Radius > Box.bottom);
 }
 
-void Stage::Draw(HDC hdc, Vector2 Scale, HBRUSH Brush)
+void Stage::Draw(HDC hdc, Vector2 Scale)
 {
 	SelectObject(hdc, Brush);
 	FillRect(hdc, &Box.toRect(Scale), Brush);

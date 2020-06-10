@@ -28,9 +28,10 @@ GDIRenderer::GDIRenderer(HWND hwnd) :
 	_giraffeColours[2] = RGB(0, 0, 255);
 	_giraffeColours[3] = RGB(255, 255, 0);
 
-	/*for (int i = 0; i < 4; ++i) {
+	SelectedPen = CreatePen(PS_SOLID, 1, RGB(255, 255, 255));
+	for (int i = 0; i < GGPO_MAX_PLAYERS; ++i) {
 		_giraffePens[i] = CreatePen(PS_SOLID, 1, _giraffeColours[i]);
-	}*/
+	}
 
 	_redBrush = CreateSolidBrush(RGB(255, 0, 0));
 	_stageBrush = CreateSolidBrush(RGB(127, 127, 127));
@@ -51,19 +52,16 @@ void GDIRenderer::Draw(GameState& gs, NonGameState& ngs)
 	SetBkMode(hdc, TRANSPARENT);
 	SelectObject(hdc, _font);
 
-	for (int i = 0; i < gs.lines.size(); ++i) {
-		gs.lines[i].Draw(hdc, Scale, gs._framenumber);
+	switch (gs.state) {
+	case 1:
+		DrawCharSelect(gs, ngs, hdc);
+		break;
+	default:
+		DrawGameLoop(gs, ngs, hdc);
+		break;
 	}
 
-	for (int i = 0; i < gs._num_giraffes; ++i) {
-		SetTextColor(hdc, _giraffeColours[i]);
-		//SelectObject(hdc, _giraffePens[i]);
-		gs.giraffes[i]->Draw(hdc, Scale, gs._framenumber);
-		DrawConnectState(hdc, *gs.giraffes[i], ngs.players[i]);
-		DrawGiraffeInfo(hdc, *gs.giraffes[i], i);
-	}
-
-	DrawStage(hdc, gs.stage);
+	
 
 	SetTextAlign(hdc, TA_BOTTOM | TA_CENTER);
 	TextOutA(hdc, (_rc.left + _rc.right) / 2, _rc.bottom - 32, _status, (int)strlen(_status));
@@ -82,6 +80,44 @@ void GDIRenderer::RenderChecksum(HDC hdc, int y, NonGameState::ChecksumInfo& inf
 	char checksum[128];
 	sprintf_s(checksum, ARRAYSIZE(checksum), "Frame: %04d  Checksum: %08x", info.framenumber, info.checksum);
 	TextOutA(hdc, (_rc.left + _rc.right) / 2, _rc.top + y, checksum, (int)strlen(checksum));
+}
+
+void GDIRenderer::DrawGameLoop(GameState& gs, NonGameState& ngs, HDC hdc)
+{
+	for (int i = 0; i < gs.lines.size(); ++i) {
+		gs.lines[i].Draw(hdc, Scale, gs._framenumber);
+	}
+
+	for (int i = 0; i < gs._num_giraffes; ++i) {
+		SetTextColor(hdc, _giraffeColours[i]);
+		gs.giraffes[i]->Draw(hdc, Scale, gs._framenumber);
+		DrawConnectState(hdc, *gs.giraffes[i], ngs.players[i]);
+		DrawGiraffeInfo(hdc, *gs.giraffes[i], i);
+	}
+
+	DrawStage(hdc, gs.stage);
+}
+
+void GDIRenderer::DrawCharSelect(GameState& gs, NonGameState& ngs, HDC hdc)
+{
+	for (int i = 0; i < gs._num_giraffes; ++i) {
+		SetTextColor(hdc, _giraffeColours[i]);
+		if (gs.selected[i]) {
+			SelectObject(hdc, SelectedPen);
+		}
+		else {
+			SelectObject(hdc, _giraffePens[i]);
+		}
+		float width = _rc.right - _rc.left;
+		float height = _rc.bottom - _rc.top;
+		POINT points[5];
+		points[0] = { (int)(width / 5.0f * (gs.selectors[i] + 0.5f)), (int)(height / 3.0f) };
+		points[1] = { (int)(width / 5.0f * (gs.selectors[i] + 1.5f)), (int)(height / 3.0f) };
+		points[2] = { (int)(width / 5.0f * (gs.selectors[i] + 1.5f)), (int)((2 * height) / 3.0f) };
+		points[3] = { (int)(width / 5.0f * (gs.selectors[i] + 0.5f)), (int)((2 * height) / 3.0f) };
+		points[4] = { (int)(width / 5.0f * (gs.selectors[i] + 0.5f)), (int)(height / 3.0f) };
+		Polyline(hdc, points, 5);
+	}
 }
 
 void GDIRenderer::SetStatusText(const char* text)

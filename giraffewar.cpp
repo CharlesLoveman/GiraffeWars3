@@ -109,25 +109,24 @@ bool __cdecl gw_advance_frame_callback(int)
 //Match the current state to the one provided by GGPO
 bool __cdecl gw_load_game_state_callback(unsigned char* buffer, int len)
 {
-	int giraffeSize = 0;
-	int ledgeSize = sizeof(gs.stage.Ledges[0]) * gs.stage.Ledges.size();
-	/*int lineSize = 0;
-	if (gs.lines.size() > 0) {
-		lineSize = sizeof(gs.lines[0]) * gs.lines.size();
-	}*/
-	int gsSize = sizeof(gs);
+	if (gs.state == 0) {
+		int giraffeSize = 0;
+		int ledgeSize = sizeof(gs.stage.Ledges[0]) * gs.stage.Ledges.size();
+		int gsSize = sizeof(gs);
 
-	memcpy(&gs, buffer, gsSize);
+		memcpy(&gs, buffer, gsSize);
 
-	for (int i = 0; i < gs._num_giraffes; ++i) {
-		memcpy(gs.giraffes[i], buffer + gsSize + giraffeSize, gs.giraffes[i]->Size());
-		giraffeSize += gs.giraffes[i]->Size();
+		for (int i = 0; i < gs._num_giraffes; ++i) {
+			memcpy(gs.giraffes[i], buffer + gsSize + giraffeSize, gs.giraffes[i]->Size());
+			giraffeSize += gs.giraffes[i]->Size();
+		}
+
+		memcpy(gs.stage.Ledges.data(), buffer + gsSize + giraffeSize, ledgeSize);
 	}
-
-	//memcpy(gs.lines.data(), buffer + gsSize + giraffeSize, lineSize);
-
-	memcpy(gs.stage.Ledges.data(), buffer + gsSize + giraffeSize, ledgeSize);
-
+	else {
+		int gsSize = sizeof(gs);
+		memcpy(&gs, buffer, gsSize);
+	}
 	return true;
 }
 
@@ -135,29 +134,42 @@ bool __cdecl gw_load_game_state_callback(unsigned char* buffer, int len)
 //Saves the current state to the buffer
 bool __cdecl gw_save_game_state_callback(unsigned char** buffer, int* len, int* checksum, int)
 {
-	int giraffeSize = 0;
-	for (int i = 0; i < gs._num_giraffes; ++i) {
-		giraffeSize += gs.giraffes[i]->Size();
-	}
+	if (gs.state == 0) {
+		int giraffeSize = 0;
+		for (int i = 0; i < gs._num_giraffes; ++i) {
+			giraffeSize += gs.giraffes[i]->Size();
+		}
+		int ledgeSize = sizeof(gs.stage.Ledges[0]) * gs.stage.Ledges.size();
 
-	int ledgeSize = sizeof(gs.stage.Ledges[0]) * gs.stage.Ledges.size();
-	int gsSize = sizeof(gs);
+		int gsSize = sizeof(gs);
 
-	*len = gsSize + giraffeSize + ledgeSize;
-	*buffer = (unsigned char*)malloc(*len);
-	if (!*buffer) {
-		return false;
-	}
+		*len = gsSize + giraffeSize + ledgeSize;
+		*buffer = (unsigned char*)malloc(*len);
+		if (!*buffer) {
+			return false;
+		}
 
-	//*checksum = fletcher32_checksum((short*)gs.normGiraffes.data(), sizeof(gs.normGiraffes[0]) * gs.normGiraffes.size() / 2);
-	memcpy(*buffer, &gs, *len);
-	*checksum = fletcher32_checksum((short*)buffer, *len);
-	giraffeSize = 0;
-	for (int i = 0; i < gs._num_giraffes; ++i) {
-		memcpy(*buffer + gsSize + giraffeSize, gs.giraffes[i], gs.giraffes[i]->Size());
-		giraffeSize += gs.giraffes[i]->Size();
+		memcpy(*buffer, &gs, *len);
+		giraffeSize = 0;
+		for (int i = 0; i < gs._num_giraffes; ++i) {
+			memcpy(*buffer + gsSize + giraffeSize, gs.giraffes[i], gs.giraffes[i]->Size());
+			giraffeSize += gs.giraffes[i]->Size();
+		}
+		memcpy(*buffer + gsSize + giraffeSize, gs.stage.Ledges.data(), ledgeSize);
+
+		*checksum = fletcher32_checksum((short*)buffer, *len / 2);
 	}
-	memcpy(*buffer + gsSize + giraffeSize, gs.stage.Ledges.data(), ledgeSize);
+	else {
+		int gsSize = sizeof(gs);
+		*len = gsSize;
+		*buffer = (unsigned char*)malloc(*len);
+		if (!*buffer) {
+			return false;
+		}
+
+		memcpy(*buffer, &gs, *len);
+		*checksum = fletcher32_checksum((short*)buffer, *len / 2);
+	}
 
 	return true;
 }
@@ -333,7 +345,7 @@ void GiraffeWar_DrawCurrentFrame()
 	if (renderer != nullptr) {
 		renderer->Draw(gs, ngs);
 	}
-	if (audioPlayer != nullptr) {
+	if (audioPlayer != nullptr && gs.state == 0) {
 		audioPlayer->Update(gs);
 	}
 }
@@ -346,7 +358,7 @@ void GiraffeWar_AdvanceFrame(int inputs[], int disconnect_flags)
 
 	//update the checksums
 	ngs.now.framenumber = gs._framenumber;
-	ngs.now.checksum = fletcher32_checksum((short*)gs.giraffes[0], sizeof(*gs.giraffes[0]) / 2);
+	ngs.now.checksum = fletcher32_checksum((short*)&gs, sizeof(gs) / 2);
 	if ((gs._framenumber % 90) == 0) {
 		ngs.periodic = ngs.now;
 	}

@@ -21,6 +21,8 @@ public:
 
 	int state;
 	int selectors[GGPO_MAX_PLAYERS];
+	bool selected[GGPO_MAX_PLAYERS];
+	int selectDelay[GGPO_MAX_PLAYERS];
 	int _framenumber;
 	int _num_giraffes;
 	RECT _bounds;
@@ -29,6 +31,7 @@ public:
 	std::vector<Line> lines;
 private:
 	void CreateGiraffes();
+	bool ParseCharSelectInputs(int inputs[]);
 };
 #endif // !_GAMESTATE_H_
 

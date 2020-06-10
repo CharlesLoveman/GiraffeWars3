@@ -800,6 +800,11 @@ void Giraffe::Die(Stage& stage, const int frameNumber, std::vector<Line>& lines)
 
 	--Stocks;
 	SoundAttackState = 0;
-	SoundMoveState = SOUND_DEATH;
-	SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_DEATH] = frameNumber + Moves->GetMoveSoundLength(XACT_WAVEBANK_MOVEBANK_DEATH);
+	if (Stocks > 0) {
+		SoundMoveState = SOUND_DEATH;
+		SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_DEATH] = frameNumber + Moves->GetMoveSoundLength(XACT_WAVEBANK_MOVEBANK_DEATH);
+	}
+	else {
+		SoundMoveState = 0;
+	}
 }

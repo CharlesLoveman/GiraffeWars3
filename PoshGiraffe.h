@@ -11,7 +11,7 @@
 
 class PoshGiraffe : public Giraffe {
 public:
-	PoshGiraffe(Vector2 _Position, MoveSet* _Moves, COLORREF _Colour);
+	PoshGiraffe(Vector2 _Position, COLORREF _Colour);
 	~PoshGiraffe();
 
 	void UniqueChanges(std::array<Giraffe*, GGPO_MAX_PLAYERS> giraffes, const int num_giraffes, const int i, const int inputs, const int frameNumber, Stage& stage);

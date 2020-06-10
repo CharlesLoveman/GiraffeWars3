@@ -16,7 +16,7 @@ extern GGPOSession* ggpo;
 
 
 //Initialise the game state
-void GameState::Init(HWND hwnd, int num_players, const std::array<MoveSet*, 4> MoveSets) {
+void GameState::Init(HWND hwnd, int num_players) {
 	int w, h;
 
 	GetClientRect(hwnd, &_bounds);
@@ -43,9 +43,9 @@ void GameState::Init(HWND hwnd, int num_players, const std::array<MoveSet*, 4> M
 	//int counter = 0;
 
 	//giraffes[0] = new CoolGiraffe(Vector2(stageleft + stagewidth * 1.0f / (2.0f * _num_giraffes), 20), MoveSets[2], _giraffeColours[0]);
-	giraffes[0] = new PoshGiraffe(Vector2(stageleft + stagewidth * 1.0f / (2.0f * _num_giraffes), 20), MoveSets[3], _giraffeColours[0]);
+	//giraffes[0] = new PoshGiraffe(Vector2(stageleft + stagewidth * 1.0f / (2.0f * _num_giraffes), 20), MoveSets[3], _giraffeColours[0]);
 	//giraffes[1] = new RobotGiraffe(Vector2(stageleft + stagewidth * 3.0f / (2.0f * _num_giraffes), 20), MoveSets[1], _giraffeColours[1]);
-	giraffes[1] = new NormGiraffe(Vector2(stageleft + stagewidth * 3.0f / (2.0f * _num_giraffes), 20), MoveSets[0], _giraffeColours[1]);
+	//giraffes[1] = new NormGiraffe(Vector2(stageleft + stagewidth * 3.0f / (2.0f * _num_giraffes), 20), MoveSets[0], _giraffeColours[1]);
 	//counter++;
 
 
@@ -78,4 +78,17 @@ void GameState::Update(int inputs[], int disconnect_flags)
 			lines.erase(lines.begin() + i);
 		}
 	}
+}
+
+void GameState::CreateGiraffes()
+{
+	/*for (int i = 0; i < _num_giraffes; ++i) {
+		switch (selectors[i])
+		{
+		case 1:
+			giraffes[i] = new RobotGiraffe(Vector2(stage.Box.left + (stage.Box.right - stage.Box.left) * i / (2.0f * _num_giraffes), 20), MoveSets[1], _giraffeColours[1]);
+		default:
+			break;
+		}
+	}*/
 }

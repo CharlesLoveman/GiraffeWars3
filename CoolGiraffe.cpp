@@ -1,8 +1,7 @@
 #include "CoolGiraffe.h"
 #include "CoolProjFuncs.h"
-#include "NormProjFuncs.h"//TEMP
 
-CoolGiraffe::CoolGiraffe(Vector2 _Position, MoveSet* _Moves, COLORREF _Colour)
+CoolGiraffe::CoolGiraffe(Vector2 _Position, COLORREF _Colour)
 {
 	//Movement
 	Position = _Position;
@@ -42,7 +41,13 @@ CoolGiraffe::CoolGiraffe(Vector2 _Position, MoveSet* _Moves, COLORREF _Colour)
 	AttackNum = 0;
 	MaxShieldDelay = 5;
 	TechDelay = 0;
-	Moves = _Moves;
+	Moves = new CoolMoveSet();
+	Moves->InitMoves();
+	Moves->InitThrows();
+	Moves->InitTilts();
+	Moves->InitSmashes();
+	Moves->InitAerials();
+	Moves->InitSpecials();
 
 	//Misc
 	Stocks = 3;
@@ -60,6 +65,7 @@ CoolGiraffe::CoolGiraffe(Vector2 _Position, MoveSet* _Moves, COLORREF _Colour)
 
 CoolGiraffe::~CoolGiraffe()
 {
+	delete Moves;
 }
 
 void CoolGiraffe::UniqueChanges(std::array<Giraffe*, GGPO_MAX_PLAYERS> giraffes, const int num_giraffes, const int i, const int inputs, const int frameNumber, Stage& stage)

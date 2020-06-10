@@ -18,7 +18,7 @@
 
 GameState gs = { 0 };
 NonGameState ngs = { 0 };
-std::array<MoveSet*, 4> MoveSets;
+//std::array<MoveSet*, 4> MoveSets;
 struct {
 	int	key;
 	int	input;
@@ -96,11 +96,11 @@ bool __cdecl gw_on_event_callback(GGPOEvent *info)
 //Move foreward one frame during a rollback
 bool __cdecl gw_advance_frame_callback(int)
 {
-	int inputs[MAX_PLAYERS] = { 0 };
+	int inputs[GGPO_MAX_PLAYERS] = { 0 };
 	int disconnect_flags;
 
 	//uses the inputs from GGPO, not from the keyboard
-	ggpo_synchronize_input(ggpo, (void*)inputs, sizeof(int) * MAX_PLAYERS, &disconnect_flags);
+	ggpo_synchronize_input(ggpo, (void*)inputs, sizeof(int) * GGPO_MAX_PLAYERS, &disconnect_flags);
 	GiraffeWar_AdvanceFrame(inputs, disconnect_flags);
 	return true;
 }
@@ -209,7 +209,7 @@ void GiraffeWar_Init(HWND hwnd, unsigned short localport, GGPOPlayer* players, i
 	audioPlayer = new AudioPlayer();
 	
 
-	MoveSets[0] = new NormMoveSet();
+	/*MoveSets[0] = new NormMoveSet();
 	MoveSets[1] = new RobotMoveSet();
 	MoveSets[2] = new CoolMoveSet();
 	MoveSets[3] = new PoshMoveSet();
@@ -221,10 +221,10 @@ void GiraffeWar_Init(HWND hwnd, unsigned short localport, GGPOPlayer* players, i
 		MoveSets[i]->InitSmashes();
 		MoveSets[i]->InitAerials();
 		MoveSets[i]->InitSpecials();
-	}
+	}*/
 
 	//Initialize the game state
-	gs.Init(hwnd, num_players, MoveSets);
+	gs.Init(hwnd, num_players);
 	ngs.num_players = num_players;
 
 	//Fill in the callback structure used by GGPO
@@ -285,12 +285,12 @@ void GiraffeWar_InitSpectator(HWND hwnd, unsigned short localport, int num_playe
 	renderer = new GDIRenderer(hwnd);
 	audioPlayer = new AudioPlayer();
 
-	MoveSets[0] = new NormMoveSet();
+	/*MoveSets[0] = new NormMoveSet();
 	MoveSets[1] = new RobotMoveSet();
-	MoveSets[2] = new CoolMoveSet();
+	MoveSets[2] = new CoolMoveSet();*/
 
 	//Initialize the game state
-	gs.Init(hwnd, num_players, MoveSets);
+	gs.Init(hwnd, num_players);
 
 	//Create the callback structure
 	GGPOSessionCallbacks cb = { 0 };
@@ -388,7 +388,7 @@ void GiraffeWar_RunFrame(HWND hwnd)
 {
 	GGPOErrorCode result = GGPO_OK;
 	int disconnect_flags;
-	int inputs[MAX_PLAYERS] = { 0 };
+	int inputs[GGPO_MAX_PLAYERS] = { 0 };
 
 	if (ngs.local_player_handle != GGPO_INVALID_HANDLE) {
 		int input = ReadInputs(hwnd);
@@ -402,7 +402,7 @@ void GiraffeWar_RunFrame(HWND hwnd)
 	//if we have enough input to move forward, then ggpo will provide the new inputs
 
 	if (GGPO_SUCCEEDED(result)) {
-		result = ggpo_synchronize_input(ggpo, (void*)inputs, sizeof(int) * MAX_PLAYERS, &disconnect_flags);
+		result = ggpo_synchronize_input(ggpo, (void*)inputs, sizeof(int) * GGPO_MAX_PLAYERS, &disconnect_flags);
 		if (GGPO_SUCCEEDED(result)) {
 			//Advance a frame with the new inputs
 			GiraffeWar_AdvanceFrame(inputs, disconnect_flags);
@@ -421,9 +421,6 @@ void GiraffeWar_Idle(int time)
 
 void GiraffeWar_Exit()
 {
-	for (int i = 0; i < 4; ++i) {
-		delete MoveSets[i];
-	}
 	for (int i = 0; i < gs._num_giraffes; ++i) {
 		delete gs.giraffes[i];
 	}

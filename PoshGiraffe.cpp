@@ -1,7 +1,8 @@
 #include "PoshGiraffe.h"
+#include "PoshMoveSet.h"
 #include "PoshProjFuncs.h"
 
-PoshGiraffe::PoshGiraffe(Vector2 _Position, MoveSet* _Moves, COLORREF _Colour)
+PoshGiraffe::PoshGiraffe(Vector2 _Position, COLORREF _Colour)
 {
 	//Movement
 	Position = _Position;
@@ -41,7 +42,13 @@ PoshGiraffe::PoshGiraffe(Vector2 _Position, MoveSet* _Moves, COLORREF _Colour)
 	AttackNum = 0;
 	MaxShieldDelay = 5;
 	TechDelay = 0;
-	Moves = _Moves;
+	Moves = new PoshMoveSet();
+	Moves->InitMoves();
+	Moves->InitThrows();
+	Moves->InitTilts();
+	Moves->InitSmashes();
+	Moves->InitAerials();
+	Moves->InitSpecials();
 
 	//Misc
 	Stocks = 3;
@@ -62,6 +69,7 @@ PoshGiraffe::PoshGiraffe(Vector2 _Position, MoveSet* _Moves, COLORREF _Colour)
 
 PoshGiraffe::~PoshGiraffe()
 {
+	delete Moves;
 }
 
 void PoshGiraffe::UniqueChanges(std::array<Giraffe*, GGPO_MAX_PLAYERS> giraffes, const int num_giraffes, const int i, const int inputs, const int frameNumber, Stage& stage)

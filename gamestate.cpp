@@ -135,8 +135,8 @@ void GameState::Update(int inputs[], int disconnect_flags)
 				}
 				if (inputs[i] & INPUT_LEFT) {
 					selectors[GGPO_MAX_PLAYERS] = (selectors[GGPO_MAX_PLAYERS] - 1) % 4;
-					if (selectors[i] < 0) {
-						selectors[i] += 4;
+					if (selectors[GGPO_MAX_PLAYERS] < 0) {
+						selectors[GGPO_MAX_PLAYERS] += 4;
 					}
 					selectDelay[i] = _framenumber + 10;
 				}

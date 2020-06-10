@@ -44,6 +44,7 @@ protected:
 	HPEN _giraffePens[GGPO_MAX_PLAYERS];
 	HBRUSH _redBrush;
 	HBRUSH _blackBrush;
+	HBRUSH _stageBrush;
 	HPEN SelectedPen;
 };
 #endif

@@ -9,6 +9,9 @@ public:
 	ArrayQueue()
 	{
 		head = 0;
+		for (int i = 0; i < ARRAYQUEUELENGTH; ++i) {
+			data[i] = 0;
+		}
 	}
 	void Push(T x)
 	{

@@ -17,7 +17,6 @@
 
 using namespace DirectX::SimpleMath;
 
-class Giraffe;
 enum GiraffeStates {
 	STATE_UP = (1 << 0),
 	STATE_BACK = (1 << 1),
@@ -98,6 +97,8 @@ enum GiraffeSoundAttackStates {
 	SOUND_HEAVY = (1 << 24),
 };
 
+int constexpr MAX_STOCKS = 3;
+
 class Giraffe {
 public:
 	virtual ~Giraffe() { };
@@ -121,6 +122,7 @@ public:
 	const std::array<HurtCollider, 6>* Hurtboxes;
 	const std::vector<HitCollider>* Hitboxes;
 	float Knockback;
+	int Stocks;
 
 	friend struct NormProjFuncs;
 	friend struct RobotProjFuncs;
@@ -164,7 +166,6 @@ protected:
 	float DashSpeed;
 
 	//Misc
-	int Stocks;
 	float Mass;
 	int LedgeID;
 	ArrayList<Projectile> Projectiles;

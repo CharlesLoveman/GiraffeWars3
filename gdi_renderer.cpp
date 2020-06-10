@@ -67,10 +67,10 @@ void GDIRenderer::Draw(GameState& gs, NonGameState& ngs)
 	SetTextAlign(hdc, TA_BOTTOM | TA_CENTER);
 	TextOutA(hdc, (_rc.left + _rc.right) / 2, _rc.bottom - 32, _status, (int)strlen(_status));
 
-	SetTextColor(hdc, RGB(192, 192, 192));
+	/*SetTextColor(hdc, RGB(192, 192, 192));
 	RenderChecksum(hdc, 40, ngs.periodic);
 	SetTextColor(hdc, RGB(128, 128, 128));
-	RenderChecksum(hdc, 56, ngs.now);
+	RenderChecksum(hdc, 56, ngs.now);*/
 
 	//SwapBuffers(hdc);//????
 	ReleaseDC(_hwnd, hdc);
@@ -89,11 +89,46 @@ void GDIRenderer::DrawGameLoop(GameState& gs, NonGameState& ngs, HDC hdc)
 		gs.lines[i].Draw(hdc, Scale, gs._framenumber);
 	}
 
+	float width = (_rc.right - _rc.left) / (gs._num_giraffes);
+	float height = (_rc.bottom - _rc.top) / 10.0f;
+	float boxwidth = (_rc.right - _rc.left) / (GGPO_MAX_PLAYERS + 1);
+	float stockwidth = boxwidth / (MAX_STOCKS + 1);
+	float stockheight = height / 2.0f;
+	SetTextAlign(hdc, TA_TOP | TA_CENTER);
 	for (int i = 0; i < gs._num_giraffes; ++i) {
 		SetTextColor(hdc, _giraffeColours[i]);
+		SelectObject(hdc, _giraffePens[i]);
+
+		std::string str = std::to_string(gs.giraffes[i]->Knockback * 10);
+		str = str.substr(0, str.find('.') + 2) + "%";
+
+		TextOutA(hdc, (int)((2 * i + 1) * width / 2.0f), (int)(8 * height), str.c_str(), str.length());
+		switch (gs.selectors[i]) {
+		case 1:
+			for (int j = 0; j < gs.giraffes[i]->Stocks; ++j) {
+				DrawPoshIcon(hdc, { (2 * i + 1) * width / 2.0f + j * stockwidth - (MAX_STOCKS / 2) * stockwidth, 9 * height }, { stockwidth, stockheight });
+			}
+			break;
+		case 2:
+			for (int j = 0; j < gs.giraffes[i]->Stocks; ++j) {
+				DrawCoolIcon(hdc, { (2 * i + 1) * width / 2.0f + j * stockwidth - (MAX_STOCKS / 2) * stockwidth, 9 * height }, { stockwidth, stockheight });
+			}
+			break;
+		case 3:
+			for (int j = 0; j < gs.giraffes[i]->Stocks; ++j) {
+				DrawRobotIcon(hdc, { (2 * i + 1) * width / 2.0f + j * stockwidth - (MAX_STOCKS / 2) * stockwidth, 9 * height }, { stockwidth, stockheight });
+			}
+			break;
+		default:
+			for (int j = 0; j < gs.giraffes[i]->Stocks; ++j) {
+				DrawNormIcon(hdc, { (2 * i + 1) * width / 2.0f + j * stockwidth - (MAX_STOCKS / 2) * stockwidth, 9 * height }, { stockwidth, stockheight });
+			}
+			break;
+		}
+
 		gs.giraffes[i]->Draw(hdc, Scale, gs._framenumber);
 		DrawConnectState(hdc, *gs.giraffes[i], ngs.players[i]);
-		DrawGiraffeInfo(hdc, *gs.giraffes[i], i);
+		//DrawGiraffeInfo(hdc, *gs.giraffes[i], i);
 	}
 
 	DrawStage(hdc, gs.stage);
@@ -104,6 +139,8 @@ void GDIRenderer::DrawCharSelect(GameState& gs, NonGameState& ngs, HDC hdc)
 	float width = _rc.right - _rc.left;
 	float height = _rc.bottom - _rc.top;
 	
+	SelectObject(hdc, SelectedPen);
+
 	DrawNormIcon(hdc, { width / 5.0f, height / 2.0f }, { width / 5.0f, height / 3.0f });
 	DrawPoshIcon(hdc, { (2 * width) / 5.0f, height / 2.0f }, { width / 5.0f, height / 3.0f });
 	DrawCoolIcon(hdc, { (3 * width) / 5.0f, height / 2.0f }, { width / 5.0f, height / 3.0f });
@@ -205,9 +242,10 @@ void GDIRenderer::DrawGiraffeInfo(HDC hdc, Giraffe& giraffe, int i)
 
 void GDIRenderer::CreateGDIFont(HDC)
 {
+	//-12,0
 	_font = CreateFontW(
-		-12,
-		0,
+		-20,
+		-10,
 		0,
 		0,
 		0,
@@ -224,7 +262,6 @@ void GDIRenderer::CreateGDIFont(HDC)
 
 void GDIRenderer::DrawNormIcon(HDC hdc, Vector2 position, Vector2 scale)
 {
-	SelectObject(hdc, SelectedPen);
 	POINT points[6];
 	Vector2 right = { scale.x, 0 };
 	Vector2 up = { 0, -scale.y };
@@ -242,7 +279,6 @@ void GDIRenderer::DrawNormIcon(HDC hdc, Vector2 position, Vector2 scale)
 
 void GDIRenderer::DrawPoshIcon(HDC hdc, Vector2 position, Vector2 scale)
 {
-	SelectObject(hdc, SelectedPen);
 	POINT points[6];
 	Vector2 right = { scale.x, 0 };
 	Vector2 up = { 0, -scale.y };
@@ -279,7 +315,6 @@ void GDIRenderer::DrawPoshIcon(HDC hdc, Vector2 position, Vector2 scale)
 
 void GDIRenderer::DrawCoolIcon(HDC hdc, Vector2 position, Vector2 scale)
 {
-	SelectObject(hdc, SelectedPen);
 	POINT points[21];
 	Vector2 right = { scale.x, 0 };
 	Vector2 up = { 0, -scale.y };
@@ -309,7 +344,6 @@ void GDIRenderer::DrawCoolIcon(HDC hdc, Vector2 position, Vector2 scale)
 
 void GDIRenderer::DrawRobotIcon(HDC hdc, Vector2 position, Vector2 scale)
 {
-	SelectObject(hdc, SelectedPen);
 	Vector2 right = { scale.x, 0 };
 	Vector2 up = { 0, -scale.y };
 	Vector2 _scale = { 1,1 };

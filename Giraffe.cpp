@@ -687,7 +687,7 @@ void Giraffe::RecieveHits(Stage& stage, const int frameNumber)
 			else {
 				KnockbackApplied = ((((Knockback / 10 + (Knockback * IncomingHits[j].Damage / 20)) * (200 / (Mass + 100)) * 1.4f + 0.18f) * IncomingHits[j].Scale) + IncomingHits[j].Knockback);
 			}
-			Velocity += KnockbackApplied * IncomingHits[j].Force;
+			Velocity += KnockbackApplied * IncomingHits[j].Force * 0.35f;
 			if (State & STATE_LEDGEHOG) {
 				stage.Ledges[LedgeID].Hogged = false;
 				State &= ~STATE_LEDGEHOG;

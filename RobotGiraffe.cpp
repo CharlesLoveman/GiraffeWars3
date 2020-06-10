@@ -50,7 +50,7 @@ RobotGiraffe::RobotGiraffe(Vector2 _Position, COLORREF _Colour)
 	Moves->InitSpecials();
 
 	//Misc
-	Stocks = 3;
+	Stocks = MAX_STOCKS;
 	Knockback = 0;
 	Mass = 150;
 	CommandGrabPointer = 0;

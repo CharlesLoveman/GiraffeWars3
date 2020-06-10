@@ -180,6 +180,9 @@ bool GameState::ParseCharSelectInputs(int inputs[])
 			if (!selected[i]) {
 				if (inputs[i] & INPUT_LEFT) {
 					selectors[i] = (selectors[i] - 1) % 4;
+					if (selectors[i] < 0) {
+						selectors[i] += 4;
+					}
 					selectDelay[i] = _framenumber + 10;
 				}
 				else if (inputs[i] & INPUT_RIGHT) {

@@ -257,7 +257,7 @@ void GDIRenderer::CreateGDIFont(HDC)
 		CLIP_DEFAULT_PRECIS,
 		ANTIALIASED_QUALITY,
 		FF_DONTCARE | DEFAULT_PITCH,
-		L"Tahoma");
+		L"Papyrus");
 }
 
 void GDIRenderer::DrawNormIcon(HDC hdc, Vector2 position, Vector2 scale)

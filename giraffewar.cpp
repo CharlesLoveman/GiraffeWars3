@@ -345,8 +345,10 @@ void GiraffeWar_DrawCurrentFrame()
 	if (renderer != nullptr) {
 		renderer->Draw(gs, ngs);
 	}
-	if (audioPlayer != nullptr && gs.state == 0) {
-		audioPlayer->Update(gs);
+	if (audioPlayer != nullptr) {
+		if (gs.state == 0 || gs.state == 3) {
+			audioPlayer->Update(gs);
+		}
 	}
 }
 

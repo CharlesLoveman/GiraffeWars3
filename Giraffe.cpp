@@ -799,12 +799,6 @@ void Giraffe::Die(Stage& stage, const int frameNumber, std::vector<Line>& lines)
 	TechDelay = frameNumber + 60;
 
 	--Stocks;
-
-	if (Stocks > 0) {
-		SoundMoveState |= SOUND_DEATH;
-		SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_DEATH] = frameNumber + Moves->GetMoveSoundLength(XACT_WAVEBANK_MOVEBANK_DEATH);
-	}
-	else {
-		SoundMoveState = 0;
-	}
+	SoundMoveState |= SOUND_DEATH;
+	SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_DEATH] = frameNumber + Moves->GetMoveSoundLength(XACT_WAVEBANK_MOVEBANK_DEATH);
 }

@@ -20,6 +20,7 @@ GDIRenderer::GDIRenderer(HWND hwnd) :
 	GetClientRect(hwnd, &_rc);
 	CreateGDIFont(hdc);
 	CreateTitleFont(hdc);
+	CreateChecksumFont(hdc);
 	ReleaseDC(_hwnd, hdc);
 
 	Scale = { 1.0f / 54.0f * (_rc.right - _rc.left), 1.0f / 48.0f * (_rc.bottom - _rc.top) };
@@ -43,6 +44,7 @@ GDIRenderer::~GDIRenderer()
 {
 	DeleteObject(_font);
 	DeleteObject(titlefont);
+	DeleteObject(checksumfont);
 }
 
 void GDIRenderer::Draw(GameState& gs, NonGameState& ngs)
@@ -79,12 +81,12 @@ void GDIRenderer::Draw(GameState& gs, NonGameState& ngs)
 	
 
 	SetTextAlign(hdc, TA_BOTTOM | TA_CENTER);
+	SelectObject(hdc, checksumfont);
 	TextOutA(hdc, (_rc.left + _rc.right) / 2, _rc.bottom - 32, _status, (int)strlen(_status));
-
 	SetTextColor(hdc, RGB(192, 192, 192));
-	RenderChecksum(hdc, 50, ngs.periodic);
-	SetTextColor(hdc, RGB(128, 128, 128));
-	RenderChecksum(hdc, 100, ngs.now);
+	RenderChecksum(hdc, 12, ngs.periodic);
+	/*SetTextColor(hdc, RGB(128, 128, 128));
+	RenderChecksum(hdc, 50, ngs.now);*/
 
 	//SwapBuffers(hdc);//????
 	ReleaseDC(_hwnd, hdc);
@@ -92,6 +94,7 @@ void GDIRenderer::Draw(GameState& gs, NonGameState& ngs)
 
 void GDIRenderer::RenderChecksum(HDC hdc, int y, NonGameState::ChecksumInfo& info) 
 {
+	//SelectObject(hdc, checksumfont);
 	char checksum[128];
 	sprintf_s(checksum, ARRAYSIZE(checksum), "Frame: %04d  Checksum: %08x", info.framenumber, info.checksum);
 	TextOutA(hdc, (_rc.left + _rc.right) / 2, _rc.top + y, checksum, (int)strlen(checksum));
@@ -108,7 +111,11 @@ void GDIRenderer::DrawGameLoop(GameState& gs, NonGameState& ngs, HDC hdc)
 	float boxwidth = (_rc.right - _rc.left) / (GGPO_MAX_PLAYERS + 1);
 	float stockwidth = boxwidth / (MAX_STOCKS + 1);
 	float stockheight = height / 2.0f;
+
+
 	SetTextAlign(hdc, TA_TOP | TA_CENTER);
+	SelectObject(hdc, _font);
+
 	for (int i = 0; i < gs._num_giraffes; ++i) {
 		SetTextColor(hdc, _giraffeColours[i]);
 		SelectObject(hdc, _giraffePens[i]);
@@ -372,6 +379,25 @@ void GDIRenderer::CreateTitleFont(HDC hdc)
 		ANTIALIASED_QUALITY,
 		FF_DONTCARE | DEFAULT_PITCH,
 		L"Jokerman");
+}
+
+void GDIRenderer::CreateChecksumFont(HDC hdc)
+{
+	checksumfont = CreateFontW(
+		-12,
+		0,
+		0,
+		0,
+		0,
+		FALSE,
+		FALSE,
+		FALSE,
+		ANSI_CHARSET,
+		OUT_TT_PRECIS,
+		CLIP_DEFAULT_PRECIS,
+		ANTIALIASED_QUALITY,
+		FF_DONTCARE | DEFAULT_PITCH,
+		L"Consolas");
 }
 
 void GDIRenderer::DrawNormIcon(HDC hdc, Vector2 position, Vector2 scale)

@@ -27,6 +27,7 @@ protected:
 	void DrawGiraffeInfo(HDC hdc, Giraffe& giraffe, int i);
 	void CreateGDIFont(HDC hdc);
 	void CreateTitleFont(HDC hdc);
+	void CreateChecksumFont(HDC hdc);
 
 	void DrawNormIcon(HDC hdc, Vector2 position, Vector2 scale);
 	void DrawPoshIcon(HDC hdc, Vector2 position, Vector2 scale);
@@ -36,6 +37,7 @@ protected:
 	Vector2 Scale;
 	HFONT _font;
 	HFONT titlefont;
+	HFONT checksumfont;
 	HWND _hwnd;
 	RECT _rc;
 	HGLRC _hrc;

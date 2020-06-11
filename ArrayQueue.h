@@ -1,6 +1,7 @@
 #ifndef _ARRAYQUEUE_H_
 #define _ARRAYQUEUE_H_
 
+#include <cstring>
 constexpr int ARRAYQUEUELENGTH = 12;
 
 template <class T>
@@ -9,9 +10,7 @@ public:
 	ArrayQueue()
 	{
 		head = 0;
-		for (int i = 0; i < ARRAYQUEUELENGTH; ++i) {
-			data[i] = 0;
-		}
+		memset(data, 0, sizeof(data));
 	}
 	void Push(T x)
 	{

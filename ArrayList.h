@@ -1,6 +1,8 @@
 #ifndef _ARRAYLIST_H_
 #define _ARRAYLIST_H_
 
+#include <cstring>
+
 constexpr int ARRAYLISTLENGTH = 12;
 
 template <class T>
@@ -9,6 +11,7 @@ public:
 	ArrayList()
 	{
 		head = -1;
+		memset(data, 0, sizeof(data));
 	}
 	void Append(T x)
 	{

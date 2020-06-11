@@ -1,4 +1,5 @@
 #include "Projectile.h"
+#include "giraffewar.h"
 
 Projectile::Projectile()
 {
@@ -36,4 +37,9 @@ Projectile::Projectile(Vector2 Pos, Vector2 Vel, float Rad, Vector2 Frc, float D
 	Draw = _Draw;
 	Pen = _Pen;
 	Brush = _Brush;
+}
+
+int Projectile::Checksum()
+{
+	return fletcher32_checksum((short*)&Position, (size_t)((size_t)&LifeSpan - (size_t)&Position) / 2);
 }

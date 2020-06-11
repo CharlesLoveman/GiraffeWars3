@@ -27,6 +27,7 @@ void GiraffeWar_RunFrame(HWND hwnd);
 void GiraffeWar_Idle(int time);
 void GiraffeWar_DisconnectPlayer(int player);
 void GiraffeWar_Exit();
+int fletcher32_checksum(short* data, size_t len);
 
 #define ARRAY_SIZE(n) (sizeof(n)/sizeof(n[0]))
 #define FRAME_DELAY	2

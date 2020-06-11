@@ -63,6 +63,16 @@ POINT Giraffe::VecToPoint(Vector2 vec, Vector2 scale)
 	return { (int)(vec.x * scale.x), (int)(vec.y * scale.y) };
 }
 
+
+int Giraffe::Checksum()
+{
+	int checksum = fletcher32_checksum((short*)&Position, (size_t)(((size_t)&AnimFrame + 4 - (size_t)&Position)) / 2);
+	for (int i = 0; i < Projectiles.Size(); ++i) {
+		checksum += Projectiles[i].Checksum();
+	}
+	return checksum;
+}
+
 void Giraffe::Update(std::array<Giraffe*, GGPO_MAX_PLAYERS> giraffes, const int num_giraffes, const int i, const int inputs, const int frameNumber, Stage& stage)
 {
 	++AnimFrame;

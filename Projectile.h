@@ -22,6 +22,7 @@ public:
 	ProjectileDraw Draw;
 	HPEN Pen;
 	HBRUSH Brush;
+	int Checksum();
 };
 
 #endif // !_PROJECTILE_H_

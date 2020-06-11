@@ -81,10 +81,10 @@ void GDIRenderer::Draw(GameState& gs, NonGameState& ngs)
 	SetTextAlign(hdc, TA_BOTTOM | TA_CENTER);
 	TextOutA(hdc, (_rc.left + _rc.right) / 2, _rc.bottom - 32, _status, (int)strlen(_status));
 
-	/*SetTextColor(hdc, RGB(192, 192, 192));
-	RenderChecksum(hdc, 40, ngs.periodic);
+	SetTextColor(hdc, RGB(192, 192, 192));
+	RenderChecksum(hdc, 50, ngs.periodic);
 	SetTextColor(hdc, RGB(128, 128, 128));
-	RenderChecksum(hdc, 56, ngs.now);*/
+	RenderChecksum(hdc, 100, ngs.now);
 
 	//SwapBuffers(hdc);//????
 	ReleaseDC(_hwnd, hdc);

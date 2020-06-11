@@ -151,13 +151,15 @@ bool __cdecl gw_save_game_state_callback(unsigned char** buffer, int* len, int* 
 
 		memcpy(*buffer, &gs, *len);
 		giraffeSize = 0;
+		*checksum = 0;
 		for (int i = 0; i < gs._num_giraffes; ++i) {
 			memcpy(*buffer + gsSize + giraffeSize, gs.giraffes[i], gs.giraffes[i]->Size());
 			giraffeSize += gs.giraffes[i]->Size();
+			*checksum += gs.giraffes[i]->Checksum();
 		}
 		memcpy(*buffer + gsSize + giraffeSize, gs.stage.Ledges.data(), ledgeSize);
 
-		*checksum = fletcher32_checksum((short*)buffer, *len / 2);
+		//*checksum = fletcher32_checksum((short*)buffer, *len / 2);
 	}
 	else {
 		int gsSize = sizeof(gs);
@@ -219,21 +221,6 @@ void GiraffeWar_Init(HWND hwnd, unsigned short localport, GGPOPlayer* players, i
 	GGPOErrorCode result;
 	renderer = new GDIRenderer(hwnd);
 	audioPlayer = new AudioPlayer();
-	
-
-	/*MoveSets[0] = new NormMoveSet();
-	MoveSets[1] = new RobotMoveSet();
-	MoveSets[2] = new CoolMoveSet();
-	MoveSets[3] = new PoshMoveSet();
-
-	for (int i = 0; i < 4; ++i) {
-		MoveSets[i]->InitMoves();
-		MoveSets[i]->InitThrows();
-		MoveSets[i]->InitTilts();
-		MoveSets[i]->InitSmashes();
-		MoveSets[i]->InitAerials();
-		MoveSets[i]->InitSpecials();
-	}*/
 
 	//Initialize the game state
 	gs.Init(hwnd, num_players);
@@ -297,10 +284,6 @@ void GiraffeWar_InitSpectator(HWND hwnd, unsigned short localport, int num_playe
 	renderer = new GDIRenderer(hwnd);
 	audioPlayer = new AudioPlayer();
 
-	/*MoveSets[0] = new NormMoveSet();
-	MoveSets[1] = new RobotMoveSet();
-	MoveSets[2] = new CoolMoveSet();*/
-
 	//Initialize the game state
 	gs.Init(hwnd, num_players);
 
@@ -360,7 +343,16 @@ void GiraffeWar_AdvanceFrame(int inputs[], int disconnect_flags)
 
 	//update the checksums
 	ngs.now.framenumber = gs._framenumber;
-	ngs.now.checksum = fletcher32_checksum((short*)&gs, sizeof(gs) / 2);
+	if (gs.state == 0) {
+		ngs.now.checksum = 0;
+		for (int i = 0; i < gs._num_giraffes; ++i) {
+			ngs.now.checksum += gs.giraffes[i]->Checksum();
+		}
+	}
+	else {
+		ngs.now.checksum = fletcher32_checksum((short*)&gs, sizeof(gs) / 2);
+	}
+
 	if ((gs._framenumber % 90) == 0) {
 		ngs.periodic = ngs.now;
 	}

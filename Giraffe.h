@@ -111,23 +111,22 @@ public:
 	static POINT VecToPoint(Vector2 vec, Vector2 scale);
 
 	virtual int Size() = 0;
-
-	Vector2 Position;
-	Vector2 Velocity;
-	int State;
-	int SoundMoveState;
-	int SoundAttackState;
-	int SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_ENTRY_COUNT];
-	int SoundAttackDelay[XACT_WAVEBANK_ATTACKBANK_ENTRY_COUNT];
-	const std::array<HurtCollider, 6>* Hurtboxes;
-	const std::vector<HitCollider>* Hitboxes;
-	float Knockback;
-	int Stocks;
+	virtual int Checksum();
 
 	friend struct NormProjFuncs;
 	friend struct RobotProjFuncs;
 	friend struct CoolProjFuncs;
 	friend struct PoshProjFuncs;
+
+	Vector2 Position;	//8
+	Vector2 Velocity;	//8
+	int State;			//4
+	int SoundMoveState;	//4
+	int SoundAttackState;//4
+	int SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_ENTRY_COUNT];//60
+	int SoundAttackDelay[XACT_WAVEBANK_ATTACKBANK_ENTRY_COUNT];//100
+	float Knockback;	//4
+	int Stocks;			//4
 
 protected:
 	virtual void UniqueChanges(std::array<Giraffe*, GGPO_MAX_PLAYERS> giraffes, const int num_giraffes, const int i, const int inputs, const int frameNumber, Stage& stage) = 0;
@@ -150,25 +149,25 @@ protected:
 	virtual void Die(Stage& stage, const int frameNumber, std::vector<Line>& lines);
 	//Movement
 	
-	float MaxGroundSpeed;
-	Vector2 MaxAirSpeed;
-	float RunAccel;
-	float AirAccel;
-	float Gravity;
-	Vector2 Facing;
+	float MaxGroundSpeed;	//4
+	Vector2 MaxAirSpeed;	//8
+	float RunAccel;			//4
+	float AirAccel;			//4
+	float Gravity;			//4
+	Vector2 Facing;			//8
 
 	//Jumping
-	bool HasDoubleJump;
-	float JumpSpeed;
+	bool HasDoubleJump;		//1
+	float JumpSpeed;		//4
 
 	//Air Dash
-	bool HasAirDash;
-	float DashSpeed;
+	bool HasAirDash;		//1
+	float DashSpeed;		//4
 
 	//Misc
 	float Mass;
 	int LedgeID;
-	ArrayList<Projectile> Projectiles;
+	
 
 
 	//State Management
@@ -178,7 +177,6 @@ protected:
 	int MaxJumpDelay;
 	int MaxShieldDelay;
 	int AttackNum;
-	MoveSet* Moves;
 
 	//Collision
 	Collider Fullbody;
@@ -195,6 +193,12 @@ protected:
 
 	//Animation
 	int AnimFrame;
+
+	ArrayList<Projectile> Projectiles;
+	//Pointers
+	MoveSet* Moves;
+	const std::array<HurtCollider, 6>* Hurtboxes;
+	const std::vector<HitCollider>* Hitboxes;
 	HPEN GiraffePen;
 	HPEN IntangiblePen;
 	HBRUSH ShieldBrush;

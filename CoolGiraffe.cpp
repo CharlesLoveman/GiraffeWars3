@@ -271,14 +271,15 @@ void CoolGiraffe::DrawHitbox(HDC hdc, Vector2 Scale, Vector2 Pos, float Rad)
 
 void CoolGiraffe::Landing(Stage& stage, const int frameNumber, std::array<Giraffe*, GGPO_MAX_PLAYERS> giraffes)
 {
-	SoundMoveState |= SOUND_JUMPLAND;
-	SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_JUMPLAND] = frameNumber + Moves->GetMoveSoundLength(XACT_WAVEBANK_MOVEBANK_JUMPLAND);
+	
 	if ((State & STATE_HEAVY) && !(State & (STATE_FORWARD | STATE_UP | STATE_BACK))) {
 		//State &= ~STATE_JUMPING;
 		HasAirDash = true;
 		HasDoubleJump = false;
 	}
 	else {
+		SoundMoveState |= SOUND_JUMPLAND;
+		SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_JUMPLAND] = frameNumber + Moves->GetMoveSoundLength(XACT_WAVEBANK_MOVEBANK_JUMPLAND);
 		if (State & STATE_HITSTUN && !(State & STATE_TECHATTEMPT)) {
 			if (Velocity.x > 0) {
 				Facing.x = -1;

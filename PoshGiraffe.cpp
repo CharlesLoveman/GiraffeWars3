@@ -444,8 +444,6 @@ void PoshGiraffe::RecieveHits(Stage& stage, const int frameNumber)
 
 void PoshGiraffe::Landing(Stage& stage, const int frameNumber, std::array<Giraffe*, GGPO_MAX_PLAYERS> giraffes)
 {
-	SoundMoveState |= SOUND_JUMPLAND;
-	SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_JUMPLAND] = frameNumber + Moves->GetMoveSoundLength(XACT_WAVEBANK_MOVEBANK_JUMPLAND);
 	if ((State & STATE_HEAVY) && (State & STATE_DOWN)) {
 		//State &= ~STATE_JUMPING;
 		Velocity.x = 0;
@@ -453,6 +451,8 @@ void PoshGiraffe::Landing(Stage& stage, const int frameNumber, std::array<Giraff
 		HasDoubleJump = false;
 	}
 	else {
+		SoundMoveState |= SOUND_JUMPLAND;
+		SoundMoveDelay[XACT_WAVEBANK_MOVEBANK_JUMPLAND] = frameNumber + Moves->GetMoveSoundLength(XACT_WAVEBANK_MOVEBANK_JUMPLAND);
 		if (State & STATE_HITSTUN && !(State & STATE_TECHATTEMPT)) {
 			if (Velocity.x > 0) {
 				Facing.x = -1;

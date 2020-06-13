@@ -111,7 +111,7 @@ void PoshGiraffe::UniqueChanges(std::array<Giraffe*, GGPO_MAX_PLAYERS> giraffes,
 			ChangeHat();
 		}
 
-		else if (STATE_JUMPING && State & STATE_UP) {
+		else if (State & STATE_JUMPING && State & STATE_UP) {
 			if (AnimFrame == 0) {
 				Velocity.y = 0;
 			}

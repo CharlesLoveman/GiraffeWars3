@@ -79,11 +79,6 @@ void AudioPlayer::AddGiraffeBank(int ID)
 	for (int i = 0; i < XACT_WAVEBANK_ATTACKBANK_ENTRY_COUNT; ++i) {
 		soundAttackInstances.back().push_back(attackBanks.back()->CreateInstance(i));
 	}
-	if (ID == 3) {
-		for (int i = XACT_WAVEBANK_ATTACKBANK_ENTRY_COUNT; i < XACT_WAVEBANK_ATTACKBANK_ENTRY_COUNT + 2; ++i) {
-			soundAttackInstances.back().push_back(attackBanks.back()->CreateInstance(i));
-		}
-	}
 }
 
 void AudioPlayer::Clear()

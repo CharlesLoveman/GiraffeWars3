@@ -12,6 +12,7 @@
 
 using namespace DirectX::SimpleMath;
 
+constexpr int SELECT_DELAY = 20;
 
 extern GGPOSession* ggpo;
 
@@ -63,7 +64,7 @@ void GameState::Update(int inputs[], int disconnect_flags, AudioPlayer& audioPla
 					giraffes[i]->Position = { (stage.Box.left + stage.Box.right) / 2.0f, 30 };
 					giraffes[i]->SoundAttackState = 0;
 					giraffes[i]->SoundMoveState = 0;
-					selectDelay[i] = _framenumber + 30;
+					selectDelay[i] = _framenumber + SELECT_DELAY;
 				}
 				state = 3;
 				break;
@@ -107,7 +108,7 @@ void GameState::Update(int inputs[], int disconnect_flags, AudioPlayer& audioPla
 		if (Finished) {
 			state = 4;
 			for (int i = 0; i < _num_giraffes; ++i) {
-				selectDelay[i] = _framenumber + 30;
+				selectDelay[i] = _framenumber + SELECT_DELAY;
 			}
 		}
 		break;
@@ -127,7 +128,7 @@ void GameState::Update(int inputs[], int disconnect_flags, AudioPlayer& audioPla
 			for (int i = 0; i < _num_giraffes; ++i) {
 				delete giraffes[i];
 				selected[i] = false;
-				selectDelay[i] = _framenumber + 30;
+				selectDelay[i] = _framenumber + SELECT_DELAY;
 			}
 		}
 		break;
@@ -139,7 +140,7 @@ void GameState::Update(int inputs[], int disconnect_flags, AudioPlayer& audioPla
 			if (_framenumber >= selectDelay[i]) {
 				if (inputs[i] & INPUT_WEAK) {
 					state = 1;
-					selectDelay[i] = _framenumber + 30;
+					selectDelay[i] = _framenumber + SELECT_DELAY;
 					CreateStage();
 					break;
 				}

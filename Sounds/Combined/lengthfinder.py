@@ -29,11 +29,13 @@ def main(argv):
 
     for name in filenames:
         name = name.rstrip()
+        outputf.write("{");
         with contextlib.closing(wave.open(name, 'r')) as f:
             frames = f.getnframes()
             rate = f.getframerate()
             duration = int((frames / float(rate)) * 60)
-            outputf.write("#define TESTBANK_" + name.upper()[:name.find('.')] + "_LENGTH " + str(duration) + "\n")
+            outputf.write(str(duration) + ",")
+        outputf.write("};");
 
     outputf.close()
 

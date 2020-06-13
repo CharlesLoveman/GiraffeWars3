@@ -48,6 +48,8 @@ struct RobotProjFuncs {
 	static void MissileOnHit(Projectile& self, Giraffe& parent, Giraffe* collided, int frameNumber) {
 		//Add explosion projectile to parent
 		parent.Projectiles.Append(Projectile(self.Position, Vector2::Zero, 0, Vector2::Zero, 0, 0, 0, 0, self.ID, frameNumber + 20, StandardOnHit, StandardUpdate, M_ExplosionDraw, CreatePen(PS_SOLID, 1, RGB(230, 128, 40)), self.Brush));
+		parent.SoundAttackState |= SOUND_SPECIAL2;
+		parent.SoundAttackDelay[XACT_WAVEBANK_ATTACKBANK_SPECIAL2] = frameNumber + parent.Moves->GetAttackSoundLength(XACT_WAVEBANK_ATTACKBANK_SPECIAL2);
 	}
 
 	static bool MissileUpdate(Projectile& self, Giraffe& parent, int frameNumber) {
@@ -58,6 +60,8 @@ struct RobotProjFuncs {
 		self.Velocity = newVel;
 		if (frameNumber >= self.LifeSpan) {
 			parent.Projectiles.Append(Projectile(self.Position, Vector2::Zero, 0, Vector2::Zero, 0, 0, 0, 0, self.ID, frameNumber + 20, StandardOnHit, StandardUpdate, M_ExplosionDraw, CreatePen(PS_SOLID, 1, RGB(230, 128, 40)), self.Brush));
+			parent.SoundAttackState |= SOUND_SPECIAL2;
+			parent.SoundAttackDelay[XACT_WAVEBANK_ATTACKBANK_SPECIAL2] = frameNumber + parent.Moves->GetAttackSoundLength(XACT_WAVEBANK_ATTACKBANK_SPECIAL2);
 			return true;
 		}
 		else {
@@ -185,6 +189,8 @@ struct RobotProjFuncs {
 
 	static void BombOnHit(Projectile& self, Giraffe& parent, Giraffe* collided, int frameNumber) {
 		parent.Projectiles.Append(Projectile(self.Position, Vector2::Zero, 0, Vector2::Zero, 0, 0, 0, 0, self.ID, frameNumber + 20, StandardOnHit, StandardUpdate, B_ExplosionDraw, CreatePen(PS_SOLID, 1, RGB(230, 128, 40)), self.Brush));
+		parent.SoundAttackState |= SOUND_SPECIAL1;
+		parent.SoundAttackDelay[XACT_WAVEBANK_ATTACKBANK_SPECIAL1] = frameNumber + parent.Moves->GetAttackSoundLength(XACT_WAVEBANK_ATTACKBANK_SPECIAL1);
 	}
 
 	static bool BombUpdate(Projectile& self, Giraffe& parent, int frameNumber) {

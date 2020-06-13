@@ -68,6 +68,9 @@ void AudioPlayer::AddGiraffeBank(int ID)
 	case 2:
 		attackBanks.push_back(std::make_unique<WaveBank>(audEngine.get(), L"coolattackbank.xwb"));
 		break;
+	case 3:
+		attackBanks.push_back(std::make_unique<WaveBank>(audEngine.get(), L"robotattackbank.xwb"));
+		break;
 	default:
 		attackBanks.push_back(std::make_unique<WaveBank>(audEngine.get(), L"normattackbank.xwb"));
 		break;
@@ -75,6 +78,11 @@ void AudioPlayer::AddGiraffeBank(int ID)
 	soundAttackInstances.push_back({});
 	for (int i = 0; i < XACT_WAVEBANK_ATTACKBANK_ENTRY_COUNT; ++i) {
 		soundAttackInstances.back().push_back(attackBanks.back()->CreateInstance(i));
+	}
+	if (ID == 3) {
+		for (int i = XACT_WAVEBANK_ATTACKBANK_ENTRY_COUNT; i < XACT_WAVEBANK_ATTACKBANK_ENTRY_COUNT + 2; ++i) {
+			soundAttackInstances.back().push_back(attackBanks.back()->CreateInstance(i));
+		}
 	}
 }
 

@@ -95,6 +95,8 @@ enum GiraffeSoundAttackStates {
 	SOUND_WEAK = (1 << 22),
 	SOUND_MEDIUM = (1 << 23),
 	SOUND_HEAVY = (1 << 24),
+	SOUND_SPECIAL1 = (1 << 25),
+	SOUND_SPECIAL2 = (1 << 26),
 };
 
 int constexpr MAX_STOCKS = 3;

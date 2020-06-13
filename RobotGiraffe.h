@@ -4,7 +4,7 @@
 #include "Giraffe.h"
 #include "RobotMoveSet.h"
 
-constexpr int CHARGELIMIT = 1000;
+constexpr int CHARGELIMIT = 3000;
 
 enum RobotState {
 	ROBOTSTATE_BIGLASER = (1 << 0),

@@ -23,3 +23,5 @@ DownB.wav
 Weak.wav
 Medium.wav
 Heavy.wav
+BombExplosion.wav
+MissileExplosion.wav

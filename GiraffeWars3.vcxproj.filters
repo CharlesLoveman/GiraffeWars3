@@ -194,6 +194,7 @@
     <None Include="packages.config" />
     <None Include="normattackbank.xwb" />
     <None Include="poshattackbank.xwb" />
+    <None Include="coolattackbank.xwb" />
   </ItemGroup>
   <ItemGroup>
     <CopyFileToFolders Include="movebank.xwb" />

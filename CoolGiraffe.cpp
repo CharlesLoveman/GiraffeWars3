@@ -346,6 +346,7 @@ void CoolGiraffe::RecieveHits(Stage& stage, const int frameNumber)
 		else if (State & STATE_JUMPING && State & STATE_HEAVY && State & STATE_DOWN && AnimFrame >= 5 && AnimFrame <= 29) {
 			AnimFrame = 28;
 			AttackDelay = frameNumber + 30;
+			SoundAttackDelay[SOUND_DOWNB] = frameNumber + 30;
 		}
 		else {
 			for (int j = 0; j < numIncoming; ++j) {

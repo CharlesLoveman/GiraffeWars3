@@ -65,6 +65,9 @@ void AudioPlayer::AddGiraffeBank(int ID)
 	case 1:
 		attackBanks.push_back(std::make_unique<WaveBank>(audEngine.get(), L"poshattackbank.xwb"));
 		break;
+	case 2:
+		attackBanks.push_back(std::make_unique<WaveBank>(audEngine.get(), L"coolattackbank.xwb"));
+		break;
 	default:
 		attackBanks.push_back(std::make_unique<WaveBank>(audEngine.get(), L"normattackbank.xwb"));
 		break;

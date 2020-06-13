@@ -3,7 +3,7 @@
 RobotMoveSet::RobotMoveSet()
 {
 	AttackSoundLengths = { {24, 29, 32, 25, 23, 29, 9, 13, 12, 8, 14, 16, 11, 12, 12, 10, 13, 11, 21, 18, 29, 41, 23, 29, 27 } };
-	MoveSoundLengths = { {239, 17, 18, 44, 91, 38, 24, 11, 14, 18, 9, 39, 25, 30, 14} };
+	MoveSoundLengths = { {239, 17, 18, 44, 91, 38, 24, 11, 14, 18, 9, 39, 25, 338, 67} };
 }
 
 RobotMoveSet::~RobotMoveSet()

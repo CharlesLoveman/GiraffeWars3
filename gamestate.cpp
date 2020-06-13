@@ -57,18 +57,26 @@ void GameState::Update(int inputs[], int disconnect_flags, AudioPlayer& audioPla
 		}
 
 		if (alive <= 1) {
-			for (int i = 0; i < _num_giraffes; ++i) {
-				giraffes[i]->Position = { (stage.Box.left + stage.Box.right) / 2.0f, 30 };
-				giraffes[i]->SoundAttackState = 0;
-				giraffes[i]->SoundMoveState = 0;
-				selectDelay[i] = _framenumber + 30;
+			if (selectDelay[1] == -1 && _framenumber >= selectDelay[0]) {
+				for (int i = 0; i < _num_giraffes; ++i) {
+					giraffes[i]->Position = { (stage.Box.left + stage.Box.right) / 2.0f, 30 };
+					giraffes[i]->SoundAttackState = 0;
+					giraffes[i]->SoundMoveState = 0;
+					selectDelay[i] = _framenumber + 30;
+				}
+				state = 3;
+				break;
 			}
-			state = 3;
-			break;
+			else if (selectDelay[1] != -1){
+				selectDelay[0] = _framenumber + 60;
+				selectDelay[1] = -1;
+			}
 		}
 
 		for (int i = 0; i < _num_giraffes; ++i) {
-			giraffes[i]->Move(stage, _framenumber, giraffes, lines);
+			if (giraffes[i]->Stocks > 0) {
+				giraffes[i]->Move(stage, _framenumber, giraffes, lines);
+			}
 		}
 
 		for (int i = lines.size() - 1; i > 0; --i) {

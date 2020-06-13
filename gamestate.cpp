@@ -7,6 +7,7 @@
 #include "NormGiraffe.h"
 #include "PoshGiraffe.h"
 #include "SimpleMath.h"
+#include "AudioPlayer.h"
 
 
 using namespace DirectX::SimpleMath;
@@ -37,7 +38,7 @@ void GameState::Init(HWND hwnd, int num_players) {
 
 
 
-void GameState::Update(int inputs[], int disconnect_flags)
+void GameState::Update(int inputs[], int disconnect_flags, AudioPlayer& audioPlayer)
 {
 	++_framenumber;
 
@@ -82,7 +83,7 @@ void GameState::Update(int inputs[], int disconnect_flags)
 	case 1:
 	{
 		if (ParseCharSelectInputs(inputs)) {
-			CreateGiraffes();
+			CreateGiraffes(audioPlayer);
 			state = 0;
 		}
 		break;
@@ -151,7 +152,7 @@ void GameState::Update(int inputs[], int disconnect_flags)
 	}
 }
 
-void GameState::CreateGiraffes()
+void GameState::CreateGiraffes(AudioPlayer& audioPlayer)
 {
 	COLORREF _giraffeColours[4];
 	_giraffeColours[0] = RGB(255, 0, 0);
@@ -159,20 +160,25 @@ void GameState::CreateGiraffes()
 	_giraffeColours[2] = RGB(0, 0, 255);
 
 	_giraffeColours[3] = RGB(255, 255, 0);
+	audioPlayer.Clear();
 	for (int i = 0; i < _num_giraffes; ++i) {
 		switch (selectors[i])
 		{
 		case 1:
 			giraffes[i] = new PoshGiraffe(Vector2(stage.Box.left + (stage.Box.right - stage.Box.left) * (2 * i + 1) / (2.0f * _num_giraffes), 20), _giraffeColours[i]);
+			audioPlayer.AddGiraffeBank(1);
 			break;
 		case 2:
 			giraffes[i] = new CoolGiraffe(Vector2(stage.Box.left + (stage.Box.right - stage.Box.left) * (2 * i + 1) / (2.0f * _num_giraffes), 20), _giraffeColours[i]);
+			audioPlayer.AddGiraffeBank(2);
 			break;
 		case 3:
 			giraffes[i] = new RobotGiraffe(Vector2(stage.Box.left + (stage.Box.right - stage.Box.left) * (2 * i + 1) / (2.0f * _num_giraffes), 20), _giraffeColours[i]);
+			audioPlayer.AddGiraffeBank(3);
 			break;
 		default:
 			giraffes[i] = new NormGiraffe(Vector2(stage.Box.left + (stage.Box.right - stage.Box.left) * (2 * i + 1) / (2.0f * _num_giraffes), 20), _giraffeColours[i]);
+			audioPlayer.AddGiraffeBank(0);
 			break;
 		}
 	}

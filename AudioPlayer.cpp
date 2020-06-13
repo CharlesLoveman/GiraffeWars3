@@ -1,24 +1,30 @@
 #include "AudioPlayer.h"
 #include "resource.h"
 
-AudioPlayer::AudioPlayer()
+AudioPlayer::AudioPlayer(int NumGiraffes)
 {
 	AUDIO_ENGINE_FLAGS eflags = AudioEngine_Default;
 #if defined(_DEBUG)
 	eflags = eflags | AudioEngine_Debug;
 #endif
 	audEngine = std::make_unique<AudioEngine>(eflags);
-	for (int i = 0; i < 4; ++i) {
-		moveBanks[i] = std::make_unique<WaveBank>(audEngine.get(), L"movebank.xwb");
-		attackBanks[i] = std::make_unique<WaveBank>(audEngine.get(), L"attackbank.xwb");
+	for (int i = 0; i < NumGiraffes; ++i) {
+		moveBanks.push_back(std::make_unique<WaveBank>(audEngine.get(), L"movebank.xwb"));
+		soundMoveInstances.push_back({});
 		for (int j = 0; j < XACT_WAVEBANK_MOVEBANK_ENTRY_COUNT; ++j) {
-			soundMoveInstances[i][j] = moveBanks[i]->CreateInstance(j);
+			soundMoveInstances.back().push_back(moveBanks.back()->CreateInstance(j));
 		}
-		for (int j = 0; j < XACT_WAVEBANK_ATTACKBANK_ENTRY_COUNT; ++j) {
-			soundAttackInstances[i][j] = attackBanks[i]->CreateInstance(j);
-		}
-		//soundMoveInstances[i][13]->l
+		soundAttackStates.push_back(0);
+		soundMoveStates.push_back(0);
 	}
+}
+
+AudioPlayer::~AudioPlayer()
+{
+	soundAttackInstances.clear();
+	soundMoveInstances.clear();
+	attackBanks.clear();
+	moveBanks.clear();
 }
 
 void AudioPlayer::Update(GameState gs)
@@ -51,4 +57,26 @@ void AudioPlayer::Update(GameState gs)
 		}
 		soundAttackStates[i] = gs.giraffes[i]->SoundAttackState;
 	}
+}
+
+void AudioPlayer::AddGiraffeBank(int ID)
+{
+	switch(ID) {
+	case 1:
+		attackBanks.push_back(std::make_unique<WaveBank>(audEngine.get(), L"poshattackbank.xwb"));
+		break;
+	default:
+		attackBanks.push_back(std::make_unique<WaveBank>(audEngine.get(), L"normattackbank.xwb"));
+		break;
+	}
+	soundAttackInstances.push_back({});
+	for (int i = 0; i < XACT_WAVEBANK_ATTACKBANK_ENTRY_COUNT; ++i) {
+		soundAttackInstances.back().push_back(attackBanks.back()->CreateInstance(i));
+	}
+}
+
+void AudioPlayer::Clear()
+{
+	soundAttackInstances.clear();
+	attackBanks.clear();
 }

@@ -192,9 +192,10 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="packages.config" />
+    <None Include="normattackbank.xwb" />
+    <None Include="poshattackbank.xwb" />
   </ItemGroup>
   <ItemGroup>
-    <CopyFileToFolders Include="attackbank.xwb" />
     <CopyFileToFolders Include="movebank.xwb" />
   </ItemGroup>
   <ItemGroup>

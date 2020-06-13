@@ -220,7 +220,7 @@ void GiraffeWar_Init(HWND hwnd, unsigned short localport, GGPOPlayer* players, i
 {
 	GGPOErrorCode result;
 	renderer = new GDIRenderer(hwnd);
-	audioPlayer = new AudioPlayer();
+	audioPlayer = new AudioPlayer(num_players);
 
 	//Initialize the game state
 	gs.Init(hwnd, num_players);
@@ -282,7 +282,7 @@ void GiraffeWar_InitSpectator(HWND hwnd, unsigned short localport, int num_playe
 {
 	GGPOErrorCode result;
 	renderer = new GDIRenderer(hwnd);
-	audioPlayer = new AudioPlayer();
+	audioPlayer = new AudioPlayer(num_players);
 
 	//Initialize the game state
 	gs.Init(hwnd, num_players);
@@ -339,7 +339,7 @@ void GiraffeWar_DrawCurrentFrame()
 //Advances the game state by 1 frame, using the inputs given by ggpo
 void GiraffeWar_AdvanceFrame(int inputs[], int disconnect_flags)
 {
-	gs.Update(inputs, disconnect_flags);
+	gs.Update(inputs, disconnect_flags, *audioPlayer);
 
 	//update the checksums
 	ngs.now.framenumber = gs._framenumber;

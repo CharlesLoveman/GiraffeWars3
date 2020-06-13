@@ -13,11 +13,13 @@
 //Structure to be serialized at each frame
 //Needs to be small
 
+class AudioPlayer;
+
 struct GameState
 {
 public:
 	void Init(HWND hwnd, int num_players);
-	void Update(int inputs[], int disconnect_flags);
+	void Update(int inputs[], int disconnect_flags, AudioPlayer& audioPlayer);
 
 	int state;
 	int selectors[GGPO_MAX_PLAYERS + 1];
@@ -30,7 +32,7 @@ public:
 	Stage stage;
 	std::vector<Line> lines;
 private:
-	void CreateGiraffes();
+	void CreateGiraffes(AudioPlayer& audioPlayer);
 	void CreateStage();
 	bool ParseCharSelectInputs(int inputs[]);
 };

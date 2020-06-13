@@ -10,16 +10,19 @@ using namespace DirectX;
 
 class AudioPlayer {
 public:
-	AudioPlayer();
+	AudioPlayer(int NumGiraffes);
+	~AudioPlayer();
 	void Update(GameState gs);
+	void AddGiraffeBank(int ID);
+	void Clear();
 private:
 	std::unique_ptr<AudioEngine> audEngine;
-	std::array<std::unique_ptr<WaveBank>, GGPO_MAX_PLAYERS> moveBanks;
-	std::array<std::unique_ptr<WaveBank>, GGPO_MAX_PLAYERS> attackBanks;
-	std::array<std::array<std::unique_ptr<SoundEffectInstance>, XACT_WAVEBANK_MOVEBANK_ENTRY_COUNT>, GGPO_MAX_PLAYERS> soundMoveInstances;
-	std::array<std::array<std::unique_ptr<SoundEffectInstance>, XACT_WAVEBANK_ATTACKBANK_ENTRY_COUNT>, GGPO_MAX_PLAYERS> soundAttackInstances;
-	std::array<int, GGPO_MAX_PLAYERS> soundAttackStates;
-	std::array<int, GGPO_MAX_PLAYERS> soundMoveStates;
+	std::vector<std::unique_ptr<WaveBank>> moveBanks;
+	std::vector<std::unique_ptr<WaveBank>> attackBanks;
+	std::vector<std::vector<std::unique_ptr<SoundEffectInstance>>> soundMoveInstances;
+	std::vector<std::vector<std::unique_ptr<SoundEffectInstance>>> soundAttackInstances;
+	std::vector<int> soundAttackStates;
+	std::vector<int> soundMoveStates;
 };
 
 #endif // !_AUDIOPLAYER_H_

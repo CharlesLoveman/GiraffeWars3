@@ -52,6 +52,7 @@ void GameState::Update(int inputs[], int disconnect_flags, AudioPlayer& audioPla
 				giraffes[i]->Update(giraffes, _num_giraffes, i, inputs[i], _framenumber, stage);
 			}
 			else {
+				giraffes[i]->DeathUpdate(_framenumber);
 				--alive;
 			}
 		}

@@ -122,6 +122,20 @@ void Giraffe::Move(Stage& stage, const int frameNumber, std::array<Giraffe*, 4> 
 	}
 }
 
+void Giraffe::DeathUpdate(const int frameNumber)
+{
+	for (int i = 0; i < XACT_WAVEBANK_MOVEBANK_ENTRY_COUNT; ++i) {
+		if (SoundMoveState & (1 << i) && frameNumber >= SoundMoveDelay[i]) {
+			SoundMoveState &= ~(1 << i);
+		}
+	}
+	for (int i = 0; i < XACT_WAVEBANK_ATTACKBANK_ENTRY_COUNT; ++i) {
+		if (SoundAttackState & (1 << i) && frameNumber >= SoundAttackDelay[i]) {
+			SoundAttackState &= ~(1 << i);
+		}
+	}
+}
+
 void Giraffe::TransitionStates(const int frameNumber)
 {
 	//Transition States Based On Frame Number

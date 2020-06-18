@@ -192,6 +192,11 @@
     <ResourceCompile Include="Resource.rc" />
   </ItemGroup>
   <ItemGroup>
+    <CopyFileToFolders Include="GiraffeWarsTheme.wav">
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
+      <FileType>Document</FileType>
+    </CopyFileToFolders>
     <Media Include="Sounds\Hit1.wav" />
     <Media Include="Sounds\Hit2.wav" />
     <Media Include="Sounds\Jump.wav" />

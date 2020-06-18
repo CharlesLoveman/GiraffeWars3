@@ -17,6 +17,9 @@ AudioPlayer::AudioPlayer(int NumGiraffes)
 		soundAttackStates.push_back(0);
 		soundMoveStates.push_back(0);
 	}
+
+	musicEffect = std::make_unique<SoundEffect>(audEngine.get(), L"GiraffeWarsTheme.wav");
+	music = musicEffect->CreateInstance();
 }
 
 AudioPlayer::~AudioPlayer()
@@ -85,4 +88,15 @@ void AudioPlayer::Clear()
 {
 	soundAttackInstances.clear();
 	attackBanks.clear();
+	music->Stop(true);
+}
+
+void AudioPlayer::StartMusic()
+{
+	music->Play(true);
+}
+
+void AudioPlayer::StopMusic()
+{
+	music->Stop(true);
 }

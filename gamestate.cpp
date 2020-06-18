@@ -67,6 +67,7 @@ void GameState::Update(int inputs[], int disconnect_flags, AudioPlayer& audioPla
 					selectDelay[i] = _framenumber + SELECT_DELAY;
 				}
 				state = 3;
+				audioPlayer.StopMusic();
 				break;
 			}
 			else if (selectDelay[1] != -1){
@@ -192,6 +193,7 @@ void GameState::CreateGiraffes(AudioPlayer& audioPlayer)
 			break;
 		}
 	}
+	audioPlayer.StartMusic();
 }
 
 void GameState::CreateStage()

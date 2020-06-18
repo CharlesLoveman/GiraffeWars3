@@ -183,6 +183,9 @@
     <Media Include="Sounds\Hit2.wav">
       <Filter>Resource Files</Filter>
     </Media>
+    <Media Include="GiraffeWarsTheme.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
   </ItemGroup>
   <ItemGroup>
     <None Include="wave2.bin">

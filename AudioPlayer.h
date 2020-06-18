@@ -15,8 +15,7 @@ public:
 	void Update(GameState gs);
 	void AddGiraffeBank(int ID);
 	void Clear();
-	void StartMusic();
-	void StopMusic();
+	void ChangeMusic(int State);
 
 private:
 	std::unique_ptr<AudioEngine> audEngine;
@@ -27,8 +26,8 @@ private:
 	std::vector<int> soundAttackStates;
 	std::vector<int> soundMoveStates;
 
-	std::unique_ptr<SoundEffect> musicEffect;
-	std::unique_ptr<SoundEffectInstance> music;
+	std::unique_ptr<WaveBank> musicBank;
+	std::vector<std::unique_ptr<SoundEffectInstance>> musicInstances;
 };
 
 #endif // !_AUDIOPLAYER_H_

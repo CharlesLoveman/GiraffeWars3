@@ -1,5 +1,6 @@
 #include "AudioPlayer.h"
 #include "resource.h"
+#include "musicbankheader.h"
 
 AudioPlayer::AudioPlayer(int NumGiraffes)
 {
@@ -18,8 +19,11 @@ AudioPlayer::AudioPlayer(int NumGiraffes)
 		soundMoveStates.push_back(0);
 	}
 
-	musicEffect = std::make_unique<SoundEffect>(audEngine.get(), L"GiraffeWarsTheme.wav");
-	music = musicEffect->CreateInstance();
+	musicBank = std::make_unique<WaveBank>(audEngine.get(), L"musicbank.xwb");
+	for (int i = 0; i < XACT_WAVEBANK_MUSICBANK_ENTRY_COUNT; ++i) {
+		musicInstances.push_back(musicBank->CreateInstance(i));
+	}
+	musicInstances[2]->Play(true);
 }
 
 AudioPlayer::~AudioPlayer()
@@ -88,15 +92,21 @@ void AudioPlayer::Clear()
 {
 	soundAttackInstances.clear();
 	attackBanks.clear();
-	music->Stop(true);
 }
 
-void AudioPlayer::StartMusic()
+void AudioPlayer::ChangeMusic(int State)
 {
-	music->Play(true);
-}
-
-void AudioPlayer::StopMusic()
-{
-	music->Stop(true);
+	switch (State) {
+	case 0:
+		musicInstances[2]->Stop(true);
+		musicInstances[0]->Play(true);
+		break;
+	case 3:
+		musicInstances[0]->Stop(true);
+		musicInstances[1]->Play(true);
+		break;
+	default:
+		musicInstances[1]->Stop(true);
+		musicInstances[2]->Play(true);
+	}
 }

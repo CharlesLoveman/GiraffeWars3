@@ -67,7 +67,7 @@ void GameState::Update(int inputs[], int disconnect_flags, AudioPlayer& audioPla
 					selectDelay[i] = _framenumber + SELECT_DELAY;
 				}
 				state = 3;
-				audioPlayer.StopMusic();
+				audioPlayer.ChangeMusic(state);
 				break;
 			}
 			else if (selectDelay[1] != -1){
@@ -96,6 +96,7 @@ void GameState::Update(int inputs[], int disconnect_flags, AudioPlayer& audioPla
 		if (ParseCharSelectInputs(inputs)) {
 			CreateGiraffes(audioPlayer);
 			state = 0;
+			audioPlayer.ChangeMusic(state);
 		}
 		break;
 	}
@@ -126,6 +127,7 @@ void GameState::Update(int inputs[], int disconnect_flags, AudioPlayer& audioPla
 		}
 		if (Finished) {
 			state = 4;
+			audioPlayer.ChangeMusic(state);
 			for (int i = 0; i < _num_giraffes; ++i) {
 				delete giraffes[i];
 				selected[i] = false;
@@ -193,7 +195,6 @@ void GameState::CreateGiraffes(AudioPlayer& audioPlayer)
 			break;
 		}
 	}
-	audioPlayer.StartMusic();
 }
 
 void GameState::CreateStage()

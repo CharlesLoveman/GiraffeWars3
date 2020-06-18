@@ -1,0 +1,1 @@
+XWBTool.exe -o MusicBank.xwb -h MusicBankHeader.h -l -y -flist MusicFiles.txt
